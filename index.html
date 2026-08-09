@@ -1,0 +1,1175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico">
+  <title>Sketchbook Trilogies</title>
+  <style>
+    :root {
+      --ink: #05070b;
+      --paper: #bfc7dc;
+      --paper-shadow: #9fa8bd;
+      --panel: #838a9b;
+      --panel-dark: #4f5666;
+      --line: #090a0d;
+      --link: #002fff;
+      --visited: #4f1eb7;
+      --hot: #d5dbed;
+      --muted: #3f4654;
+      --tile: #8a91a1;
+      --violet: #8050e8;
+      --bevel-light: #c8cedd;
+      --bevel-dark: #4c5363;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 1px 1px, #2a2a33 1px, transparent 1.5px) 0 0 / 7px 7px,
+        #06060a;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      text-rendering: optimizeSpeed;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 1px;
+    }
+
+    a:visited {
+      color: var(--visited);
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: #000;
+      background: #b8c7ff;
+      outline: 1px dotted #111;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100vw - 18px, 980px);
+      min-height: 100vh;
+      margin: 0 auto;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border-left: 4px solid #51596b;
+      border-right: 4px solid #51596b;
+      box-shadow: 0 0 0 1px #171a22;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 188px;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 0 18px 32px 22px;
+    }
+
+    .topbar {
+      min-height: 42px;
+      display: flex;
+      align-items: start;
+      gap: 6px;
+      border-bottom: 3px double #6c758b;
+      overflow: hidden;
+    }
+
+    .brand {
+      width: 215px;
+      height: 34px;
+      object-fit: contain;
+      object-position: left center;
+      filter: contrast(1.18);
+      margin-top: 2px;
+      flex: 0 1 auto;
+    }
+
+    .nav {
+      display: flex;
+      align-items: start;
+      gap: 4px;
+      min-height: 34px;
+      padding-top: 3px;
+      font-size: 16px;
+      line-height: 1.15;
+      white-space: nowrap;
+    }
+
+    .nav p {
+      margin: 0;
+    }
+
+    .nav [hidden] {
+      display: none;
+    }
+
+    .nav span {
+      color: var(--ink);
+    }
+
+    .welcome {
+      position: relative;
+      padding: 8px 10px 27px 0;
+      border-bottom: 4px solid var(--line);
+    }
+
+    .welcome::after {
+      content: "est. 2004-ish";
+      position: absolute;
+      right: 0;
+      bottom: 6px;
+      color: #566176;
+      font: 700 11px Verdana, Arial, sans-serif;
+      letter-spacing: .03em;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 28px;
+      line-height: 1.05;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0 #e2e6f2;
+    }
+
+    .welcome p {
+      max-width: 700px;
+      font-size: 15px;
+      line-height: 1.22;
+      font-weight: 700;
+    }
+
+    .welcome p + p {
+      margin-top: 14px;
+    }
+
+    .tools {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 94px;
+      gap: 8px;
+      padding: 10px 0 13px;
+    }
+
+    .search,
+    .filter {
+      height: 25px;
+      border: 2px solid var(--panel-dark);
+      border-top-color: #3d4556;
+      border-left-color: #3d4556;
+      border-right-color: #b4bbcc;
+      border-bottom-color: #b4bbcc;
+      background: #858c9c;
+      color: #20242c;
+      padding: 0 6px;
+      min-width: 0;
+      box-shadow: none;
+    }
+
+    .search::placeholder {
+      color: #20242c;
+      opacity: 1;
+    }
+
+    .filter {
+      padding: 0 3px;
+      color: #404657;
+    }
+
+    .comics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px 20px;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      min-height: 180px;
+      padding: 12px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      font: 14px/1.25 Georgia, "Times New Roman", serif;
+    }
+
+    .empty-state.compact {
+      min-height: 0;
+      border-width: 3px;
+      padding: 7px;
+      font-size: 12px;
+    }
+
+    .comic-card,
+    .comic-card:visited {
+      min-width: 0;
+      background: var(--tile);
+      border: 4px solid #5f687d;
+      color: #111;
+      text-decoration: none;
+      display: grid;
+      grid-template-rows: auto auto;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      transition: transform .08s steps(2, end), box-shadow .08s steps(2, end);
+    }
+
+    .comic-card:hover,
+    .comic-card:focus-visible {
+      transform: translate(-1px, -1px);
+      outline: 2px dotted #111;
+      outline-offset: 2px;
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark),
+        3px 3px 0 #3e4554;
+    }
+
+    .comic-art {
+      background:
+        repeating-linear-gradient(135deg, #111 0 1px, transparent 1px 7px),
+        #000;
+      aspect-ratio: 3 / 4;
+      border-bottom: 1px solid #313644;
+    }
+
+    .comic-meta {
+      padding: 3px 4px 5px;
+      background: #8d94a5;
+      border-top: 1px solid #535b6d;
+      line-height: .86;
+    }
+
+    .comic-title {
+      display: block;
+      font-size: 21px;
+    }
+
+    .comic-author {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .comic-stats {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+      font-family: "Trebuchet MS", Verdana, Arial, sans-serif;
+    }
+
+    .sidebar {
+      min-width: 0;
+      background: #798294;
+      border-left: 2px solid #9da6bb;
+      box-shadow: inset 1px 0 0 #566076;
+      padding: 7px 10px 22px 9px;
+    }
+
+    .profile-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 48px;
+      align-items: start;
+      gap: 4px;
+    }
+
+    .username {
+      font-size: 20px;
+      line-height: 1.05;
+      text-transform: uppercase;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      min-width: 0;
+    }
+
+    .avatar {
+      width: 46px;
+      height: 46px;
+      border: 4px solid #090a0d;
+      border-radius: 50%;
+      background: #303545;
+      object-fit: cover;
+      object-position: center;
+      box-shadow: 2px 2px 0 #303545;
+    }
+
+    .profile-body {
+      display: grid;
+      gap: 10px;
+      margin-top: -7px;
+      padding-bottom: 8px;
+      border-bottom: 4px solid var(--line);
+    }
+
+    .profile-links {
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .profile-links p,
+    .stats p {
+      margin: 0;
+    }
+
+    .stats {
+      color: #424957;
+      font-size: 11px;
+      line-height: 1.14;
+      font-family: "Courier New", monospace;
+      word-break: break-all;
+    }
+
+    .stats b {
+      display: block;
+      color: #303642;
+      letter-spacing: .02em;
+    }
+
+    .auth-actions {
+      display: grid;
+      gap: 6px;
+      padding-bottom: 9px;
+      border-bottom: 4px solid var(--line);
+    }
+
+    .auth-actions button {
+      min-height: 24px;
+      border: 2px solid #111;
+      border-top-color: #c8cedd;
+      border-left-color: #c8cedd;
+      border-right-color: #4c5363;
+      border-bottom-color: #4c5363;
+      background: #969eb1;
+      color: #05070b;
+      cursor: pointer;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .auth-actions button:active {
+      border-top-color: #4c5363;
+      border-left-color: #4c5363;
+      border-right-color: #c8cedd;
+      border-bottom-color: #c8cedd;
+    }
+
+    .account-ui[hidden],
+    .auth-actions[hidden] {
+      display: none;
+    }
+
+    .account-footer {
+      padding-top: 8px;
+    }
+
+    .account-footer button {
+      min-height: 22px;
+      border: 2px solid #111;
+      border-top-color: #c8cedd;
+      border-left-color: #c8cedd;
+      border-right-color: #4c5363;
+      border-bottom-color: #4c5363;
+      background: #969eb1;
+      color: #05070b;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .account-footer button:active {
+      border-top-color: #4c5363;
+      border-left-color: #4c5363;
+      border-right-color: #c8cedd;
+      border-bottom-color: #c8cedd;
+    }
+
+    .side-section {
+      padding: 5px 0 0;
+    }
+
+    .side-section + .side-section {
+      border-top: 4px solid var(--line);
+      margin-top: 7px;
+    }
+
+    .side-section h2 {
+      font-size: 25px;
+      line-height: 1;
+      font-weight: 400;
+      margin-bottom: 5px;
+    }
+
+    .inbox-badge {
+      display: inline-block;
+      min-width: 15px;
+      padding: 0 4px;
+      margin-left: 2px;
+      border-radius: 8px;
+      background: #c25b5b;
+      color: #f4e9e9;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 15px;
+      text-align: center;
+      font-family: "Trebuchet MS", Verdana, Arial, sans-serif;
+      vertical-align: 2px;
+    }
+
+    .activity-list,
+    .news-list {
+      display: grid;
+      gap: 7px;
+      font-size: 13px;
+      line-height: 1.12;
+    }
+
+    .activity-list p,
+    .news-item p {
+      color: var(--link);
+    }
+
+    .activity-list p {
+      padding-left: 8px;
+      border-left: 2px solid rgba(5, 7, 11, .38);
+    }
+
+    .activity-list p::first-line {
+      font-weight: 700;
+    }
+
+    .view-all-link {
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    .news-item {
+      padding-bottom: 7px;
+      border-bottom: 3px solid var(--line);
+    }
+
+    .news-item strong {
+      display: block;
+      color: var(--link);
+      line-height: 1.08;
+      background: #8f98ac;
+      padding: 1px 2px;
+    }
+
+    .news-item small {
+      display: block;
+      margin-top: 4px;
+      font-size: 12px;
+    }
+
+    .footer-links {
+      margin-top: 13px;
+      font-size: 13px;
+      line-height: 1.1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .comic-card {
+        transition: none;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        width: 100%;
+        grid-template-columns: 1fr;
+        border: 0;
+        box-shadow: none;
+      }
+
+      .main {
+        padding: 0 12px 24px;
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+        min-height: auto;
+        padding-bottom: 7px;
+      }
+
+      .brand {
+        width: min(260px, 100%);
+      }
+
+      .nav {
+        width: 100%;
+        font-size: 16px;
+        min-height: 22px;
+        padding-top: 0;
+      }
+
+      .search,
+      .filter {
+        height: 44px;
+        font-size: 16px;
+      }
+
+      .comics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .sidebar {
+        border-left: 0;
+        border-top: 4px solid var(--line);
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px 18px;
+      }
+
+      .profile,
+      .footer-links {
+        grid-column: span 2;
+      }
+
+      .side-section + .side-section {
+        margin-top: 0;
+      }
+
+      .auth-actions button {
+        min-height: 44px;
+        font-size: 15px;
+      }
+
+      .account-footer button {
+        min-height: 40px;
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .tools,
+      .comics-grid,
+      .sidebar {
+        grid-template-columns: 1fr;
+      }
+
+      .profile,
+      .footer-links {
+        grid-column: auto;
+      }
+
+      .nav {
+        font-size: 15px;
+        gap: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <main class="main">
+      <header class="topbar" aria-label="Site header">
+        <img class="brand" src="Logo.png" alt="Sketchbook Trilogies">
+        <nav class="nav" aria-label="Primary navigation">
+          <p><span>|</span></p>
+          <p><a href="#home">home</a></p>
+          <p><span>-</span></p>
+          <p><a href="#about">about</a></p>
+          <p><span>-</span></p>
+          <p><a href="blog.html">blog</a></p>
+          <p data-dashboard-link hidden><span>-</span></p>
+          <p data-dashboard-link hidden><a href="dashboard.html">dashboard</a></p>
+        </nav>
+      </header>
+
+      <section class="welcome" id="home">
+        <h1>Welcome!</h1>
+        <p>Sketchbook Trilogies is a place to post, browse, and follow webcomics.</p>
+        <p>Make a profile, publish pages, collect series, and find comics from other artists.</p>
+      </section>
+
+      <form class="tools" aria-label="Find webcomics">
+        <input class="search" type="search" placeholder="Search for webcomics..." aria-label="Search for webcomics">
+        <select class="filter" aria-label="Filter webcomics">
+          <option>filter</option>
+          <option>new</option>
+          <option>popular</option>
+          <option>saved</option>
+        </select>
+      </form>
+
+      <section class="comics-grid" aria-label="Webcomic listings">
+      </section>
+    </main>
+
+    <aside class="sidebar" id="dashboard" aria-label="User dashboard">
+      <section class="profile">
+        <div class="auth-actions" id="auth-actions">
+          <button type="button" id="sign-in-button">sign in</button>
+          <button type="button" id="register-button">register</button>
+        </div>
+        <div class="account-ui" id="account-ui" hidden>
+          <div class="profile-head">
+            <h2 class="username" id="user-name">User</h2>
+            <img class="avatar" id="user-avatar" alt="User avatar" src="default-avatar.png" onerror="this.onerror=null;this.src='default-avatar.png';">
+          </div>
+          <div class="profile-body">
+            <div class="profile-links" id="profile-links">
+            </div>
+            <div class="stats" id="user-stats">
+            </div>
+          </div>
+          <div class="account-footer">
+            <button type="button" id="sign-out-button">sign out</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="side-section" aria-label="Activity">
+        <h2>Activity</h2>
+        <div class="activity-list" id="activity-list">
+        </div>
+        <p class="view-all-link"><a href="blog.html">view all activity &rarr;</a></p>
+      </section>
+
+      <section class="side-section" aria-label="Newsletter">
+        <h2>Newsletter</h2>
+        <div class="news-list" id="news-list">
+        </div>
+      </section>
+
+      <footer class="footer-links">
+        <a href="#terms">terms and conditions</a><br>
+        <a href="#privacy">privacy policy</a>
+      </footer>
+    </aside>
+  </div>
+
+  <script type="module">
+    // If this page is restored from the browser's back/forward cache (e.g.
+    // after signing in/out as a different account on another page, then
+    // hitting Back), force a fresh reload so auth-dependent UI (like
+    // "edit profile" or "account settings") re-evaluates against whoever is
+    // ACTUALLY signed in right now, instead of showing stale cached state.
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    });
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg6umXxHQ6INyc_U2AvmhF9blhQ5ZEtT8",
+      authDomain: "sketchbook-trilogies.firebaseapp.com",
+      projectId: "sketchbook-trilogies",
+      storageBucket: "sketchbook-trilogies.firebasestorage.app",
+      messagingSenderId: "564902002463",
+      appId: "1:564902002463:web:7dc95e5e857e19b959fa2a",
+      measurementId: "G-Q08PSQDHMH",
+    };
+
+    const sampleAvatar = "default-avatar.png";
+
+    const firebaseCollections = {
+      comics: "webcomics",
+      posts: "posts",
+      newsletter: "newsletter",
+    };
+
+    const firebaseOptions = {
+      // Gates the public newsletter feed only (unbuilt/experimental). Posts,
+      // published webcomics, and the signed-in user's own profile doc are
+      // always fetched (see below).
+      enablePublicFirestoreReads: false,
+    };
+
+    const appState = {
+      user: null,
+      comics: [],
+      activity: [],
+      newsletter: [],
+    };
+
+    const comicsGrid = document.querySelector(".comics-grid");
+    const searchInput = document.querySelector(".search");
+    const filterSelect = document.querySelector(".filter");
+    const userName = document.querySelector("#user-name");
+    const userAvatar = document.querySelector("#user-avatar");
+    const accountUi = document.querySelector("#account-ui");
+    const authActions = document.querySelector("#auth-actions");
+    const signInButton = document.querySelector("#sign-in-button");
+    const registerButton = document.querySelector("#register-button");
+    const signOutButton = document.querySelector("#sign-out-button");
+    const dashboardLinks = document.querySelectorAll("[data-dashboard-link]");
+    const profileLinks = document.querySelector("#profile-links");
+    const userStats = document.querySelector("#user-stats");
+    const activityList = document.querySelector("#activity-list");
+    const newsList = document.querySelector("#news-list");
+
+    const firebaseIsConfigured = Object.entries(firebaseConfig)
+      .filter(([key]) => !["storageBucket", "messagingSenderId", "measurementId"].includes(key))
+      .every(([, value]) => value.trim().length > 0);
+
+    function renderEmpty(container, message, compact = false) {
+      container.innerHTML = "";
+      const empty = document.createElement("p");
+      empty.className = compact ? "empty-state compact" : "empty-state";
+      empty.textContent = message;
+      container.append(empty);
+    }
+
+    // Comic cards and post previews store the author's display name at the
+    // time they were made; we prefer showing their CURRENT username (or
+    // display name if no username is set) instead, fetched live and cached
+    // per uid since it isn't kept in sync on the comic/post itself.
+    const authorNameCache = new Map();
+
+    function syncAuthorName(el, uid, db, firestore, prefix = "") {
+      if (!uid || !db || !firestore) return;
+
+      if (authorNameCache.has(uid)) {
+        const name = authorNameCache.get(uid);
+        if (name) el.textContent = prefix + name;
+        return;
+      }
+
+      firestore.getDoc(firestore.doc(db, "users", uid)).then((snap) => {
+        let name = null;
+        if (snap.exists()) {
+          const data = snap.data();
+          name = data.username ? `@${data.username}` : (data.displayName || null);
+        }
+        authorNameCache.set(uid, name);
+        if (name) el.textContent = prefix + name;
+      }).catch(() => {
+        authorNameCache.set(uid, null);
+      });
+    }
+
+    function renderComics(comics, db = null, firestore = null, comicStats = null) {
+      comicsGrid.innerHTML = "";
+
+      if (!comics.length) {
+        renderEmpty(comicsGrid, "No webcomics to show.");
+        return;
+      }
+
+      comics.forEach((comic) => {
+        const card = document.createElement("a");
+        card.className = "comic-card";
+        card.href = `webcomic-view.html?id=${encodeURIComponent(comic.id || "")}`;
+
+        const art = document.createElement("div");
+        art.className = "comic-art";
+        art.setAttribute("aria-hidden", "true");
+        if (comic.coverImage) {
+          art.style.backgroundImage = `url("${comic.coverImage}")`;
+          art.style.backgroundSize = "cover";
+          art.style.backgroundPosition = "center";
+        }
+
+        const meta = document.createElement("div");
+        meta.className = "comic-meta";
+        const title = document.createElement("span");
+        title.className = "comic-title";
+        title.textContent = comic.title || "Untitled";
+        const author = document.createElement("span");
+        author.className = "comic-author";
+        author.textContent = `by ${comic.authorName || "someone"}`;
+        syncAuthorName(author, comic.authorUid, db, firestore, "by ");
+        const stats = document.createElement("span");
+        stats.className = "comic-stats";
+        const s = (comicStats && comicStats.get(comic.id)) || { reads: 0, hearts: 0, saves: 0 };
+        stats.textContent = `${s.reads} reads, ${s.hearts} hearts, ${s.saves} saves`;
+        meta.append(title, author, stats);
+
+        card.append(art, meta);
+        comicsGrid.append(card);
+      });
+    }
+
+    let unreadNotifCount = 0;
+    let lastRenderedUser = null;
+
+    function renderUser(user) {
+      lastRenderedUser = user;
+      profileLinks.innerHTML = "";
+      userStats.innerHTML = "";
+      dashboardLinks.forEach((link) => {
+        link.hidden = !user;
+      });
+
+      if (!user) {
+        accountUi.hidden = true;
+        authActions.hidden = false;
+        return;
+      }
+
+      authActions.hidden = true;
+      accountUi.hidden = false;
+      userName.textContent = user.name;
+      userAvatar.src = user.photoURL || sampleAvatar;
+      const profileHref = `profile.html?uid=${encodeURIComponent(user.uid)}`;
+      const inboxBadge = unreadNotifCount > 0
+        ? ` <span class="inbox-badge">${unreadNotifCount > 99 ? "99+" : unreadNotifCount}</span>`
+        : "";
+      profileLinks.innerHTML = `
+        <p><a href="${profileHref}">view your profile</a></p>
+        <p><a href="blog.html?uid=${encodeURIComponent(user.uid)}">my posts</a></p>
+        <p><a href="library.html">library</a></p>
+        <p><a href="settings.html">settings</a></p>
+        <p><a href="inbox.html">inbox</a>${inboxBadge}</p>
+        <p><a href="dms.html">DMs</a></p>
+      `;
+      userStats.innerHTML = `
+        <p><b>STATS:</b></p>
+        <p>${user.followers} followers</p>
+        <p>${user.following} following</p>
+        <p>${user.webcomics} webcomics</p>
+        <p>${user.posts} posts</p>
+        <p>${user.likes} total likes</p>
+        <p><b>UID:</b> ${user.uid}</p>
+      `;
+    }
+
+    function renderActivity(posts, db = null, firestore = null) {
+      activityList.innerHTML = "";
+
+      if (!posts.length) {
+        renderEmpty(activityList, "No activity yet.", true);
+        return;
+      }
+
+      posts.forEach((post) => {
+        const entry = document.createElement("p");
+
+        const authorLink = document.createElement("a");
+        authorLink.href = `profile.html?uid=${encodeURIComponent(post.authorUid || "")}`;
+        authorLink.textContent = post.authorName || "Someone";
+        syncAuthorName(authorLink, post.authorUid, db, firestore);
+
+        const rawSnippet = (post.text || "").trim() || (post.imageURL ? "shared an image" : "posted");
+        const snippet = rawSnippet.length > 70 ? `${rawSnippet.slice(0, 70)}\u2026` : rawSnippet;
+
+        entry.append(authorLink, document.createTextNode(`: ${snippet}`));
+        activityList.append(entry);
+      });
+    }
+
+    function renderNewsletter(newsletter) {
+      newsList.innerHTML = "";
+
+      if (!newsletter.length) {
+        renderEmpty(newsList, "No newsletter posts yet.", true);
+        return;
+      }
+
+      newsletter.forEach((item) => {
+        const entry = document.createElement("article");
+        entry.className = "news-item";
+        entry.innerHTML = "<strong></strong><small></small>";
+        entry.querySelector("strong").textContent = item.title;
+        entry.querySelector("small").textContent = item.meta;
+        newsList.append(entry);
+      });
+    }
+
+    async function loadRecentPosts(db, firestore, max) {
+      const postsQuery = firestore.query(
+        firestore.collection(db, firebaseCollections.posts),
+        firestore.orderBy("createdAt", "desc"),
+        firestore.limit(max),
+      );
+      const snapshot = await firestore.getDocs(postsQuery);
+      return snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+    }
+
+    async function loadPublishedComics(db, firestore, max) {
+      // Equality-only filter (no orderBy combined in the same query) so this
+      // doesn't require a composite Firestore index; sort client-side instead.
+      const comicsQuery = firestore.query(
+        firestore.collection(db, firebaseCollections.comics),
+        firestore.where("status", "==", "published"),
+        firestore.limit(max),
+      );
+      const snapshot = await firestore.getDocs(comicsQuery);
+      const comics = snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+      const toMillis = (t) => (t && typeof t.toMillis === "function" ? t.toMillis() : 0);
+      comics.sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
+      return comics;
+    }
+
+    // Hearts/saves/reads aren't counter fields on the webcomic doc (nobody
+    // but a webcomic's own author can write that doc — see firestore.rules).
+    // Each is a one-doc-per-user subcollection instead, so the count is the
+    // size of that subcollection. We fetch all three, for every comic on
+    // the page, once up front so search/sort/filter can run instantly
+    // against the results afterward without re-querying Firestore.
+    async function loadComicStats(db, firestore, comics) {
+      const statsMap = new Map();
+      await Promise.all(comics.map(async (comic) => {
+        try {
+          const [heartsSnap, savesSnap, viewsSnap] = await Promise.all([
+            firestore.getDocs(firestore.collection(db, "webcomics", comic.id, "hearts")),
+            firestore.getDocs(firestore.collection(db, "webcomics", comic.id, "saves")),
+            firestore.getDocs(firestore.collection(db, "webcomics", comic.id, "views")),
+          ]);
+          statsMap.set(comic.id, {
+            hearts: heartsSnap.size,
+            saves: savesSnap.size,
+            reads: viewsSnap.size,
+            savedByUids: new Set(savesSnap.docs.map((d) => d.id)),
+          });
+        } catch (error) {
+          statsMap.set(comic.id, { hearts: 0, saves: 0, reads: 0, savedByUids: new Set() });
+        }
+      }));
+      return statsMap;
+    }
+
+    async function loadPublicCollections(db, firestore) {
+      const newsletterSnapshot = await firestore.getDocs(firestore.collection(db, firebaseCollections.newsletter));
+      return {
+        newsletter: newsletterSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })),
+      };
+    }
+
+    async function loadFirebase() {
+      if (!firebaseIsConfigured) {
+        return appState;
+      }
+
+      const [{ initializeApp }, { getAuth, onAuthStateChanged, signOut }, analytics] = await Promise.all([
+        import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js"),
+        import("https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js"),
+      ]);
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      signOutButton.addEventListener("click", () => {
+        signOut(auth).catch((error) => console.error(error));
+      });
+
+      if (await analytics.isSupported()) {
+        analytics.getAnalytics(app);
+      }
+
+      onAuthStateChanged(auth, async (firebaseUser) => {
+        browseState.currentUid = firebaseUser ? firebaseUser.uid : null;
+        applyBrowseFilters();
+
+        if (!firebaseUser) {
+          unreadNotifCount = 0;
+          renderUser(null);
+          return;
+        }
+
+        const baseUser = {
+          uid: firebaseUser.uid,
+          name: firebaseUser.displayName || firebaseUser.email || "User",
+          photoURL: firebaseUser.photoURL,
+          followers: 0,
+          following: 0,
+          webcomics: 0,
+          posts: 0,
+          likes: 0,
+        };
+
+        renderUser(baseUser);
+
+        // The signed-in user's own profile doc is always fetched: it's the
+        // source of truth for avatar/bio/stats (uploaded avatars in particular
+        // live only here, not on the Firebase Auth user record).
+        try {
+          const firestore = await import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js");
+          const db = firestore.getFirestore(app);
+          const userSnap = await firestore.getDoc(firestore.doc(db, "users", firebaseUser.uid));
+
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+            renderUser({
+              ...baseUser,
+              name: data.displayName || baseUser.name,
+              photoURL: data.photoURL || baseUser.photoURL,
+              followers: data.followers ?? 0,
+              following: data.following ?? 0,
+              webcomics: data.webcomics ?? 0,
+              posts: data.posts ?? 0,
+              likes: data.likes ?? 0,
+            });
+          } else {
+            await firestore.setDoc(firestore.doc(db, "users", firebaseUser.uid), {
+              uid: firebaseUser.uid,
+              displayName: baseUser.name,
+              email: firebaseUser.email || null,
+              photoURL: firebaseUser.photoURL || null,
+              bio: "",
+              followers: 0,
+              following: 0,
+              webcomics: 0,
+              posts: 0,
+              likes: 0,
+              createdAt: firestore.serverTimestamp(),
+            });
+          }
+        } catch (error) {
+          console.error("Could not load user profile document:", error);
+        }
+
+        // Unread inbox count for the sidebar badge — best-effort, not
+        // critical if it fails, and shouldn't block the rest of the sidebar.
+        try {
+          const firestore = await import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js");
+          const db = firestore.getFirestore(app);
+          const unreadQuery = firestore.query(
+            firestore.collection(db, "users", firebaseUser.uid, "notifications"),
+            firestore.where("read", "==", false),
+            firestore.limit(100),
+          );
+          const unreadSnap = await firestore.getDocs(unreadQuery);
+          unreadNotifCount = unreadSnap.size;
+        } catch (error) {
+          console.error("Could not load unread notification count:", error);
+          unreadNotifCount = 0;
+        }
+        renderUser(lastRenderedUser);
+      });
+
+      const firestore = await import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js");
+      const db = firestore.getFirestore(app);
+
+      let activity = [];
+      try {
+        activity = await loadRecentPosts(db, firestore, 5);
+      } catch (error) {
+        console.error("Could not load recent posts:", error);
+      }
+
+      let comics = [];
+      try {
+        comics = await loadPublishedComics(db, firestore, 24);
+      } catch (error) {
+        console.error("Could not load published webcomics:", error);
+      }
+
+      let comicStats = new Map();
+      try {
+        comicStats = await loadComicStats(db, firestore, comics);
+      } catch (error) {
+        console.error("Could not load webcomic stats:", error);
+      }
+
+      if (!firebaseOptions.enablePublicFirestoreReads) {
+        return { ...appState, activity, comics, comicStats, db, firestore };
+      }
+
+      const publicData = await loadPublicCollections(db, firestore);
+
+      return {
+        ...appState,
+        ...publicData,
+        activity,
+        comics,
+        comicStats,
+        db,
+        firestore,
+      };
+    }
+
+    // ---- browse: search box + filter dropdown ----
+    // Everything runs client-side against the (already-fetched) `comics`
+    // list and `comicStats` map above — no re-querying Firestore per
+    // keystroke. Kept in one place so both the search input and the filter
+    // dropdown can share the same filter/sort logic.
+    const browseState = { comics: [], comicStats: new Map(), db: null, firestore: null, currentUid: null };
+
+    function applyBrowseFilters() {
+      const term = searchInput.value.trim().toLowerCase();
+      const filterValue = filterSelect.value;
+
+      let list = browseState.comics.slice();
+
+      if (term) {
+        list = list.filter((comic) => {
+          const title = (comic.title || "").toLowerCase();
+          const author = (comic.authorName || "").toLowerCase();
+          return title.includes(term) || author.includes(term);
+        });
+      }
+
+      if (filterValue === "saved") {
+        list = list.filter((comic) => {
+          const stats = browseState.comicStats.get(comic.id);
+          return !!(browseState.currentUid && stats && stats.savedByUids.has(browseState.currentUid));
+        });
+      } else if (filterValue === "popular") {
+        list = list.slice().sort((a, b) => {
+          const aHearts = browseState.comicStats.get(a.id)?.hearts ?? 0;
+          const bHearts = browseState.comicStats.get(b.id)?.hearts ?? 0;
+          return bHearts - aHearts;
+        });
+      }
+      // "new" and the default "filter" placeholder both just use the list's
+      // existing order, which is already sorted newest-first.
+
+      renderComics(list, browseState.db, browseState.firestore, browseState.comicStats);
+    }
+
+    searchInput.addEventListener("input", applyBrowseFilters);
+    filterSelect.addEventListener("change", applyBrowseFilters);
+    document.querySelector(".tools").addEventListener("submit", (event) => {
+      event.preventDefault();
+      applyBrowseFilters();
+    });
+
+    signInButton.addEventListener("click", () => {
+      window.location.href = "auth-sign-in.html?mode=signin";
+    });
+
+    registerButton.addEventListener("click", () => {
+      window.location.href = "auth-sign-up.html";
+    });
+
+    renderUser(null);
+    renderComics([]);
+    renderActivity([]);
+    renderNewsletter([]);
+
+    loadFirebase().then((state) => {
+      browseState.comics = state.comics;
+      browseState.comicStats = state.comicStats;
+      browseState.db = state.db;
+      browseState.firestore = state.firestore;
+      applyBrowseFilters();
+      renderActivity(state.activity, state.db, state.firestore);
+      renderNewsletter(state.newsletter);
+    }).catch((error) => {
+      console.error(error);
+      renderUser(null);
+      renderComics([]);
+      renderActivity([]);
+      renderNewsletter([]);
+    });
+  </script>
+</body>
+</html>

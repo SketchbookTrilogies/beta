@@ -1,0 +1,1687 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico">
+  <title>Blog - Sketchbook Trilogies</title>
+  <style>
+    :root {
+      --ink: #05070b;
+      --paper: #bfc7dc;
+      --panel: #8a91a1;
+      --panel-dark: #4f5666;
+      --line: #090a0d;
+      --link: #002fff;
+      --visited: #4f1eb7;
+      --bevel-light: #c8cedd;
+      --bevel-dark: #4c5363;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 1px 1px, #2a2a33 1px, transparent 1.5px) 0 0 / 7px 7px,
+        #06060a;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 1px;
+    }
+
+    a:visited {
+      color: var(--visited);
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100vw - 18px, 720px);
+      min-height: 100vh;
+      margin: 0 auto;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border-left: 4px solid #51596b;
+      border-right: 4px solid #51596b;
+      box-shadow: 0 0 0 1px #171a22;
+      padding: 0 22px 40px;
+    }
+
+    .topbar {
+      min-height: 42px;
+      display: flex;
+      align-items: start;
+      gap: 6px;
+      border-bottom: 3px double #6c758b;
+      overflow: hidden;
+    }
+
+    .brand {
+      width: 215px;
+      height: 34px;
+      object-fit: contain;
+      object-position: left center;
+      filter: contrast(1.18);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: start;
+      gap: 4px;
+      min-height: 34px;
+      padding-top: 3px;
+      font-size: 16px;
+      line-height: 1.15;
+      white-space: nowrap;
+      flex-wrap: wrap;
+    }
+
+    .nav p,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      margin: 14px 0 0;
+      font-size: 26px;
+      line-height: 1.05;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0 #e2e6f2;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      padding-bottom: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      border-bottom: 4px solid var(--line);
+    }
+
+    .subtitle a {
+      font-weight: 700;
+    }
+
+    .state-box {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .state-box.error {
+      color: #650000;
+      font-weight: 700;
+    }
+
+    /* Composer */
+    .composer {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 12px;
+    }
+
+    .composer[hidden] {
+      display: none;
+    }
+
+    .composer textarea {
+      width: 100%;
+      min-height: 76px;
+      resize: vertical;
+      border: 2px solid var(--panel-dark);
+      border-top-color: #3d4556;
+      border-left-color: #3d4556;
+      border-right-color: #b4bbcc;
+      border-bottom-color: #b4bbcc;
+      background: #c6ccda;
+      color: #111;
+      padding: 6px 8px;
+      font-size: 14px;
+    }
+
+    .composer-row {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .composer-preview {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .composer-preview img {
+      max-width: 90px;
+      max-height: 90px;
+      border: 2px solid #090a0d;
+      object-fit: cover;
+      display: none;
+    }
+
+    .composer-preview img.visible {
+      display: block;
+    }
+
+    .composer-row button,
+    .composer-row .file-button {
+      min-height: 28px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 3px 12px;
+    }
+
+    .composer-row button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .composer-row button:disabled {
+      cursor: default;
+      opacity: .6;
+    }
+
+    .composer-status {
+      min-height: 16px;
+      font-size: 12px;
+      color: #1f2736;
+      flex: 1 1 100%;
+    }
+
+    .composer-status.error {
+      color: #650000;
+      font-weight: 700;
+    }
+
+    .composer-status.success {
+      color: #12401d;
+      font-weight: 700;
+    }
+
+    .field-help {
+      margin: -2px 0 4px;
+      font-size: 11px;
+      font-weight: 400;
+      font-style: italic;
+      color: #33394a;
+      flex: 1 1 100%;
+    }
+
+    .feed-heading {
+      margin-top: 18px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .feed-heading h2 {
+      margin: 0;
+      font-size: 18px;
+      text-transform: uppercase;
+    }
+
+    .feed-heading .clear-filter {
+      font-size: 13px;
+    }
+
+    .feed {
+      display: grid;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .post-card {
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 12px;
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .post-avatar {
+      width: 34px;
+      height: 34px;
+      border: 2px solid #090a0d;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #303545;
+    }
+
+    .post-author {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .post-time {
+      font-size: 11px;
+      color: #2c3140;
+      font-family: "Courier New", monospace;
+    }
+
+    .post-text {
+      margin: 10px 0 0;
+      font-size: 14px;
+      line-height: 1.35;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .post-image {
+      margin-top: 10px;
+      max-width: 100%;
+      max-height: 420px;
+      border: 3px solid #090a0d;
+      display: block;
+    }
+
+    .post-footer {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .post-footer .delete-button {
+      min-height: 24px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: #650000;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 2px 9px;
+    }
+
+    .post-footer .delete-button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .reactions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .reactions button {
+      min-height: 24px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 2px 9px;
+    }
+
+    .reactions button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .reactions button:disabled {
+      cursor: default;
+      opacity: .55;
+    }
+
+    .reactions button.active.like-button {
+      background: #7bab6e;
+      font-weight: 700;
+    }
+
+    .reactions button.active.dislike-button {
+      background: #b57575;
+      font-weight: 700;
+    }
+
+    .comments-section {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 3px solid var(--line);
+    }
+
+    .comments-section[hidden] {
+      display: none;
+    }
+
+    .comments-list {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .comment-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .comment-avatar {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #090a0d;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #303545;
+      flex: 0 0 auto;
+    }
+
+    .comment-body {
+      font-size: 13px;
+      line-height: 1.3;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .comment-body .comment-author {
+      font-weight: 700;
+      margin-right: 4px;
+    }
+
+    .comment-text {
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .comment-time {
+      font-size: 10px;
+      color: #2c3140;
+      font-family: "Courier New", monospace;
+    }
+
+    .comment-delete {
+      border: none;
+      background: none;
+      color: #650000;
+      cursor: pointer;
+      font-size: 11px;
+      padding: 0;
+      text-decoration: underline;
+    }
+
+    .comment-reply-button {
+      border: none;
+      background: none;
+      color: var(--link);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 0;
+      margin-right: 8px;
+      text-decoration: underline;
+    }
+
+    .comment-actions {
+      margin-top: 2px;
+    }
+
+    .comment-replies {
+      margin: 6px 0 0 20px;
+      padding-left: 10px;
+      border-left: 2px solid #6c758b;
+      display: grid;
+      gap: 8px;
+    }
+
+    .comment-replying-to {
+      font-size: 10px;
+      font-style: italic;
+      color: var(--muted, #33394a);
+      margin-bottom: 1px;
+    }
+
+    .comment-reply-form {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .comment-reply-form input {
+      flex: 1 1 auto;
+      height: 24px;
+      border: 2px solid var(--panel-dark);
+      border-top-color: #3d4556;
+      border-left-color: #3d4556;
+      border-right-color: #b4bbcc;
+      border-bottom-color: #b4bbcc;
+      background: #c6ccda;
+      color: #111;
+      padding: 1px 5px;
+      font-size: 12px;
+    }
+
+    .comment-reply-form button {
+      min-height: 24px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 1px 8px;
+    }
+
+    .comment-form {
+      display: flex;
+      gap: 6px;
+    }
+
+    .comment-form input {
+      flex: 1 1 auto;
+      height: 26px;
+      border: 2px solid var(--panel-dark);
+      border-top-color: #3d4556;
+      border-left-color: #3d4556;
+      border-right-color: #b4bbcc;
+      border-bottom-color: #b4bbcc;
+      background: #c6ccda;
+      color: #111;
+      padding: 2px 6px;
+      font-size: 13px;
+    }
+
+    .comment-form button {
+      min-height: 26px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 2px 10px;
+    }
+
+    .comments-note {
+      font-size: 12px;
+      color: #2c3140;
+    }
+
+    .empty-feed {
+      margin-top: 12px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 16px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        width: 100%;
+        border: 0;
+        padding: 0 12px 32px;
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+        min-height: auto;
+        padding-bottom: 7px;
+      }
+
+      .brand {
+        width: min(260px, 100%);
+      }
+
+      .nav {
+        width: 100%;
+        padding-top: 0;
+      }
+
+      .composer-row button,
+      .composer-row .file-button {
+        min-height: 40px;
+        padding: 0 12px;
+        font-size: 14px;
+      }
+
+      .reactions button {
+        min-height: 36px;
+        padding: 0 10px;
+        font-size: 13px;
+      }
+
+      .comment-form input,
+      .comment-reply-form input {
+        min-height: 38px;
+        font-size: 15px;
+      }
+
+      .comment-form button,
+      .comment-reply-form button,
+      .comment-reply-button {
+        min-height: 36px;
+        padding: 0 10px;
+        font-size: 13px;
+      }
+
+      .post-footer .delete-button {
+        min-height: 32px;
+        padding: 0 10px;
+      }
+
+      .app-popup-actions button {
+        min-height: 40px;
+        font-size: 14px;
+      }
+    }
+
+    /* Custom alert/confirm popup (replaces browser alert()/confirm()) */
+    .app-popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 5, 9, .72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 300;
+    }
+
+    .app-popup-overlay[hidden] {
+      display: none;
+    }
+
+    .app-popup-panel {
+      width: min(100%, 380px);
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border: 4px solid #313644;
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark),
+        0 0 0 1px #090a0d,
+        6px 6px 0 rgba(0, 0, 0, .5);
+      padding: 18px;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .app-popup-message {
+      margin: 0 0 16px;
+      font-size: 14px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    .app-popup-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .app-popup-actions button {
+      min-height: 30px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 4px 14px;
+    }
+
+    .app-popup-actions button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .app-popup-actions button.primary {
+      background: #7bab6e;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-popup-overlay" id="app-popup-overlay" hidden>
+    <div class="app-popup-panel" role="alertdialog" aria-modal="true" aria-labelledby="app-popup-message">
+      <p class="app-popup-message" id="app-popup-message"></p>
+      <div class="app-popup-actions">
+        <button type="button" id="app-popup-cancel" hidden>cancel</button>
+        <button type="button" class="primary" id="app-popup-ok">OK</button>
+      </div>
+    </div>
+  </div>
+  <main class="page">
+    <header class="topbar" aria-label="Site header">
+      <img class="brand" src="Logo.png" alt="Sketchbook Trilogies">
+      <div class="topbar-menu">
+        <nav class="nav" aria-label="Primary navigation">
+          <p><span>|</span></p>
+          <p><a href="index.html">home</a></p>
+          <p><span>-</span></p>
+          <p><a href="blog.html">blog</a></p>
+          <p><span>-</span></p>
+          <p><a href="settings.html">settings</a></p>
+        </nav>
+
+      </div>
+    </header>
+
+    <h1>Blog</h1>
+    <p class="subtitle" id="subtitle">Text and image posts from everyone on Sketchbook Trilogies.</p>
+
+    <section class="state-box" id="signed-out-box" hidden>
+      Sign in to post your own updates. <a href="auth-sign-in.html?mode=signin">Sign in</a>
+    </section>
+
+    <form class="composer" id="composer" hidden>
+      <textarea id="post-text" maxlength="1000" placeholder="What are you working on?"></textarea>
+      <div class="composer-row">
+        <label class="file-button">
+          add image
+          <input id="post-image-input" type="file" accept="image/*" style="display:none;">
+        </label>
+        <p class="field-help">Photos up to 8MB are accepted and compressed automatically. Animated GIFs can't be compressed without losing their animation, so keep those under about 0.9MB.</p>
+        <div class="composer-preview">
+          <img id="post-image-preview" alt="Selected image preview">
+          <button type="button" id="remove-post-image" hidden>remove image</button>
+        </div>
+        <button type="submit" id="post-submit">post</button>
+        <p class="composer-status" id="composer-status" aria-live="polite"></p>
+      </div>
+    </form>
+
+    <div class="feed-heading">
+      <h2 id="feed-title">Recent posts</h2>
+      <p class="clear-filter" id="clear-filter" hidden><a href="blog.html">show everyone's posts</a></p>
+    </div>
+
+    <section class="state-box" id="feed-state" hidden></section>
+    <div class="feed" id="feed"></div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import {
+      addDoc,
+      collection,
+      deleteDoc,
+      doc,
+      getDoc,
+      getDocs,
+      getFirestore,
+      limit,
+      orderBy,
+      query,
+      serverTimestamp,
+      setDoc,
+      updateDoc,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js";
+
+    // If this page is restored from the browser's back/forward cache (e.g.
+    // after signing in/out as a different account on another page, then
+    // hitting Back), force a fresh reload so auth-dependent UI (like
+    // "edit profile" or "account settings") re-evaluates against whoever is
+    // ACTUALLY signed in right now, instead of showing stale cached state.
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    });
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg6umXxHQ6INyc_U2AvmhF9blhQ5ZEtT8",
+      authDomain: "sketchbook-trilogies.firebaseapp.com",
+      projectId: "sketchbook-trilogies",
+      storageBucket: "sketchbook-trilogies.firebasestorage.app",
+      messagingSenderId: "564902002463",
+      appId: "1:564902002463:web:7dc95e5e857e19b959fa2a",
+      measurementId: "G-Q08PSQDHMH",
+    };
+
+    const sampleAvatar = "default-avatar.png";
+    const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
+    const COMPRESS_THRESHOLD_BYTES = 1 * 1024 * 1024; // files over 1MB get compressed
+    const FIRESTORE_FIELD_SAFETY_BYTES = 900 * 1024; // stay under Firestore's 1MiB document cap
+    const FEED_LIMIT = 60;
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    if (await isSupported()) {
+      getAnalytics(app);
+    }
+
+    // ---- custom alert/confirm popup (replaces browser alert()/confirm()) ----
+    const appPopupOverlay = document.querySelector("#app-popup-overlay");
+    const appPopupMessage = document.querySelector("#app-popup-message");
+    const appPopupCancelButton = document.querySelector("#app-popup-cancel");
+    const appPopupOkButton = document.querySelector("#app-popup-ok");
+    let appPopupResolve = null;
+
+    function closeAppPopup(result) {
+      appPopupOverlay.hidden = true;
+      if (appPopupResolve) {
+        const resolve = appPopupResolve;
+        appPopupResolve = null;
+        resolve(result);
+      }
+    }
+
+    appPopupOkButton.addEventListener("click", () => closeAppPopup(true));
+    appPopupCancelButton.addEventListener("click", () => closeAppPopup(false));
+    appPopupOverlay.addEventListener("click", (event) => {
+      if (event.target === appPopupOverlay) closeAppPopup(false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !appPopupOverlay.hidden) closeAppPopup(false);
+    });
+
+    function showAppAlert(message) {
+      return new Promise((resolve) => {
+        appPopupResolve = resolve;
+        appPopupMessage.textContent = message;
+        appPopupCancelButton.hidden = true;
+        appPopupOkButton.textContent = "OK";
+        appPopupOverlay.hidden = false;
+        appPopupOkButton.focus();
+      });
+    }
+
+    function showAppConfirm(message, confirmLabel = "OK") {
+      return new Promise((resolve) => {
+        appPopupResolve = resolve;
+        appPopupMessage.textContent = message;
+        appPopupCancelButton.hidden = false;
+        appPopupOkButton.textContent = confirmLabel;
+        appPopupOverlay.hidden = false;
+        appPopupOkButton.focus();
+      });
+    }
+
+    const subtitle = document.querySelector("#subtitle");
+    const signedOutBox = document.querySelector("#signed-out-box");
+    const composer = document.querySelector("#composer");
+    const postText = document.querySelector("#post-text");
+    const postImageInput = document.querySelector("#post-image-input");
+    const postImagePreview = document.querySelector("#post-image-preview");
+    const removePostImageButton = document.querySelector("#remove-post-image");
+    const postSubmit = document.querySelector("#post-submit");
+    const composerStatus = document.querySelector("#composer-status");
+    const feedTitle = document.querySelector("#feed-title");
+    const clearFilter = document.querySelector("#clear-filter");
+    const feedState = document.querySelector("#feed-state");
+    const feed = document.querySelector("#feed");
+
+    const params = new URLSearchParams(window.location.search);
+    const filterUid = params.get("uid");
+
+    let currentUser = null;
+    let currentUserDoc = null;
+    let pendingImageData = null; // null = no image attached
+    let imageProcessing = false;
+
+    function setComposerStatus(message, kind = "") {
+      composerStatus.textContent = message;
+      composerStatus.className = kind ? `composer-status ${kind}` : "composer-status";
+    }
+
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Could not read that file."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function loadImageEl(src) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error("Could not read that image."));
+        image.src = src;
+      });
+    }
+
+    async function compressImage(file, maxDimension, quality) {
+      const dataUrl = await readFileAsDataURL(file);
+      const image = await loadImageEl(dataUrl);
+
+      let { width, height } = image;
+      if (width > height && width > maxDimension) {
+        height = Math.round((height * maxDimension) / width);
+        width = maxDimension;
+      } else if (height >= width && height > maxDimension) {
+        width = Math.round((width * maxDimension) / height);
+        height = maxDimension;
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext("2d").drawImage(image, 0, 0, width, height);
+      return canvas.toDataURL("image/jpeg", quality);
+    }
+
+    // Animated GIFs can't go through the canvas-based compression below —
+    // canvas only ever captures a single frame, so doing that would
+    // silently flatten the GIF into a static image. Instead we just check
+    // its size directly and use it as-is, keeping the animation intact.
+    function isAnimatedGifCandidate(file) {
+      return file.type === "image/gif";
+    }
+
+    async function readGifAsIs(file) {
+      const dataUrl = await readFileAsDataURL(file);
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        throw new Error("That GIF is too large to store (animated GIFs can't be auto-compressed without losing the animation). Try a smaller or shorter GIF.");
+      }
+      return dataUrl;
+    }
+
+    // Files over 1MB get resized/recompressed; smaller files are base64-encoded as-is.
+    async function processImageFile(file) {
+      if (isAnimatedGifCandidate(file)) {
+        return readGifAsIs(file);
+      }
+
+      let dataUrl = file.size > COMPRESS_THRESHOLD_BYTES
+        ? await compressImage(file, 1000, 0.82)
+        : await readFileAsDataURL(file);
+
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        dataUrl = await compressImage(file, 720, 0.72);
+      }
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        dataUrl = await compressImage(file, 520, 0.6);
+      }
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        throw new Error("That image is too detailed to compress small enough. Try a smaller photo.");
+      }
+
+      return dataUrl;
+    }
+
+    function formatTimestamp(timestamp) {
+      if (!timestamp) {
+        return "";
+      }
+      const date = typeof timestamp.toDate === "function" ? timestamp.toDate() : new Date(timestamp);
+      if (Number.isNaN(date.getTime())) {
+        return "";
+      }
+      return date.toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+    }
+
+    function renderFeed(posts) {
+      feed.innerHTML = "";
+
+      if (!posts.length) {
+        feedState.hidden = false;
+        feedState.className = "state-box";
+        feedState.textContent = filterUid
+          ? "This person hasn't posted anything yet."
+          : "No posts yet. Be the first to share something.";
+        return;
+      }
+
+      feedState.hidden = true;
+      feedState.className = "state-box";
+      feedState.textContent = "";
+
+      posts.forEach((post) => {
+        feed.append(buildPostCard(post));
+      });
+    }
+
+    // Posts/comments store the author's display name and avatar at the time
+    // they were posted; we prefer showing their CURRENT username, display
+    // name, and avatar instead — fetched live (and cached per uid) since
+    // none of the three are kept in sync on the post/comment itself.
+    const authorInfoCache = new Map();
+
+    function applyLiveAuthorInfo(authorUid, { nameEl = null, avatarEl = null } = {}) {
+      if (!authorUid) return;
+
+      function apply(info) {
+        if (!info) return;
+        if (nameEl) {
+          nameEl.textContent = info.username ? `@${info.username}` : (info.displayName || nameEl.textContent);
+        }
+        if (avatarEl && info.photoURL) {
+          avatarEl.src = info.photoURL;
+        }
+      }
+
+      if (authorInfoCache.has(authorUid)) {
+        apply(authorInfoCache.get(authorUid));
+        return;
+      }
+
+      getDoc(doc(db, "users", authorUid)).then((snap) => {
+        const info = snap.exists()
+          ? {
+            username: snap.data().username || null,
+            displayName: snap.data().displayName || null,
+            photoURL: snap.data().photoURL || null,
+          }
+          : null;
+        authorInfoCache.set(authorUid, info);
+        apply(info);
+      }).catch(() => {
+        authorInfoCache.set(authorUid, null);
+      });
+    }
+
+    function buildPostCard(post) {
+      const card = document.createElement("article");
+      card.className = "post-card";
+
+      const header = document.createElement("div");
+      header.className = "post-header";
+
+      const avatar = document.createElement("img");
+      avatar.className = "post-avatar";
+      avatar.alt = "";
+      avatar.src = post.authorPhotoURL || sampleAvatar;
+      avatar.onerror = () => {
+        avatar.onerror = null;
+        avatar.src = sampleAvatar;
+      };
+
+      const meta = document.createElement("div");
+      const authorLink = document.createElement("a");
+      authorLink.className = "post-author";
+      authorLink.href = `profile.html?uid=${encodeURIComponent(post.authorUid || "")}`;
+      authorLink.textContent = post.authorName || "Someone";
+      applyLiveAuthorInfo(post.authorUid, { nameEl: authorLink, avatarEl: avatar });
+      const time = document.createElement("div");
+      time.className = "post-time";
+      time.textContent = formatTimestamp(post.createdAt);
+      meta.append(authorLink, time);
+
+      header.append(avatar, meta);
+      card.append(header);
+
+      if (post.text) {
+        const text = document.createElement("p");
+        text.className = "post-text";
+        text.textContent = post.text;
+        card.append(text);
+      }
+
+      if (post.imageURL) {
+        const image = document.createElement("img");
+        image.className = "post-image";
+        image.src = post.imageURL;
+        image.alt = "";
+        card.append(image);
+      }
+
+      // --- reactions + delete row ---
+      const footer = document.createElement("div");
+      footer.className = "post-footer";
+
+      const reactions = document.createElement("div");
+      reactions.className = "reactions";
+
+      const likeButton = document.createElement("button");
+      likeButton.type = "button";
+      likeButton.className = "like-button";
+      const dislikeButton = document.createElement("button");
+      dislikeButton.type = "button";
+      dislikeButton.className = "dislike-button";
+      const commentsToggle = document.createElement("button");
+      commentsToggle.type = "button";
+      commentsToggle.className = "comments-toggle";
+
+      function refreshReactionButtons() {
+        likeButton.textContent = `like (${post.likes ?? 0})`;
+        dislikeButton.textContent = `dislike (${post.dislikes ?? 0})`;
+        commentsToggle.textContent = `comments (${post.commentCount ?? 0})`;
+        likeButton.classList.toggle("active", post.userReaction === "like");
+        dislikeButton.classList.toggle("active", post.userReaction === "dislike");
+      }
+      refreshReactionButtons();
+      post._refreshLabels = refreshReactionButtons;
+
+      if (!currentUser) {
+        likeButton.disabled = true;
+        dislikeButton.disabled = true;
+      } else {
+        likeButton.addEventListener("click", () => setReaction(post, "like", refreshReactionButtons));
+        dislikeButton.addEventListener("click", () => setReaction(post, "dislike", refreshReactionButtons));
+      }
+
+      reactions.append(likeButton, dislikeButton, commentsToggle);
+      footer.append(reactions);
+
+      if (currentUser && currentUser.uid === post.authorUid) {
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "delete-button";
+        deleteButton.textContent = "delete";
+        deleteButton.addEventListener("click", () => deletePost(post));
+        footer.append(deleteButton);
+      }
+
+      card.append(footer);
+
+      // --- comments section (lazy loaded on first toggle) ---
+      const commentsSection = document.createElement("div");
+      commentsSection.className = "comments-section";
+      commentsSection.hidden = true;
+
+      const commentsList = document.createElement("div");
+      commentsList.className = "comments-list";
+      commentsSection.append(commentsList);
+
+      if (currentUser) {
+        const commentForm = document.createElement("form");
+        commentForm.className = "comment-form";
+        const commentInput = document.createElement("input");
+        commentInput.type = "text";
+        commentInput.maxLength = 300;
+        commentInput.placeholder = "Add a comment...";
+        const commentSubmit = document.createElement("button");
+        commentSubmit.type = "submit";
+        commentSubmit.textContent = "reply";
+        commentForm.append(commentInput, commentSubmit);
+        commentForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const text = commentInput.value.trim();
+          if (!text) {
+            return;
+          }
+          commentSubmit.disabled = true;
+          try {
+            await addComment(post, text);
+            commentInput.value = "";
+            post.commentCount = (post.commentCount || 0) + 1;
+            refreshReactionButtons();
+            await renderComments(post, commentsList);
+          } catch (error) {
+            console.error(error);
+            await showAppAlert("Could not post your comment. Please try again.");
+          } finally {
+            commentSubmit.disabled = false;
+          }
+        });
+        commentsSection.append(commentForm);
+      } else {
+        const note = document.createElement("p");
+        note.className = "comments-note";
+        note.innerHTML = 'Sign in to comment. <a href="auth-sign-in.html?mode=signin">Sign in</a>';
+        commentsSection.append(note);
+      }
+
+      let commentsLoaded = false;
+      commentsToggle.addEventListener("click", async () => {
+        commentsSection.hidden = !commentsSection.hidden;
+        if (!commentsSection.hidden && !commentsLoaded) {
+          commentsLoaded = true;
+          commentsList.textContent = "loading comments...";
+          await renderComments(post, commentsList);
+        }
+      });
+
+      card.append(commentsSection);
+
+      return card;
+    }
+
+    function refreshCommentCountLabel(post) {
+      post._refreshLabels?.();
+    }
+
+    function buildCommentRow(post, comment, container, replyingToName = null) {
+      const row = document.createElement("div");
+      row.className = "comment-row";
+
+      const avatar = document.createElement("img");
+      avatar.className = "comment-avatar";
+      avatar.alt = "";
+      avatar.src = comment.authorPhotoURL || sampleAvatar;
+      avatar.onerror = () => {
+        avatar.onerror = null;
+        avatar.src = sampleAvatar;
+      };
+
+      const body = document.createElement("div");
+      body.className = "comment-body";
+
+      if (replyingToName) {
+        const replyingTo = document.createElement("div");
+        replyingTo.className = "comment-replying-to";
+        replyingTo.textContent = `replying to ${replyingToName}`;
+        body.append(replyingTo);
+      }
+
+      const authorLink = document.createElement("a");
+      authorLink.className = "comment-author";
+      authorLink.href = `profile.html?uid=${encodeURIComponent(comment.authorUid || "")}`;
+      authorLink.textContent = comment.authorName || "Someone";
+      applyLiveAuthorInfo(comment.authorUid, { nameEl: authorLink, avatarEl: avatar });
+
+      const text = document.createElement("span");
+      text.className = "comment-text";
+      text.textContent = comment.text || "";
+
+      const time = document.createElement("div");
+      time.className = "comment-time";
+      time.textContent = formatTimestamp(comment.createdAt);
+
+      body.append(authorLink, text, time);
+
+      const actions = document.createElement("div");
+      actions.className = "comment-actions";
+
+      if (currentUser) {
+        const replyButton = document.createElement("button");
+        replyButton.type = "button";
+        replyButton.className = "comment-reply-button";
+        replyButton.textContent = "reply";
+
+        let replyForm = null;
+        replyButton.addEventListener("click", () => {
+          if (replyForm) {
+            replyForm.remove();
+            replyForm = null;
+            return;
+          }
+          replyForm = document.createElement("form");
+          replyForm.className = "comment-reply-form";
+          const input = document.createElement("input");
+          input.type = "text";
+          input.maxLength = 500;
+          input.placeholder = `reply to ${comment.authorName || "this comment"}...`;
+          const submit = document.createElement("button");
+          submit.type = "submit";
+          submit.textContent = "reply";
+          replyForm.append(input, submit);
+
+          replyForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const replyText = input.value.trim();
+            if (!replyText) return;
+            submit.disabled = true;
+            try {
+              await addComment(post, replyText, comment.id);
+              post.commentCount = (post.commentCount || 0) + 1;
+              refreshCommentCountLabel(post);
+              await renderComments(post, container);
+            } catch (error) {
+              console.error(error);
+              await showAppAlert("Could not post your reply. Please try again.");
+              submit.disabled = false;
+            }
+          });
+
+          actions.append(replyForm);
+          input.focus();
+        });
+
+        actions.append(replyButton);
+      }
+
+      if (currentUser && currentUser.uid === comment.authorUid) {
+        const del = document.createElement("button");
+        del.type = "button";
+        del.className = "comment-delete";
+        del.textContent = "delete";
+        del.addEventListener("click", async () => {
+          if (!currentUser || currentUser.uid !== comment.authorUid) {
+            return;
+          }
+          try {
+            await deleteDoc(doc(db, "posts", post.id, "comments", comment.id));
+            post.commentCount = Math.max(0, (post.commentCount || 0) - 1);
+            refreshCommentCountLabel(post);
+            await renderComments(post, container);
+          } catch (error) {
+            console.error(error);
+            await showAppAlert("Could not delete that comment. Please try again.");
+          }
+        });
+        actions.append(del);
+      }
+
+      body.append(actions);
+      row.append(avatar, body);
+      return row;
+    }
+
+    async function renderComments(post, container) {
+      try {
+        const commentsQuery = query(
+          collection(db, "posts", post.id, "comments"),
+          orderBy("createdAt", "asc"),
+          limit(200),
+        );
+        const snapshot = await getDocs(commentsQuery);
+        const allComments = snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+
+        container.innerHTML = "";
+
+        if (!allComments.length) {
+          const empty = document.createElement("p");
+          empty.className = "comments-note";
+          empty.textContent = "No comments yet.";
+          container.append(empty);
+          return;
+        }
+
+        const byId = new Map(allComments.map((comment) => [comment.id, comment]));
+
+        function topLevelAncestorId(comment) {
+          let current = comment;
+          const seen = new Set();
+          while (current.parentId && byId.has(current.parentId) && !seen.has(current.id)) {
+            seen.add(current.id);
+            current = byId.get(current.parentId);
+          }
+          return current.id;
+        }
+
+        const topLevel = allComments.filter((comment) => !comment.parentId);
+        const repliesByTopLevel = new Map();
+        allComments.forEach((comment) => {
+          if (!comment.parentId) return;
+          const topId = topLevelAncestorId(comment);
+          if (topId === comment.id) return; // broken/self-referential parentId — skip rather than loop
+          if (!repliesByTopLevel.has(topId)) repliesByTopLevel.set(topId, []);
+          repliesByTopLevel.get(topId).push(comment);
+        });
+
+        topLevel.forEach((comment) => {
+          container.append(buildCommentRow(post, comment, container));
+
+          const replies = repliesByTopLevel.get(comment.id);
+          if (replies && replies.length) {
+            const repliesWrap = document.createElement("div");
+            repliesWrap.className = "comment-replies";
+            replies.forEach((reply) => {
+              // A reply directly on the top-level comment needs no extra
+              // context; a reply-to-a-reply shows who it was aimed at,
+              // since it's displayed flat rather than deeply indented.
+              const parent = byId.get(reply.parentId);
+              const replyingToName = parent && parent.id !== comment.id
+                ? (parent.authorName || "Someone")
+                : null;
+              repliesWrap.append(buildCommentRow(post, reply, container, replyingToName));
+            });
+            container.append(repliesWrap);
+          }
+        });
+      } catch (error) {
+        console.error(error);
+        container.innerHTML = "";
+        const errorNote = document.createElement("p");
+        errorNote.className = "comments-note";
+        errorNote.textContent = "Could not load comments.";
+        container.append(errorNote);
+      }
+    }
+
+    async function addComment(post, text, parentId = null) {
+      await addDoc(collection(db, "posts", post.id, "comments"), {
+        authorUid: currentUser.uid,
+        authorName: currentUserDoc?.displayName || currentUser.displayName || currentUser.email || "User",
+        authorPhotoURL: currentUserDoc?.photoURL || null,
+        text,
+        parentId,
+        createdAt: serverTimestamp(),
+      });
+      notifyOwnerOfComment(post, text);
+    }
+
+    // Best-effort: let the post's author know about the comment in their
+    // inbox. Never notify someone about their own comment on their own
+    // post, and never let a notification failure block the comment itself
+    // from posting.
+    async function notifyOwnerOfComment(post, text) {
+      if (!post.authorUid || post.authorUid === currentUser.uid) return;
+      try {
+        await addDoc(collection(db, "users", post.authorUid, "notifications"), {
+          type: "post-comment",
+          fromUid: currentUser.uid,
+          fromName: currentUserDoc?.displayName || currentUser.displayName || currentUser.email || "User",
+          postId: post.id,
+          text: text.slice(0, 140),
+          read: false,
+          createdAt: serverTimestamp(),
+        });
+      } catch (error) {
+        console.error("Could not send inbox notification:", error);
+      }
+    }
+
+    async function loadReactionSummary(postId) {
+      const snapshot = await getDocs(collection(db, "posts", postId, "reactions"));
+      let likes = 0;
+      let dislikes = 0;
+      let userReaction = null;
+
+      snapshot.forEach((docSnap) => {
+        const type = docSnap.data().type;
+        if (type === "like") likes += 1;
+        else if (type === "dislike") dislikes += 1;
+        if (currentUser && docSnap.id === currentUser.uid) {
+          userReaction = type || null;
+        }
+      });
+
+      return { likes, dislikes, userReaction };
+    }
+
+    async function loadCommentCount(postId) {
+      const snapshot = await getDocs(collection(db, "posts", postId, "comments"));
+      return snapshot.size;
+    }
+
+    async function setReaction(post, type, onUpdated) {
+      if (!currentUser) {
+        return;
+      }
+
+      const previous = post.userReaction || null;
+      const next = previous === type ? null : type;
+
+      try {
+        // The only write here is to this user's own reaction doc, keyed by
+        // their own UID — never to the post document itself.
+        const reactionRef = doc(db, "posts", post.id, "reactions", currentUser.uid);
+        if (next) {
+          await setDoc(reactionRef, { type: next });
+        } else {
+          await deleteDoc(reactionRef);
+        }
+
+        // Recompute the counts fresh by reading everyone's reaction docs.
+        const summary = await loadReactionSummary(post.id);
+        post.likes = summary.likes;
+        post.dislikes = summary.dislikes;
+        post.userReaction = summary.userReaction;
+        onUpdated();
+      } catch (error) {
+        console.error(error);
+        await showAppAlert("Could not update your reaction. Please try again.");
+      }
+    }
+
+    async function loadFeed() {
+      feedState.hidden = false;
+      feedState.className = "state-box";
+      feedState.textContent = "loading posts...";
+
+      try {
+        const postsQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(FEED_LIMIT));
+        const snapshot = await getDocs(postsQuery);
+        let posts = snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+
+        if (filterUid) {
+          posts = posts.filter((post) => post.authorUid === filterUid);
+        }
+
+        await Promise.all(posts.map(async (post) => {
+          try {
+            const [reactionSummary, commentCount] = await Promise.all([
+              loadReactionSummary(post.id),
+              loadCommentCount(post.id),
+            ]);
+            post.likes = reactionSummary.likes;
+            post.dislikes = reactionSummary.dislikes;
+            post.userReaction = reactionSummary.userReaction;
+            post.commentCount = commentCount;
+          } catch (error) {
+            console.error("Could not load counts for a post:", error);
+            post.likes = 0;
+            post.dislikes = 0;
+            post.commentCount = 0;
+            post.userReaction = null;
+          }
+        }));
+
+        renderFeed(posts);
+      } catch (error) {
+        console.error(error);
+        feedState.hidden = false;
+        feedState.className = "state-box error";
+        feedState.textContent = "Could not load posts. Please try again.";
+      }
+    }
+
+    async function deletePost(post) {
+      if (!currentUser || currentUser.uid !== post.authorUid) {
+        return;
+      }
+
+      const confirmed = await showAppConfirm("Delete this post?", "delete");
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        await deleteDoc(doc(db, "posts", post.id));
+
+        if (currentUserDoc && currentUser) {
+          const newCount = Math.max(0, (currentUserDoc.posts || 0) - 1);
+          await updateDoc(doc(db, "users", currentUser.uid), { posts: newCount });
+          currentUserDoc.posts = newCount;
+        }
+
+        await loadFeed();
+      } catch (error) {
+        console.error(error);
+        await showAppAlert("Could not delete that post. Please try again.");
+      }
+    }
+
+    postImageInput.addEventListener("change", async () => {
+      const file = postImageInput.files?.[0];
+      if (!file) {
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        setComposerStatus("Please choose an image file.", "error");
+        postImageInput.value = "";
+        return;
+      }
+
+      if (file.size > MAX_UPLOAD_BYTES) {
+        setComposerStatus("That file is too large (max 8MB).", "error");
+        postImageInput.value = "";
+        return;
+      }
+
+      imageProcessing = true;
+      setComposerStatus(file.size > COMPRESS_THRESHOLD_BYTES ? "compressing image..." : "processing image...");
+
+      try {
+        const dataUrl = await processImageFile(file);
+        pendingImageData = dataUrl;
+        postImagePreview.src = dataUrl;
+        postImagePreview.classList.add("visible");
+        removePostImageButton.hidden = false;
+        setComposerStatus(file.size > COMPRESS_THRESHOLD_BYTES ? "compressed and ready." : "ready.", "success");
+      } catch (error) {
+        console.error(error);
+        setComposerStatus(error.message || "Could not process that image.", "error");
+        postImageInput.value = "";
+      } finally {
+        imageProcessing = false;
+      }
+    });
+
+    removePostImageButton.addEventListener("click", () => {
+      pendingImageData = null;
+      postImageInput.value = "";
+      postImagePreview.src = "";
+      postImagePreview.classList.remove("visible");
+      removePostImageButton.hidden = true;
+      setComposerStatus("");
+    });
+
+    composer.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (!currentUser) {
+        return;
+      }
+
+      if (imageProcessing) {
+        setComposerStatus("Still processing your image, hang on a second.", "error");
+        return;
+      }
+
+      const text = postText.value.trim();
+      if (!text && !pendingImageData) {
+        setComposerStatus("Write something or add an image first.", "error");
+        return;
+      }
+
+      postSubmit.disabled = true;
+      setComposerStatus("posting...");
+
+      try {
+        await addDoc(collection(db, "posts"), {
+          authorUid: currentUser.uid,
+          authorName: currentUserDoc?.displayName || currentUser.displayName || currentUser.email || "User",
+          authorPhotoURL: currentUserDoc?.photoURL || null,
+          text,
+          imageURL: pendingImageData || null,
+          createdAt: serverTimestamp(),
+        });
+
+        try {
+          const newCount = (currentUserDoc?.posts || 0) + 1;
+          await updateDoc(doc(db, "users", currentUser.uid), { posts: newCount });
+          if (currentUserDoc) {
+            currentUserDoc.posts = newCount;
+          }
+        } catch (countError) {
+          console.error("Could not update post count:", countError);
+        }
+
+        postText.value = "";
+        pendingImageData = null;
+        postImageInput.value = "";
+        postImagePreview.src = "";
+        postImagePreview.classList.remove("visible");
+        removePostImageButton.hidden = true;
+        setComposerStatus("posted!", "success");
+
+        if (!filterUid || filterUid === currentUser.uid) {
+          await loadFeed();
+        }
+      } catch (error) {
+        console.error(error);
+        setComposerStatus("Could not save your post. Please try again.", "error");
+      } finally {
+        postSubmit.disabled = false;
+      }
+    });
+
+    if (filterUid) {
+      clearFilter.hidden = false;
+      feedTitle.textContent = "Posts from this member";
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+
+      if (!user) {
+        signedOutBox.hidden = false;
+        composer.hidden = true;
+        return;
+      }
+
+      signedOutBox.hidden = true;
+      composer.hidden = false;
+
+      try {
+        const snapshot = await getDoc(doc(db, "users", user.uid));
+        currentUserDoc = snapshot.exists() ? snapshot.data() : null;
+      } catch (error) {
+        console.error("Could not load your profile doc:", error);
+        currentUserDoc = null;
+      }
+
+      // Re-render so any of your own posts already on screen show a delete button.
+      loadFeed();
+    });
+
+    loadFeed();
+  </script>
+</body>
+</html>

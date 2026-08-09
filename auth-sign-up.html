@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico">
+  <title>Create Account - Sketchbook Trilogies</title>
+  <style>
+    :root {
+      --ink: #05070b;
+      --paper: #bfc7dc;
+      --panel: #8a91a1;
+      --panel-dark: #4f5666;
+      --line: #090a0d;
+      --link: #002fff;
+      --visited: #4f1eb7;
+      --bevel-light: #c8cedd;
+      --bevel-dark: #4c5363;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 1px 1px, #2a2a33 1px, transparent 1.5px) 0 0 / 7px 7px,
+        #06060a;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 1px;
+    }
+
+    a:visited {
+      color: var(--visited);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100vw - 18px, 620px);
+      min-height: 100vh;
+      margin: 0 auto;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border-left: 4px solid #51596b;
+      border-right: 4px solid #51596b;
+      box-shadow: 0 0 0 1px #171a22;
+      padding: 0 22px 32px;
+    }
+
+    .topbar {
+      min-height: 42px;
+      display: flex;
+      align-items: start;
+      gap: 6px;
+      border-bottom: 3px double #6c758b;
+      overflow: hidden;
+    }
+
+    .brand {
+      width: 215px;
+      height: 34px;
+      object-fit: contain;
+      object-position: left center;
+      filter: contrast(1.18);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: start;
+      gap: 4px;
+      min-height: 34px;
+      padding-top: 3px;
+      font-size: 16px;
+      line-height: 1.15;
+      white-space: nowrap;
+    }
+
+    .nav p,
+    p {
+      margin: 0;
+    }
+
+    .intro {
+      padding: 10px 0 20px;
+      border-bottom: 4px solid var(--line);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.05;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0 #e2e6f2;
+    }
+
+    .intro p {
+      max-width: 520px;
+      font-size: 15px;
+      line-height: 1.22;
+      font-weight: 700;
+    }
+
+    .auth-box {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 12px;
+    }
+
+    .form-actions button {
+      min-height: 28px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .form-actions button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 10px;
+    }
+
+    label {
+      display: grid;
+      gap: 3px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .field-help {
+      font-size: 11px;
+      font-weight: 400;
+      color: #2b3040;
+    }
+
+    input {
+      height: 28px;
+      border: 2px solid var(--panel-dark);
+      border-top-color: #3d4556;
+      border-left-color: #3d4556;
+      border-right-color: #b4bbcc;
+      border-bottom-color: #b4bbcc;
+      background: #c6ccda;
+      color: #111;
+      padding: 2px 6px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+
+    .create-account-note {
+      margin-top: 12px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .status {
+      min-height: 18px;
+      color: #1f2736;
+      font-size: 13px;
+      line-height: 1.2;
+    }
+
+    .error {
+      color: #650000;
+      font-weight: 700;
+    }
+
+    .oauth-divider {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 12px 0;
+      font-size: 12px;
+      color: #33394a;
+      text-transform: uppercase;
+    }
+
+    .oauth-divider::before,
+    .oauth-divider::after {
+      content: "";
+      flex: 1 1 auto;
+      height: 2px;
+      background: #6c758b;
+    }
+
+    .google-button {
+      width: 100%;
+      min-height: 32px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #f3f4f8;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .google-button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .google-button:disabled {
+      cursor: default;
+      opacity: .6;
+    }
+
+    .google-button svg {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        width: 100%;
+        border: 0;
+        padding: 0 12px 24px;
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+        min-height: auto;
+        padding-bottom: 7px;
+      }
+
+      .brand {
+        width: min(260px, 100%);
+      }
+
+      .nav {
+        width: 100%;
+        padding-top: 0;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .form-actions button {
+        min-height: 44px;
+        font-size: 16px;
+      }
+
+      input {
+        height: 44px;
+        font-size: 16px;
+        padding: 2px 10px;
+      }
+
+      label {
+        font-size: 15px;
+      }
+
+      .google-button {
+        min-height: 44px;
+        font-size: 15px;
+      }
+
+      .status {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar" aria-label="Site header">
+      <img class="brand" src="Logo.png" alt="Sketchbook Trilogies">
+      <div class="topbar-menu">
+        <nav class="nav" aria-label="Primary navigation">
+          <p><span>|</span></p>
+          <p><a href="index.html">home</a></p>
+          <p><span>-</span></p>
+          <p><a href="blog.html">blog</a></p>
+        </nav>
+
+      </div>
+    </header>
+
+    <section class="intro">
+      <h1>Create Account</h1>
+      <p>An email and password to get started — you'll set up your display name and username next.</p>
+    </section>
+
+    <section class="auth-box" aria-label="Create account">
+      <button type="button" class="google-button" id="google-button">
+        <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"/>
+          <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.9v2.33A9 9 0 0 0 9 18z"/>
+          <path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.9A9 9 0 0 0 0 9c0 1.45.35 2.83.9 4.03z"/>
+          <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0A9 9 0 0 0 .9 4.97l3.05 2.33C4.66 5.17 6.65 3.58 9 3.58z"/>
+        </svg>
+        continue with Google
+      </button>
+
+      <div class="oauth-divider">or use email</div>
+
+      <form class="auth-form" id="auth-form">
+        <label>
+          email
+          <input id="email" type="email" autocomplete="email" required>
+        </label>
+        <label>
+          password
+          <input id="password" type="password" autocomplete="new-password" minlength="6" required>
+          <span class="field-help">at least 6 characters.</span>
+        </label>
+
+        <div class="form-actions">
+          <button type="submit" id="submit-button">continue</button>
+          <a href="index.html">cancel</a>
+        </div>
+        <p class="status" id="status" aria-live="polite"></p>
+      </form>
+
+      <p class="create-account-note">Already have an account? <a href="auth-sign-in.html">Sign in</a></p>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+    import {
+      createUserWithEmailAndPassword,
+      getAdditionalUserInfo,
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import {
+
+      doc,
+      getFirestore,
+      serverTimestamp,
+      setDoc,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js";
+
+    // If this page is restored from the browser's back/forward cache (e.g.
+    // after signing in/out as a different account on another page, then
+    // hitting Back), force a fresh reload so auth-dependent UI (like
+    // "edit profile" or "account settings") re-evaluates against whoever is
+    // ACTUALLY signed in right now, instead of showing stale cached state.
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    });
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg6umXxHQ6INyc_U2AvmhF9blhQ5ZEtT8",
+      authDomain: "sketchbook-trilogies.firebaseapp.com",
+      projectId: "sketchbook-trilogies",
+      storageBucket: "sketchbook-trilogies.firebasestorage.app",
+      messagingSenderId: "564902002463",
+      appId: "1:564902002463:web:7dc95e5e857e19b959fa2a",
+      measurementId: "G-Q08PSQDHMH",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    if (await isSupported()) {
+      getAnalytics(app);
+    }
+
+    const USERNAME_PATTERN = /^[a-z0-9_]{3,20}$/;
+
+    function sanitizeUsernameBase(rawEmail) {
+      const local = (rawEmail || "user").split("@")[0].toLowerCase();
+      let cleaned = local.replace(/[^a-z0-9_]/g, "");
+      if (cleaned.length < 3) cleaned = (cleaned + "user000").slice(0, 3);
+      return cleaned.slice(0, 16); // leave room for a numeric suffix, 20 chars max
+    }
+
+    // Best-effort: derives a username from the email address (e.g.
+    // "brad@example.com" -> "brad") and claims it via the usernames
+    // collection, trying "brad2", "brad3", etc. if it's already taken.
+    // Never blocks account creation — if nothing can be claimed, the
+    // account is just left without a username (settable later in profile).
+    async function claimDefaultUsername(rawEmail, uid) {
+      const base = sanitizeUsernameBase(rawEmail);
+      const candidates = [base];
+      for (let i = 2; i <= 20; i++) candidates.push(`${base}${i}`);
+
+      for (const candidate of candidates) {
+        if (!USERNAME_PATTERN.test(candidate)) continue;
+        try {
+          await setDoc(doc(db, "usernames", candidate), { uid });
+          return candidate;
+        } catch (error) {
+          // Already taken (or some other issue) — try the next candidate.
+        }
+      }
+      return null;
+    }
+
+    const form = document.querySelector("#auth-form");
+    const email = document.querySelector("#email");
+    const password = document.querySelector("#password");
+    const submitButton = document.querySelector("#submit-button");
+    const status = document.querySelector("#status");
+    const googleButton = document.querySelector("#google-button");
+
+    function showError(error) {
+      status.className = "status error";
+      status.textContent = error.message.replace("Firebase: ", "");
+    }
+
+    // Google already provides a display name and photo, so a brand-new
+    // Google account doesn't need the onboarding profile step — it gets a
+    // default username claimed automatically and goes straight to its
+    // profile, same as if it had signed up via the full onboarding flow.
+    googleButton.addEventListener("click", async () => {
+      googleButton.disabled = true;
+      status.className = "status";
+      status.textContent = "opening Google sign-in...";
+
+      try {
+        const result = await signInWithPopup(auth, new GoogleAuthProvider());
+        const info = getAdditionalUserInfo(result);
+        const user = result.user;
+
+        if (info?.isNewUser) {
+          const username = await claimDefaultUsername(user.email, user.uid);
+          await setDoc(doc(db, "users", user.uid), {
+            uid: user.uid,
+            displayName: user.displayName || null,
+            username,
+            email: user.email,
+            photoURL: user.photoURL || null,
+            bio: "",
+            followers: 0,
+            following: 0,
+            webcomics: 0,
+            posts: 0,
+            likes: 0,
+            createdAt: serverTimestamp(),
+          });
+        }
+
+        status.textContent = "success. taking you to your profile...";
+        window.location.href = `profile.html?uid=${encodeURIComponent(user.uid)}`;
+      } catch (error) {
+        if (error?.code !== "auth/popup-closed-by-user") {
+          showError(error);
+        }
+      } finally {
+        googleButton.disabled = false;
+      }
+    });
+
+    // Email/password only creates the login itself — no profile fields
+    // exist yet (no display name, no username). onboarding.html picks up
+    // from here (the person is already signed in at this point) to collect
+    // those before the account is otherwise usable.
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      status.className = "status";
+      status.textContent = "creating your account...";
+      submitButton.disabled = true;
+
+      try {
+        await createUserWithEmailAndPassword(auth, email.value, password.value);
+        status.textContent = "success. let's set up your profile...";
+        window.location.href = "onboarding.html";
+      } catch (error) {
+        showError(error);
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

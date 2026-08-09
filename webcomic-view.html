@@ -1,0 +1,1388 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico">
+  <title>Webcomic - Sketchbook Trilogies</title>
+  <style>
+    :root {
+      --ink: #05070b;
+      --paper: #bfc7dc;
+      --panel: #8a91a1;
+      --panel-dark: #4f5666;
+      --line: #090a0d;
+      --link: #002fff;
+      --visited: #4f1eb7;
+      --bevel-light: #c8cedd;
+      --bevel-dark: #4c5363;
+      --muted: #33394a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 1px 1px, #2a2a33 1px, transparent 1.5px) 0 0 / 7px 7px,
+        #06060a;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    a { color: var(--link); text-decoration: underline; text-underline-offset: 1px; }
+    a:visited { color: var(--visited); }
+    button, input { font: inherit; }
+    p { margin: 0; }
+
+    .page {
+      width: min(100vw - 18px, 760px);
+      min-height: 100vh;
+      margin: 0 auto;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border-left: 4px solid #51596b;
+      border-right: 4px solid #51596b;
+      box-shadow: 0 0 0 1px #171a22;
+      padding: 0 22px 40px;
+    }
+
+    .topbar {
+      min-height: 42px;
+      display: flex;
+      align-items: start;
+      gap: 6px;
+      border-bottom: 3px double #6c758b;
+      overflow: hidden;
+    }
+
+    .brand {
+      width: 215px;
+      height: 34px;
+      object-fit: contain;
+      object-position: left center;
+      filter: contrast(1.18);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: start;
+      gap: 4px;
+      min-height: 34px;
+      padding-top: 3px;
+      font-size: 16px;
+      line-height: 1.15;
+      white-space: nowrap;
+      flex-wrap: wrap;
+    }
+
+    .nav p { margin: 0; }
+
+    .back-link { margin-top: 12px; font-size: 13px; }
+
+    h1 {
+      margin: 10px 0 0;
+      font-size: 28px;
+      line-height: 1.1;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0 #e2e6f2;
+      overflow-wrap: anywhere;
+    }
+
+    .byline {
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .byline[hidden] { display: none; }
+
+    .byline-username {
+      margin-top: 2px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #33394a;
+      font-family: "Courier New", monospace;
+    }
+
+    .byline-username[hidden] { display: none; }
+
+    .byline-avatar {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #090a0d;
+      background: #303545;
+      flex: 0 0 auto;
+    }
+
+    .meta-line {
+      margin-top: 6px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--line);
+      font-size: 12px;
+      font-family: "Courier New", monospace;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .meta-line[hidden] { display: none; }
+
+    .state-box {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .state-box.error { color: #650000; font-weight: 700; }
+    .state-box[hidden] { display: none; }
+
+    .comic-head {
+      margin-top: 16px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .comic-head[hidden] { display: none; }
+
+    .comic-head img {
+      width: 116px;
+      height: 154px;
+      object-fit: cover;
+      border: 3px solid #090a0d;
+      background: #303545;
+      flex: 0 0 auto;
+    }
+
+    .comic-head-placeholder {
+      width: 116px;
+      height: 154px;
+      border: 3px dashed #5f687d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      text-align: center;
+      color: var(--muted);
+      background: #a9b0c0;
+      flex: 0 0 auto;
+    }
+
+    .comic-head-info {
+      flex: 1 1 260px;
+      min-width: 200px;
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .comic-description {
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      color: #1d2330;
+    }
+
+    .comic-description:empty::before {
+      content: "No description yet.";
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .reactions {
+      margin-top: auto;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .reactions button {
+      min-height: 26px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 3px 10px;
+    }
+
+    .reactions button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .reactions button:disabled { cursor: default; opacity: .55; }
+    .reactions button.active.like-button { background: #7bab6e; font-weight: 700; }
+    .reactions button.active.dislike-button { background: #b57575; font-weight: 700; }
+    .reactions button.active.heart-button { background: #c97fa4; font-weight: 700; }
+    .reactions button.active.save-button { background: #d2a94f; font-weight: 700; }
+
+    .section-heading { margin-top: 24px; display: flex; align-items: baseline; gap: 8px; }
+    .section-heading h2 { margin: 0; font-size: 18px; text-transform: uppercase; }
+    .section-heading .count { font-size: 12px; color: var(--muted); font-family: "Courier New", monospace; }
+
+    .chapters-list { display: grid; gap: 10px; margin-top: 10px; }
+
+    .chapter-row {
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 10px 12px;
+    }
+
+    .chapter-row-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chapter-row h3 { margin: 0; font-size: 16px; overflow-wrap: anywhere; }
+    .chapter-row .chapter-meta {
+      flex: 0 0 auto;
+      font-size: 11px;
+      font-family: "Courier New", monospace;
+      color: var(--muted);
+    }
+
+    .page-links {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+    }
+
+    .page-links a {
+      font-size: 13px;
+    }
+
+    .page-links .no-pages-note {
+      font-size: 12px;
+      color: var(--muted);
+      font-style: italic;
+      text-decoration: none;
+    }
+
+    .page-links a.you-are-here {
+      font-weight: 700;
+      color: #12401d;
+      text-decoration: none;
+      background: #a6d99a;
+      padding: 1px 6px;
+      border: 1px solid #4c8a3f;
+    }
+
+    .page-links .you-are-here-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #12401d;
+      align-self: center;
+    }
+
+    .page-links .you-are-here-badge::before {
+      content: "\2190 ";
+    }
+
+    .empty-note {
+      margin-top: 10px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 14px;
+      font-size: 13px;
+      text-align: center;
+    }
+    .empty-note[hidden] { display: none; }
+
+    .comments-list { display: grid; gap: 10px; margin-top: 10px; }
+
+    .comment-row { display: flex; gap: 8px; align-items: flex-start; }
+
+    .comment-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #090a0d;
+      background: #303545;
+      flex: 0 0 auto;
+    }
+
+    .comment-body { font-size: 13px; line-height: 1.35; flex: 1 1 auto; min-width: 0; }
+    .comment-body .comment-author { font-weight: 700; margin-right: 4px; }
+    .comment-text { overflow-wrap: anywhere; white-space: pre-wrap; }
+    .comment-time { font-size: 10px; color: var(--muted); font-family: "Courier New", monospace; }
+
+    .comment-delete {
+      border: none;
+      background: none;
+      color: #650000;
+      cursor: pointer;
+      font-size: 11px;
+      padding: 0;
+      text-decoration: underline;
+    }
+
+    .comment-reply-button {
+      border: none;
+      background: none;
+      color: var(--link);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 0;
+      margin-right: 8px;
+      text-decoration: underline;
+    }
+
+    .comment-actions { margin-top: 2px; }
+
+    .comment-replies {
+      margin: 6px 0 0 20px;
+      padding-left: 10px;
+      border-left: 2px solid #6c758b;
+      display: grid;
+      gap: 8px;
+    }
+
+    .comment-replying-to {
+      font-size: 10px;
+      font-style: italic;
+      color: var(--muted);
+      margin-bottom: 1px;
+    }
+
+    .comment-reply-form { display: flex; gap: 6px; margin-top: 6px; }
+
+    .comment-reply-form input {
+      flex: 1 1 auto;
+      height: 26px;
+      border: 2px solid var(--panel-dark);
+      border-top-color: #3d4556;
+      border-left-color: #3d4556;
+      border-right-color: #b4bbcc;
+      border-bottom-color: #b4bbcc;
+      background: #c6ccda;
+      color: #111;
+      padding: 1px 5px;
+      font-size: 12px;
+    }
+
+    .comment-reply-form button {
+      min-height: 26px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 1px 8px;
+    }
+
+    .comment-form { display: flex; gap: 6px; margin-top: 10px; }
+
+    .comment-form input {
+      flex: 1 1 auto;
+      height: 28px;
+      border: 2px solid var(--panel-dark);
+      border-top-color: #3d4556;
+      border-left-color: #3d4556;
+      border-right-color: #b4bbcc;
+      border-bottom-color: #b4bbcc;
+      background: #c6ccda;
+      color: #111;
+      padding: 2px 6px;
+      font-size: 13px;
+    }
+
+    .comment-form button {
+      min-height: 28px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 2px 12px;
+    }
+
+    .comments-note { margin-top: 10px; font-size: 12px; color: var(--muted); }
+
+    /* Custom alert/confirm popup (replaces browser alert()/confirm()) */
+    .app-popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 5, 9, .72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 300;
+    }
+    .app-popup-overlay[hidden] { display: none; }
+
+    .app-popup-panel {
+      width: min(100%, 380px);
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border: 4px solid #313644;
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark),
+        0 0 0 1px #090a0d,
+        6px 6px 0 rgba(0, 0, 0, .5);
+      padding: 18px;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .app-popup-message { margin: 0 0 16px; font-size: 14px; line-height: 1.4; white-space: pre-wrap; }
+    .app-popup-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+    .app-popup-actions button {
+      min-height: 30px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 4px 14px;
+    }
+
+    .app-popup-actions button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .app-popup-actions button.primary { background: #7bab6e; font-weight: 700; }
+
+    @media (max-width: 560px) {
+      .page { width: 100%; border: 0; padding: 0 12px 32px; }
+      .topbar { flex-wrap: wrap; min-height: auto; padding-bottom: 7px; }
+      .brand { width: min(260px, 100%); }
+      .nav { width: 100%; padding-top: 0; }
+      .comic-head img, .comic-head-placeholder { width: 92px; height: 122px; }
+      .reactions button { min-height: 40px; padding: 0 12px; font-size: 14px; }
+      .comment-form input, .comment-reply-form input { min-height: 40px; font-size: 15px; }
+      .comment-form button, .comment-reply-form button, .comment-reply-button { min-height: 36px; padding: 0 12px; font-size: 13px; }
+      .chapter-row h3 { font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-popup-overlay" id="app-popup-overlay" hidden>
+    <div class="app-popup-panel" role="alertdialog" aria-modal="true" aria-labelledby="app-popup-message">
+      <p class="app-popup-message" id="app-popup-message"></p>
+      <div class="app-popup-actions">
+        <button type="button" id="app-popup-cancel" hidden>cancel</button>
+        <button type="button" class="primary" id="app-popup-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="page">
+    <header class="topbar" aria-label="Site header">
+      <img class="brand" src="Logo.png" alt="Sketchbook Trilogies">
+      <div class="topbar-menu">
+        <nav class="nav" aria-label="Primary navigation">
+          <p><span>|</span></p>
+          <p><a href="index.html">home</a></p>
+          <p><span>-</span></p>
+          <p><a href="blog.html">blog</a></p>
+          <p><span>-</span></p>
+          <p><a href="settings.html">settings</a></p>
+        </nav>
+
+      </div>
+    </header>
+
+    <p class="back-link"><a href="index.html">&larr; back to home</a></p>
+
+    <h1 id="page-title">Webcomic</h1>
+    <p class="byline" id="byline" hidden>
+      by <img class="byline-avatar" id="byline-avatar" alt="" hidden><a id="byline-link"></a>
+    </p>
+    <p class="byline-username" id="byline-username" hidden></p>
+    <p class="meta-line" id="meta-line" hidden></p>
+
+    <section class="state-box" id="state-box" hidden></section>
+
+    <section class="comic-head" id="comic-head" hidden>
+      <div id="cover-slot"></div>
+      <div class="comic-head-info">
+        <p class="comic-description" id="comic-description"></p>
+        <div class="reactions" id="reactions">
+          <button type="button" id="like-button" class="like-button">like</button>
+          <button type="button" id="dislike-button" class="dislike-button">dislike</button>
+          <button type="button" id="heart-button" class="heart-button">heart</button>
+          <button type="button" id="save-button" class="save-button">save</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-heading">
+      <h2>Chapters</h2>
+      <span class="count" id="chapters-count"></span>
+    </div>
+    <div class="chapters-list" id="chapters-list"></div>
+    <p class="empty-note" id="chapters-empty" hidden>Nothing posted here yet.</p>
+
+    <div class="section-heading">
+      <h2>Comments</h2>
+      <span class="count" id="comments-count"></span>
+    </div>
+    <div id="comment-form-slot"></div>
+    <div class="comments-list" id="comments-list"></div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import {
+      doc, getDoc, getDocs, addDoc, deleteDoc, setDoc, collection, getFirestore, query, orderBy, limit, serverTimestamp,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js";
+
+    // If this page is restored from the browser's back/forward cache (e.g.
+    // after signing in/out as a different account on another page, then
+    // hitting Back), force a fresh reload so auth-dependent UI re-evaluates
+    // against whoever is ACTUALLY signed in right now.
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) window.location.reload();
+    });
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg6umXxHQ6INyc_U2AvmhF9blhQ5ZEtT8",
+      authDomain: "sketchbook-trilogies.firebaseapp.com",
+      projectId: "sketchbook-trilogies",
+      storageBucket: "sketchbook-trilogies.firebasestorage.app",
+      messagingSenderId: "564902002463",
+      appId: "1:564902002463:web:7dc95e5e857e19b959fa2a",
+      measurementId: "G-Q08PSQDHMH",
+    };
+
+    const sampleAvatar = "default-avatar.png";
+    const formatLabels = { text_image: "Text & Image", panel: "Continuous Panel" };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    if (await isSupported()) getAnalytics(app);
+
+    // ---- custom alert/confirm popup (replaces browser alert()/confirm()) ----
+    const appPopupOverlay = document.querySelector("#app-popup-overlay");
+    const appPopupMessage = document.querySelector("#app-popup-message");
+    const appPopupCancelButton = document.querySelector("#app-popup-cancel");
+    const appPopupOkButton = document.querySelector("#app-popup-ok");
+    let appPopupResolve = null;
+
+    function closeAppPopup(result) {
+      appPopupOverlay.hidden = true;
+      if (appPopupResolve) {
+        const resolve = appPopupResolve;
+        appPopupResolve = null;
+        resolve(result);
+      }
+    }
+
+    appPopupOkButton.addEventListener("click", () => closeAppPopup(true));
+    appPopupCancelButton.addEventListener("click", () => closeAppPopup(false));
+    appPopupOverlay.addEventListener("click", (event) => {
+      if (event.target === appPopupOverlay) closeAppPopup(false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !appPopupOverlay.hidden) closeAppPopup(false);
+    });
+
+    function showAppAlert(message) {
+      return new Promise((resolve) => {
+        appPopupResolve = resolve;
+        appPopupMessage.textContent = message;
+        appPopupCancelButton.hidden = true;
+        appPopupOkButton.textContent = "OK";
+        appPopupOverlay.hidden = false;
+        appPopupOkButton.focus();
+      });
+    }
+
+    function showAppConfirm(message, confirmLabel = "OK") {
+      return new Promise((resolve) => {
+        appPopupResolve = resolve;
+        appPopupMessage.textContent = message;
+        appPopupCancelButton.hidden = false;
+        appPopupOkButton.textContent = confirmLabel;
+        appPopupOverlay.hidden = false;
+        appPopupOkButton.focus();
+      });
+    }
+
+    function formatDate(timestamp) {
+      if (!timestamp) return "";
+      const date = typeof timestamp.toDate === "function" ? timestamp.toDate() : new Date(timestamp);
+      if (Number.isNaN(date.getTime())) return "";
+      return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    }
+
+    function formatTimestamp(timestamp) {
+      if (!timestamp) return "";
+      const date = typeof timestamp.toDate === "function" ? timestamp.toDate() : new Date(timestamp);
+      if (Number.isNaN(date.getTime())) return "";
+      return date.toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+    }
+
+    // Comments store the author's display name and avatar at the time they
+    // were posted; we prefer showing their CURRENT username, display name,
+    // and avatar — fetched live (and cached per uid) since none of the
+    // three are kept in sync on the comment itself.
+    const authorInfoCache = new Map();
+
+    function applyLiveAuthorInfo(authorUid, { nameEl = null, avatarEl = null } = {}) {
+      if (!authorUid) return;
+
+      function apply(info) {
+        if (!info) return;
+        if (nameEl) {
+          nameEl.textContent = info.username ? `@${info.username}` : (info.displayName || nameEl.textContent);
+        }
+        if (avatarEl && info.photoURL) {
+          avatarEl.src = info.photoURL;
+        }
+      }
+
+      if (authorInfoCache.has(authorUid)) {
+        apply(authorInfoCache.get(authorUid));
+        return;
+      }
+
+      getDoc(doc(db, "users", authorUid)).then((snap) => {
+        const info = snap.exists()
+          ? {
+            username: snap.data().username || null,
+            displayName: snap.data().displayName || null,
+            photoURL: snap.data().photoURL || null,
+          }
+          : null;
+        authorInfoCache.set(authorUid, info);
+        apply(info);
+      }).catch(() => {
+        authorInfoCache.set(authorUid, null);
+      });
+    }
+
+    const pageTitle = document.querySelector("#page-title");
+    const byline = document.querySelector("#byline");
+    const bylineAvatar = document.querySelector("#byline-avatar");
+    const bylineLink = document.querySelector("#byline-link");
+    const bylineUsername = document.querySelector("#byline-username");
+    const metaLine = document.querySelector("#meta-line");
+    const stateBox = document.querySelector("#state-box");
+    const comicHead = document.querySelector("#comic-head");
+    const coverSlot = document.querySelector("#cover-slot");
+    const comicDescription = document.querySelector("#comic-description");
+    const likeButton = document.querySelector("#like-button");
+    const dislikeButton = document.querySelector("#dislike-button");
+    const heartButton = document.querySelector("#heart-button");
+    const saveButton = document.querySelector("#save-button");
+    const chaptersList = document.querySelector("#chapters-list");
+    const chaptersCount = document.querySelector("#chapters-count");
+    const chaptersEmpty = document.querySelector("#chapters-empty");
+    const commentsCount = document.querySelector("#comments-count");
+    const commentFormSlot = document.querySelector("#comment-form-slot");
+    const commentsList = document.querySelector("#comments-list");
+
+    function showState(message, kind = "") {
+      stateBox.hidden = false;
+      stateBox.className = kind ? `state-box ${kind}` : "state-box";
+      stateBox.textContent = message;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const comicId = params.get("id");
+
+    let comic = null;
+    let currentUser = null;
+    let currentUserDoc = null;
+    let readingProgress = null;
+
+    function chapterLabel(position, chapter) {
+      const subtitle = (chapter.subtitle || chapter.title || "").trim();
+      if (chapter.chapterType === "prologue") {
+        return subtitle ? `Prologue: ${subtitle}` : "Prologue";
+      }
+      if (chapter.chapterType === "epilogue") {
+        return subtitle ? `Epilogue: ${subtitle}` : "Epilogue";
+      }
+      const prefix = (comic.chapterPrefix || "Chapter").trim() || "Chapter";
+      return subtitle ? `${prefix} ${position}: ${subtitle}` : `${prefix} ${position}`;
+    }
+
+    // Prologues/epilogues sit outside normal chapter numbering — they never
+    // take up a number, so a regular "Chapter 1" is still Chapter 1 even
+    // with a prologue in front of it. Returns an array the same length as
+    // `chapters`, each entry being the regular chapter number (or null).
+    function computeChapterPositions(chapters) {
+      let count = 0;
+      return chapters.map((chapter) => {
+        if (chapter.chapterType === "prologue" || chapter.chapterType === "epilogue") {
+          return null;
+        }
+        count += 1;
+        return count;
+      });
+    }
+
+    async function loadChapters() {
+      try {
+        if (currentUser) {
+          try {
+            const progressSnap = await getDoc(doc(db, "users", currentUser.uid, "readingProgress", comicId));
+            readingProgress = progressSnap.exists() ? progressSnap.data() : null;
+          } catch (error) {
+            readingProgress = null;
+          }
+        } else {
+          readingProgress = null;
+        }
+
+        const snapshot = await getDocs(collection(db, "webcomics", comicId, "chapters"));
+        const chapters = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+        chapters.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+        chaptersCount.textContent = `(${chapters.length})`;
+        chaptersEmpty.hidden = chapters.length > 0;
+        chaptersList.innerHTML = "";
+
+        const chapterPositions = computeChapterPositions(chapters);
+
+        chapters.forEach((chapter, index) => {
+          const row = document.createElement("article");
+          row.className = "chapter-row";
+
+          const head = document.createElement("div");
+          head.className = "chapter-row-head";
+          const titleEl = document.createElement("h3");
+          titleEl.textContent = chapterLabel(chapterPositions[index], chapter);
+          const metaEl = document.createElement("span");
+          metaEl.className = "chapter-meta";
+          metaEl.textContent = "loading\u2026";
+          head.append(titleEl, metaEl);
+
+          const pageLinks = document.createElement("div");
+          pageLinks.className = "page-links";
+
+          row.append(head, pageLinks);
+          chaptersList.append(row);
+
+          getDocs(collection(db, "webcomics", comicId, "chapters", chapter.id, "pages"))
+            .then((snap) => {
+              const pages = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+              pages.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+              metaEl.textContent = `${pages.length} page${pages.length === 1 ? "" : "s"}`;
+
+              if (!pages.length) {
+                const note = document.createElement("span");
+                note.className = "no-pages-note";
+                note.textContent = "nothing posted here yet";
+                pageLinks.append(note);
+                return;
+              }
+
+              pages.forEach((pageDoc, pageIndex) => {
+                const link = document.createElement("a");
+                link.href = `page-read.html?id=${encodeURIComponent(comicId)}&chapter=${encodeURIComponent(chapter.id)}&page=${encodeURIComponent(pageDoc.id)}`;
+                link.textContent = `page ${pageIndex + 1}`;
+
+                const isHere = readingProgress
+                  && readingProgress.chapterId === chapter.id
+                  && readingProgress.pageId === pageDoc.id;
+
+                if (isHere) {
+                  link.classList.add("you-are-here");
+                  pageLinks.append(link);
+                  const badge = document.createElement("span");
+                  badge.className = "you-are-here-badge";
+                  badge.textContent = "you are here";
+                  pageLinks.append(badge);
+                } else {
+                  pageLinks.append(link);
+                }
+              });
+            })
+            .catch(() => { metaEl.textContent = ""; });
+        });
+      } catch (error) {
+        console.error("Could not load chapters:", error);
+        // The rest of the webcomic (title, cover, description) already
+        // rendered fine above — don't slap a page-level error over it.
+        // Show a small note in the chapters section itself instead.
+        chaptersEmpty.hidden = false;
+        chaptersEmpty.textContent = "Could not load chapters. Please try again.";
+      }
+    }
+
+    // ---- reactions (like/dislike) ----
+    async function loadReactionSummary() {
+      const snapshot = await getDocs(collection(db, "webcomics", comicId, "reactions"));
+      let likes = 0;
+      let dislikes = 0;
+      let userReaction = null;
+      snapshot.forEach((docSnap) => {
+        const type = docSnap.data().type;
+        if (type === "like") likes += 1;
+        else if (type === "dislike") dislikes += 1;
+        if (currentUser && docSnap.id === currentUser.uid) userReaction = type || null;
+      });
+      return { likes, dislikes, userReaction };
+    }
+
+    function refreshReactionButtons() {
+      likeButton.textContent = `like (${comic.likes ?? 0})`;
+      dislikeButton.textContent = `dislike (${comic.dislikes ?? 0})`;
+      likeButton.classList.toggle("active", comic.userReaction === "like");
+      dislikeButton.classList.toggle("active", comic.userReaction === "dislike");
+      likeButton.disabled = !currentUser;
+      dislikeButton.disabled = !currentUser;
+    }
+
+    async function setReaction(type) {
+      if (!currentUser) return;
+      const previous = comic.userReaction || null;
+      const next = previous === type ? null : type;
+
+      try {
+        const reactionRef = doc(db, "webcomics", comicId, "reactions", currentUser.uid);
+        if (next) {
+          await setDoc(reactionRef, { type: next });
+        } else {
+          await deleteDoc(reactionRef);
+        }
+        const summary = await loadReactionSummary();
+        comic.likes = summary.likes;
+        comic.dislikes = summary.dislikes;
+        comic.userReaction = summary.userReaction;
+        refreshReactionButtons();
+      } catch (error) {
+        console.error(error);
+        await showAppAlert("Could not update your reaction. Please try again.");
+      }
+    }
+
+    likeButton.addEventListener("click", () => setReaction("like"));
+    dislikeButton.addEventListener("click", () => setReaction("dislike"));
+
+    // ---- hearts & saves ----
+    // Same principle as reactions above: nobody is ever granted write access
+    // to a document they don't own, including the running totals. So hearts
+    // and saves are one-doc-per-user subcollections (webcomics/{id}/hearts/{uid},
+    // .../saves/{uid}) — the total is just the size of that subcollection,
+    // computed by reading it, not a shared counter field on the webcomic
+    // doc itself (only its author can ever write that doc).
+    async function loadHeartSaveSummary() {
+      const [heartsSnap, savesSnap] = await Promise.all([
+        getDocs(collection(db, "webcomics", comicId, "hearts")),
+        getDocs(collection(db, "webcomics", comicId, "saves")),
+      ]);
+      return {
+        hearts: heartsSnap.size,
+        saves: savesSnap.size,
+        userHearted: !!(currentUser && heartsSnap.docs.some((d) => d.id === currentUser.uid)),
+        userSaved: !!(currentUser && savesSnap.docs.some((d) => d.id === currentUser.uid)),
+      };
+    }
+
+    function refreshHeartSaveButtons() {
+      heartButton.textContent = `heart (${comic.hearts ?? 0})`;
+      saveButton.textContent = `save (${comic.saves ?? 0})`;
+      heartButton.classList.toggle("active", !!comic.userHearted);
+      saveButton.classList.toggle("active", !!comic.userSaved);
+      heartButton.disabled = !currentUser;
+      saveButton.disabled = !currentUser;
+    }
+
+    async function toggleHeartOrSave(kind) {
+      if (!currentUser) return;
+      const collectionName = kind === "heart" ? "hearts" : "saves";
+      const userFlag = kind === "heart" ? "userHearted" : "userSaved";
+      const wasActive = !!comic[userFlag];
+      const button = kind === "heart" ? heartButton : saveButton;
+
+      button.disabled = true;
+      try {
+        const ref = doc(db, "webcomics", comicId, collectionName, currentUser.uid);
+        if (wasActive) {
+          await deleteDoc(ref);
+        } else {
+          await setDoc(ref, { uid: currentUser.uid, createdAt: serverTimestamp() });
+        }
+
+        const summary = await loadHeartSaveSummary();
+        comic.hearts = summary.hearts;
+        comic.saves = summary.saves;
+        comic.userHearted = summary.userHearted;
+        comic.userSaved = summary.userSaved;
+        refreshHeartSaveButtons();
+      } catch (error) {
+        console.error(error);
+        await showAppAlert(`Could not update your ${kind}. Please try again.`);
+      } finally {
+        button.disabled = !currentUser;
+      }
+    }
+
+    heartButton.addEventListener("click", () => toggleHeartOrSave("heart"));
+    saveButton.addEventListener("click", () => toggleHeartOrSave("save"));
+
+    // "reads" works the same way: webcomics/{id}/views/{uid}, one doc per
+    // signed-in reader, counted by size. (Signed-out visitors simply aren't
+    // counted — same limitation as hearts/saves/reactions, all of which
+    // require an account so there's an owner to grant write access to.)
+    async function recordReadIfNeeded() {
+      if (!currentUser) return;
+      try {
+        const key = `read:${comicId}:${currentUser.uid}`;
+        if (sessionStorage.getItem(key)) return;
+        sessionStorage.setItem(key, "1");
+        await setDoc(doc(db, "webcomics", comicId, "views", currentUser.uid), {
+          uid: currentUser.uid,
+          createdAt: serverTimestamp(),
+        }, { merge: true });
+        const viewsSnap = await getDocs(collection(db, "webcomics", comicId, "views"));
+        comic.reads = viewsSnap.size;
+      } catch (error) {
+        // Non-critical — don't block the page over a view-count bump.
+        console.error("Could not record read:", error);
+      }
+    }
+
+    // ---- comments ----
+    async function addComment(text, parentId = null) {
+      await addDoc(collection(db, "webcomics", comicId, "comments"), {
+        authorUid: currentUser.uid,
+        authorName: currentUserDoc?.displayName || currentUser.displayName || currentUser.email || "User",
+        authorPhotoURL: currentUserDoc?.photoURL || null,
+        text,
+        parentId,
+        createdAt: serverTimestamp(),
+      });
+    }
+
+    function buildCommentForm() {
+      commentFormSlot.innerHTML = "";
+      if (currentUser) {
+        const form = document.createElement("form");
+        form.className = "comment-form";
+        const input = document.createElement("input");
+        input.type = "text";
+        input.maxLength = 300;
+        input.placeholder = "Add a comment...";
+        const submit = document.createElement("button");
+        submit.type = "submit";
+        submit.textContent = "reply";
+        form.append(input, submit);
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const text = input.value.trim();
+          if (!text) return;
+          submit.disabled = true;
+          try {
+            await addComment(text);
+            input.value = "";
+            await renderComments();
+          } catch (error) {
+            console.error(error);
+            await showAppAlert("Could not post your comment. Please try again.");
+          } finally {
+            submit.disabled = false;
+          }
+        });
+        commentFormSlot.append(form);
+      } else {
+        const note = document.createElement("p");
+        note.className = "comments-note";
+        note.innerHTML = 'Sign in to comment. <a href="auth-sign-in.html?mode=signin">Sign in</a>';
+        commentFormSlot.append(note);
+      }
+    }
+
+    function buildCommentRow(comment, replyingToName = null) {
+      const row = document.createElement("div");
+      row.className = "comment-row";
+
+      const avatar = document.createElement("img");
+      avatar.className = "comment-avatar";
+      avatar.alt = "";
+      avatar.src = comment.authorPhotoURL || sampleAvatar;
+      avatar.onerror = () => { avatar.onerror = null; avatar.src = sampleAvatar; };
+
+      const body = document.createElement("div");
+      body.className = "comment-body";
+
+      if (replyingToName) {
+        const replyingTo = document.createElement("div");
+        replyingTo.className = "comment-replying-to";
+        replyingTo.textContent = `replying to ${replyingToName}`;
+        body.append(replyingTo);
+      }
+
+      const authorLink = document.createElement("a");
+      authorLink.className = "comment-author";
+      authorLink.href = `profile.html?uid=${encodeURIComponent(comment.authorUid || "")}`;
+      authorLink.textContent = comment.authorName || "Someone";
+      applyLiveAuthorInfo(comment.authorUid, { nameEl: authorLink, avatarEl: avatar });
+
+      const text = document.createElement("span");
+      text.className = "comment-text";
+      text.textContent = comment.text || "";
+
+      const time = document.createElement("div");
+      time.className = "comment-time";
+      time.textContent = formatTimestamp(comment.createdAt);
+
+      body.append(authorLink, text, time);
+
+      const actions = document.createElement("div");
+      actions.className = "comment-actions";
+
+      if (currentUser) {
+        const replyButton = document.createElement("button");
+        replyButton.type = "button";
+        replyButton.className = "comment-reply-button";
+        replyButton.textContent = "reply";
+
+        let replyForm = null;
+        replyButton.addEventListener("click", () => {
+          if (replyForm) {
+            replyForm.remove();
+            replyForm = null;
+            return;
+          }
+          replyForm = document.createElement("form");
+          replyForm.className = "comment-reply-form";
+          const input = document.createElement("input");
+          input.type = "text";
+          input.maxLength = 300;
+          input.placeholder = `reply to ${comment.authorName || "this comment"}...`;
+          const submit = document.createElement("button");
+          submit.type = "submit";
+          submit.textContent = "reply";
+          replyForm.append(input, submit);
+
+          replyForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const replyText = input.value.trim();
+            if (!replyText) return;
+            submit.disabled = true;
+            try {
+              await addComment(replyText, comment.id);
+              await renderComments();
+            } catch (error) {
+              console.error(error);
+              await showAppAlert("Could not post your reply. Please try again.");
+              submit.disabled = false;
+            }
+          });
+
+          actions.append(replyForm);
+          input.focus();
+        });
+
+        actions.append(replyButton);
+      }
+
+      if (currentUser && currentUser.uid === comment.authorUid) {
+        const del = document.createElement("button");
+        del.type = "button";
+        del.className = "comment-delete";
+        del.textContent = "delete";
+        del.addEventListener("click", async () => {
+          const confirmed = await showAppConfirm("Delete this comment?", "delete");
+          if (!confirmed) return;
+          try {
+            await deleteDoc(doc(db, "webcomics", comicId, "comments", comment.id));
+            await renderComments();
+          } catch (error) {
+            console.error(error);
+            await showAppAlert("Could not delete that comment. Please try again.");
+          }
+        });
+        actions.append(del);
+      }
+
+      body.append(actions);
+      row.append(avatar, body);
+      return row;
+    }
+
+    async function renderComments() {
+      try {
+        const commentsQuery = query(
+          collection(db, "webcomics", comicId, "comments"),
+          orderBy("createdAt", "asc"),
+          limit(200),
+        );
+        const snapshot = await getDocs(commentsQuery);
+        const allComments = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+        commentsCount.textContent = `(${allComments.length})`;
+        commentsList.innerHTML = "";
+
+        if (!allComments.length) {
+          const empty = document.createElement("p");
+          empty.className = "comments-note";
+          empty.textContent = "No comments yet.";
+          commentsList.append(empty);
+          return;
+        }
+
+        const byId = new Map(allComments.map((c) => [c.id, c]));
+
+        function topLevelAncestorId(comment) {
+          let current = comment;
+          const seen = new Set();
+          while (current.parentId && byId.has(current.parentId) && !seen.has(current.id)) {
+            seen.add(current.id);
+            current = byId.get(current.parentId);
+          }
+          return current.id;
+        }
+
+        const topLevel = allComments.filter((comment) => !comment.parentId);
+        const repliesByTopLevel = new Map();
+        allComments.forEach((comment) => {
+          if (!comment.parentId) return;
+          const topId = topLevelAncestorId(comment);
+          if (topId === comment.id) return;
+          if (!repliesByTopLevel.has(topId)) repliesByTopLevel.set(topId, []);
+          repliesByTopLevel.get(topId).push(comment);
+        });
+
+        topLevel.forEach((comment) => {
+          commentsList.append(buildCommentRow(comment));
+
+          const replies = repliesByTopLevel.get(comment.id);
+          if (replies && replies.length) {
+            const repliesWrap = document.createElement("div");
+            repliesWrap.className = "comment-replies";
+            replies.forEach((reply) => {
+              const parent = byId.get(reply.parentId);
+              const replyingToName = parent && parent.id !== comment.id
+                ? (parent.authorName || "Someone")
+                : null;
+              repliesWrap.append(buildCommentRow(reply, replyingToName));
+            });
+            commentsList.append(repliesWrap);
+          }
+        });
+      } catch (error) {
+        console.error(error);
+        commentsList.innerHTML = "";
+        const errorNote = document.createElement("p");
+        errorNote.className = "comments-note";
+        errorNote.textContent = "Could not load comments.";
+        commentsList.append(errorNote);
+      }
+    }
+
+    async function loadComic() {
+      if (!comicId) {
+        showState("No webcomic was specified.", "error");
+        return;
+      }
+
+      try {
+        const snapshot = await getDoc(doc(db, "webcomics", comicId));
+        if (!snapshot.exists()) {
+          showState("That webcomic doesn't exist, or has been deleted.", "error");
+          return;
+        }
+
+        comic = { id: snapshot.id, ...snapshot.data() };
+
+        if (comic.status !== "published") {
+          showState("This webcomic isn't available to view.", "error");
+          return;
+        }
+
+        // We have a real, viewable webcomic now — clear out any leftover
+        // error from an earlier attempt so it doesn't just sit there next
+        // to content that actually loaded fine.
+        stateBox.hidden = true;
+
+        pageTitle.textContent = comic.title || "Untitled";
+        document.title = `${comic.title || "Untitled"} - Sketchbook Trilogies`;
+
+        byline.hidden = false;
+        bylineLink.href = `profile.html?uid=${encodeURIComponent(comic.authorUid || "")}`;
+        bylineLink.textContent = comic.authorName || "someone";
+
+        const metaParts = [];
+        if (comic.format) metaParts.push(formatLabels[comic.format] || comic.format);
+        const published = formatDate(comic.createdAt);
+        if (published) metaParts.push(`published ${published}`);
+        if (typeof comic.pageCount === "number") metaParts.push(`${comic.pageCount} page${comic.pageCount === 1 ? "" : "s"}`);
+        if (metaParts.length) {
+          metaLine.hidden = false;
+          metaLine.textContent = metaParts.join("  \u00b7  ");
+        }
+
+        comicHead.hidden = false;
+        coverSlot.innerHTML = "";
+        if (comic.coverImage) {
+          const img = document.createElement("img");
+          img.alt = "";
+          img.src = comic.coverImage;
+          coverSlot.append(img);
+        } else {
+          const placeholder = document.createElement("div");
+          placeholder.className = "comic-head-placeholder";
+          placeholder.textContent = "no cover";
+          coverSlot.append(placeholder);
+        }
+        comicDescription.textContent = comic.description || "";
+
+        if (comic.customCssMain) {
+          const styleTag = document.createElement("style");
+          styleTag.id = "author-custom-css";
+          styleTag.textContent = comic.customCssMain;
+          document.head.append(styleTag);
+        }
+
+        // Author avatar/username/display name for the byline (best-effort;
+        // not critical if it fails). Unlike posts/comments, the byline's
+        // own name always stays the display name — username gets its own
+        // separate line below rather than replacing it here.
+        if (comic.authorUid) {
+          bylineAvatar.hidden = false;
+          bylineAvatar.onerror = () => { bylineAvatar.hidden = true; };
+          getDoc(doc(db, "users", comic.authorUid)).then((authorSnap) => {
+            if (!authorSnap.exists()) return;
+            const authorData = authorSnap.data();
+            if (authorData.displayName) {
+              bylineLink.textContent = authorData.displayName;
+            }
+            if (authorData.photoURL) {
+              bylineAvatar.src = authorData.photoURL;
+            }
+            if (authorData.username) {
+              bylineUsername.hidden = false;
+              bylineUsername.textContent = `@${authorData.username}`;
+            }
+          }).catch(() => {});
+        }
+
+        // Everything below is secondary to the core webcomic content that's
+        // already rendered above (title, byline, cover, description). If
+        // reactions, hearts/saves, chapters, or comments fail to load, log
+        // it and move on rather than slapping a "could not load" error over
+        // content that plainly did load.
+        try {
+          const summary = await loadReactionSummary();
+          comic.likes = summary.likes;
+          comic.dislikes = summary.dislikes;
+          comic.userReaction = summary.userReaction;
+          refreshReactionButtons();
+
+          const heartSaveSummary = await loadHeartSaveSummary();
+          comic.hearts = heartSaveSummary.hearts;
+          comic.saves = heartSaveSummary.saves;
+          comic.userHearted = heartSaveSummary.userHearted;
+          comic.userSaved = heartSaveSummary.userSaved;
+          refreshHeartSaveButtons();
+          recordReadIfNeeded();
+        } catch (error) {
+          console.error("Could not load reactions/hearts/saves:", error);
+        }
+
+        try {
+          await loadChapters();
+        } catch (error) {
+          console.error("Could not load chapters:", error);
+        }
+
+        try {
+          buildCommentForm();
+          await renderComments();
+        } catch (error) {
+          console.error("Could not load comments:", error);
+        }
+      } catch (error) {
+        console.error("Could not load webcomic:", error);
+        showState("Could not load this webcomic. Please try again.", "error");
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      currentUserDoc = null;
+
+      if (user) {
+        try {
+          const userSnap = await getDoc(doc(db, "users", user.uid));
+          if (userSnap.exists()) currentUserDoc = userSnap.data();
+        } catch (error) {
+          console.error("Could not load current user profile:", error);
+        }
+      }
+
+      if (comic) {
+        refreshReactionButtons();
+        refreshHeartSaveButtons();
+        buildCommentForm();
+        loadReactionSummary().then((summary) => {
+          comic.likes = summary.likes;
+          comic.dislikes = summary.dislikes;
+          comic.userReaction = summary.userReaction;
+          refreshReactionButtons();
+        }).catch(() => {});
+        loadHeartSaveSummary().then((summary) => {
+          comic.hearts = summary.hearts;
+          comic.saves = summary.saves;
+          comic.userHearted = summary.userHearted;
+          comic.userSaved = summary.userSaved;
+          refreshHeartSaveButtons();
+        }).catch(() => {});
+        renderComments();
+        loadChapters();
+      }
+    });
+
+    loadComic();
+  </script>
+</body>
+</html>

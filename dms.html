@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DMs - Sketchbook Trilogies</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    :root {
+      --ink: #05070b;
+      --paper: #bfc7dc;
+      --panel: #8a91a1;
+      --line: #090a0d;
+      --link: #002fff;
+      --visited: #4f1eb7;
+      --bevel-light: #c8cedd;
+      --bevel-dark: #4c5363;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 1px 1px, #2a2a33 1px, transparent 1.5px) 0 0 / 7px 7px,
+        #06060a;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 1px;
+    }
+
+    a:visited {
+      color: var(--visited);
+    }
+
+    .page {
+      width: min(100vw - 18px, 720px);
+      min-height: 100vh;
+      margin: 0 auto;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border-left: 4px solid #51596b;
+      border-right: 4px solid #51596b;
+      box-shadow: 0 0 0 1px #171a22;
+      padding: 0 22px 32px;
+    }
+
+    .topbar {
+      min-height: 42px;
+      display: flex;
+      align-items: start;
+      gap: 6px;
+      border-bottom: 3px double #6c758b;
+      overflow: hidden;
+    }
+
+    .brand {
+      width: 215px;
+      height: 34px;
+      object-fit: contain;
+      object-position: left center;
+      filter: contrast(1.18);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: start;
+      gap: 4px;
+      min-height: 34px;
+      padding-top: 3px;
+      font-size: 16px;
+      line-height: 1.15;
+      white-space: nowrap;
+      flex-wrap: wrap;
+    }
+
+    .nav p,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      margin: 14px 0 0;
+      font-size: 26px;
+      line-height: 1.05;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0 #e2e6f2;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      padding-bottom: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      border-bottom: 4px solid var(--line);
+    }
+
+    .state-box {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .panel {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 22px 14px;
+      text-align: center;
+      font-size: 14px;
+      color: #23283a;
+    }
+
+    .panel[hidden] {
+      display: none;
+    }
+
+    .panel b {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .convo-list {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .convo {
+      display: block;
+      border: 3px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 10px 12px;
+      text-decoration: none;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .convo:visited {
+      color: #1d2330;
+    }
+
+    .convo.unread {
+      background: #cfd6e8;
+      border-color: #3d4556;
+      font-weight: 700;
+    }
+
+    .convo .convo-with {
+      font-weight: 700;
+    }
+
+    .convo .convo-preview {
+      display: block;
+      margin-top: 2px;
+      font-weight: 400;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .convo .convo-when {
+      display: block;
+      margin-top: 3px;
+      font-size: 11px;
+      font-weight: 400;
+      color: #4c5363;
+      font-family: "Trebuchet MS", Verdana, Arial, sans-serif;
+    }
+
+    .thread-header {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .thread-header h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .message-list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 55vh;
+      overflow-y: auto;
+      padding: 10px;
+      border: 3px solid #5f687d;
+      background: #737a8c;
+    }
+
+    .message-row {
+      max-width: 80%;
+      padding: 6px 10px;
+      border: 2px solid #090a0d;
+      background: #d8dceb;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .message-row.mine {
+      align-self: flex-end;
+      background: #b9c3ea;
+    }
+
+    .message-when {
+      display: block;
+      margin-top: 3px;
+      font-size: 10px;
+      color: #4c5363;
+      font-family: "Trebuchet MS", Verdana, Arial, sans-serif;
+    }
+
+    .message-form {
+      margin-top: 10px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .message-form input {
+      flex: 1 1 auto;
+      min-height: 30px;
+      border: 2px solid var(--panel);
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+      padding: 0 8px;
+      font: 14px Georgia, "Times New Roman", serif;
+    }
+
+    .message-form button {
+      min-height: 30px;
+      padding: 0 14px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font: 700 13px Georgia, "Times New Roman", serif;
+    }
+
+    .message-form button:disabled {
+      cursor: default;
+      opacity: .6;
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        width: 100%;
+        border: 0;
+        padding: 0 12px 24px;
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+        min-height: auto;
+        padding-bottom: 7px;
+      }
+
+      .brand {
+        width: min(260px, 100%);
+      }
+
+      .nav {
+        width: 100%;
+        padding-top: 0;
+      }
+
+      .convo {
+        font-size: 15px;
+        padding: 12px 14px;
+      }
+
+      .message-form input {
+        min-height: 44px;
+        font-size: 16px;
+      }
+
+      .message-form button {
+        min-height: 44px;
+        padding: 0 18px;
+        font-size: 14px;
+      }
+
+      .message-row {
+        max-width: 88%;
+        font-size: 14px;
+      }
+
+      .thread-header h2 {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar" aria-label="Site header">
+      <img class="brand" src="Logo.png" alt="Sketchbook Trilogies">
+      <div class="topbar-menu">
+        <nav class="nav" aria-label="Primary navigation">
+          <p><span>|</span></p>
+          <p><a href="index.html">home</a></p>
+          <p><span>-</span></p>
+          <p><a href="blog.html">blog</a></p>
+          <p><span>-</span></p>
+          <p><a href="settings.html">settings</a></p>
+        </nav>
+
+      </div>
+    </header>
+
+    <h1>DMs</h1>
+    <p class="subtitle">Direct messages between you and other members.</p>
+
+    <section class="state-box" id="state-box" hidden></section>
+
+    <section class="panel" id="dms-panel" hidden>
+      <b>Nothing here yet</b>
+      No conversations yet. Start one from someone's profile page.
+    </section>
+
+    <section id="convo-list-section" hidden>
+      <div class="convo-list" id="convo-list"></div>
+    </section>
+
+    <section id="thread-section" hidden>
+      <div class="thread-header">
+        <h2 id="thread-with">Conversation</h2>
+        <a href="dms.html">&larr; all conversations</a>
+      </div>
+      <div class="message-list" id="message-list"></div>
+      <form class="message-form" id="message-form">
+        <input type="text" id="message-input" maxlength="1000" placeholder="Type a message..." autocomplete="off">
+        <button type="submit" id="message-submit">send</button>
+      </form>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import {
+      getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc,
+      query, where, orderBy, limit, serverTimestamp,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js";
+
+    // If this page is restored from the browser's back/forward cache (e.g.
+    // after signing in/out as a different account on another page, then
+    // hitting Back), force a fresh reload so auth-dependent UI (like
+    // "edit profile" or "account settings") re-evaluates against whoever is
+    // ACTUALLY signed in right now, instead of showing stale cached state.
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    });
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg6umXxHQ6INyc_U2AvmhF9blhQ5ZEtT8",
+      authDomain: "sketchbook-trilogies.firebaseapp.com",
+      projectId: "sketchbook-trilogies",
+      storageBucket: "sketchbook-trilogies.firebasestorage.app",
+      messagingSenderId: "564902002463",
+      appId: "1:564902002463:web:7dc95e5e857e19b959fa2a",
+      measurementId: "G-Q08PSQDHMH",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    if (await isSupported()) {
+      getAnalytics(app);
+    }
+
+    const stateBox = document.querySelector("#state-box");
+    const dmsPanel = document.querySelector("#dms-panel");
+    const convoListSection = document.querySelector("#convo-list-section");
+    const convoList = document.querySelector("#convo-list");
+    const threadSection = document.querySelector("#thread-section");
+    const threadWith = document.querySelector("#thread-with");
+    const messageList = document.querySelector("#message-list");
+    const messageForm = document.querySelector("#message-form");
+    const messageInput = document.querySelector("#message-input");
+    const messageSubmit = document.querySelector("#message-submit");
+
+    const params = new URLSearchParams(window.location.search);
+    const toUid = params.get("to");
+    const conversationIdParam = params.get("c");
+
+    function hideAll() {
+      dmsPanel.hidden = true;
+      convoListSection.hidden = true;
+      threadSection.hidden = true;
+    }
+
+    function conversationIdFor(uidA, uidB) {
+      return [uidA, uidB].sort().join("_");
+    }
+
+    function timeAgo(timestamp) {
+      if (!timestamp || typeof timestamp.toMillis !== "function") return "";
+      const seconds = Math.max(0, Math.round((Date.now() - timestamp.toMillis()) / 1000));
+      if (seconds < 60) return "just now";
+      const minutes = Math.round(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      const hours = Math.round(minutes / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.round(hours / 24);
+      return `${days}d ago`;
+    }
+
+    async function displayNameFor(uid) {
+      try {
+        const snap = await getDoc(doc(db, "users", uid));
+        return snap.exists() ? (snap.data().displayName || "User") : "User";
+      } catch (error) {
+        return "User";
+      }
+    }
+
+    // ---- conversation list ----
+    async function renderConversationList(uid) {
+      const convoQuery = query(
+        collection(db, "conversations"),
+        where("participants", "array-contains", uid),
+        orderBy("updatedAt", "desc"),
+        limit(30),
+      );
+      const snapshot = await getDocs(convoQuery);
+
+      if (!snapshot.docs.length) {
+        dmsPanel.hidden = false;
+        convoListSection.hidden = true;
+        return;
+      }
+
+      dmsPanel.hidden = true;
+      convoListSection.hidden = false;
+      convoList.innerHTML = "";
+
+      snapshot.docs.forEach((docSnap) => {
+        const data = docSnap.data();
+        const otherUid = (data.participants || []).find((p) => p !== uid);
+        const otherName = (data.participantNames && data.participantNames[otherUid]) || "Someone";
+        const unread = data.lastMessageFromUid && data.lastMessageFromUid !== uid && data.lastReadBy?.[uid] !== true;
+
+        const link = document.createElement("a");
+        link.className = `convo${unread ? " unread" : ""}`;
+        link.href = `dms.html?c=${encodeURIComponent(docSnap.id)}`;
+
+        const withEl = document.createElement("span");
+        withEl.className = "convo-with";
+        withEl.textContent = otherName;
+
+        const preview = document.createElement("span");
+        preview.className = "convo-preview";
+        preview.textContent = data.lastMessage || "";
+
+        const when = document.createElement("span");
+        when.className = "convo-when";
+        when.textContent = timeAgo(data.updatedAt);
+
+        link.append(withEl, preview, when);
+        convoList.append(link);
+      });
+    }
+
+    // ---- thread ----
+    let activeConversationId = null;
+    let activeOtherUid = null;
+
+    async function loadOrCreateConversation(uid, otherUid) {
+      const conversationId = conversationIdFor(uid, otherUid);
+      const ref = doc(db, "conversations", conversationId);
+      const snap = await getDoc(ref);
+
+      if (!snap.exists()) {
+        const [myName, otherName] = await Promise.all([
+          displayNameFor(uid),
+          displayNameFor(otherUid),
+        ]);
+        await setDoc(ref, {
+          participants: [uid, otherUid],
+          participantNames: { [uid]: myName, [otherUid]: otherName },
+          lastMessage: "",
+          lastMessageFromUid: null,
+          lastReadBy: { [uid]: true, [otherUid]: true },
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      }
+
+      return conversationId;
+    }
+
+    function renderMessages(uid, docs) {
+      messageList.innerHTML = "";
+      docs.forEach((docSnap) => {
+        const data = docSnap.data();
+        const row = document.createElement("div");
+        row.className = `message-row${data.fromUid === uid ? " mine" : ""}`;
+        const text = document.createElement("div");
+        text.textContent = data.text || "";
+        const when = document.createElement("span");
+        when.className = "message-when";
+        when.textContent = timeAgo(data.createdAt);
+        row.append(text, when);
+        messageList.append(row);
+      });
+      messageList.scrollTop = messageList.scrollHeight;
+    }
+
+    async function openThread(uid, conversationId) {
+      activeConversationId = conversationId;
+      hideAll();
+      threadSection.hidden = false;
+
+      const convoSnap = await getDoc(doc(db, "conversations", conversationId));
+      if (!convoSnap.exists()) {
+        threadWith.textContent = "Conversation not found";
+        messageList.innerHTML = "";
+        messageForm.hidden = true;
+        return;
+      }
+      const convoData = convoSnap.data();
+      activeOtherUid = (convoData.participants || []).find((p) => p !== uid);
+      threadWith.textContent = (convoData.participantNames && convoData.participantNames[activeOtherUid]) || "Conversation";
+
+      const messagesQuery = query(
+        collection(db, "conversations", conversationId, "messages"),
+        orderBy("createdAt", "asc"),
+        limit(200),
+      );
+      const messagesSnap = await getDocs(messagesQuery);
+      renderMessages(uid, messagesSnap.docs);
+
+      updateDoc(doc(db, "conversations", conversationId), {
+        [`lastReadBy.${uid}`]: true,
+      }).catch(() => {});
+    }
+
+    messageForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const user = auth.currentUser;
+      if (!user || !activeConversationId) return;
+      const text = messageInput.value.trim();
+      if (!text) return;
+
+      messageSubmit.disabled = true;
+      try {
+        await addDoc(collection(db, "conversations", activeConversationId, "messages"), {
+          fromUid: user.uid,
+          text,
+          createdAt: serverTimestamp(),
+        });
+        await updateDoc(doc(db, "conversations", activeConversationId), {
+          lastMessage: text,
+          lastMessageFromUid: user.uid,
+          [`lastReadBy.${activeOtherUid}`]: false,
+          [`lastReadBy.${user.uid}`]: true,
+          updatedAt: serverTimestamp(),
+        });
+        messageInput.value = "";
+        const messagesQuery = query(
+          collection(db, "conversations", activeConversationId, "messages"),
+          orderBy("createdAt", "asc"),
+          limit(200),
+        );
+        const messagesSnap = await getDocs(messagesQuery);
+        renderMessages(user.uid, messagesSnap.docs);
+      } catch (error) {
+        console.error("Could not send message:", error);
+      } finally {
+        messageSubmit.disabled = false;
+      }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        stateBox.hidden = false;
+        stateBox.innerHTML = 'Sign in to view your DMs. <a href="auth-sign-in.html?mode=signin">Sign in</a>';
+        hideAll();
+        return;
+      }
+
+      stateBox.hidden = true;
+
+      try {
+        if (toUid && toUid !== user.uid) {
+          const conversationId = await loadOrCreateConversation(user.uid, toUid);
+          window.location.replace(`dms.html?c=${encodeURIComponent(conversationId)}`);
+          return;
+        }
+
+        if (conversationIdParam) {
+          await openThread(user.uid, conversationIdParam);
+          return;
+        }
+
+        hideAll();
+        await renderConversationList(user.uid);
+      } catch (error) {
+        console.error("Could not load DMs:", error);
+        hideAll();
+        dmsPanel.hidden = false;
+      }
+    });
+  </script>
+</body>
+</html>

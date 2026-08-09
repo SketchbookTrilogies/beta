@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings - Sketchbook Trilogies</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    :root {
+      --ink: #05070b;
+      --paper: #bfc7dc;
+      --panel: #8a91a1;
+      --panel-dark: #4f5666;
+      --line: #090a0d;
+      --link: #002fff;
+      --visited: #4f1eb7;
+      --bevel-light: #c8cedd;
+      --bevel-dark: #4c5363;
+      --danger: #650000;
+      --danger-bg: #cbb3b3;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 1px 1px, #2a2a33 1px, transparent 1.5px) 0 0 / 7px 7px,
+        #06060a;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 1px;
+    }
+
+    a:visited {
+      color: var(--visited);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100vw - 18px, 720px);
+      min-height: 100vh;
+      margin: 0 auto;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border-left: 4px solid #51596b;
+      border-right: 4px solid #51596b;
+      box-shadow: 0 0 0 1px #171a22;
+      padding: 0 22px 40px;
+    }
+
+    .topbar {
+      min-height: 42px;
+      display: flex;
+      align-items: start;
+      gap: 6px;
+      border-bottom: 3px double #6c758b;
+      overflow: hidden;
+    }
+
+    .brand {
+      width: 215px;
+      height: 34px;
+      object-fit: contain;
+      object-position: left center;
+      filter: contrast(1.18);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: start;
+      gap: 4px;
+      min-height: 34px;
+      padding-top: 3px;
+      font-size: 16px;
+      line-height: 1.15;
+      white-space: nowrap;
+    }
+
+    .nav p,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      margin: 14px 0 0;
+      font-size: 26px;
+      line-height: 1.05;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0 #e2e6f2;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      padding-bottom: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      border-bottom: 4px solid var(--line);
+    }
+
+    .state-box {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .settings-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .settings-tabs button {
+      min-height: 28px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 3px 10px;
+    }
+
+    .settings-tabs button[aria-selected="true"] {
+      background: #c5ccdd;
+      font-weight: 700;
+    }
+
+    .settings-tabs button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .panel {
+      margin-top: 12px;
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 14px;
+    }
+
+    .panel[hidden] {
+      display: none;
+    }
+
+    .panel h2 {
+      margin: 0 0 4px;
+      font-size: 19px;
+      line-height: 1.1;
+    }
+
+    .panel .hint {
+      margin: 0 0 12px;
+      font-size: 13px;
+      line-height: 1.3;
+      color: #262b39;
+    }
+
+    .field-form {
+      display: grid;
+      gap: 10px;
+      padding: 12px 0;
+    }
+
+    .field-form + .field-form {
+      border-top: 3px solid var(--line);
+    }
+
+    label {
+      display: grid;
+      gap: 3px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input {
+      height: 28px;
+      border: 2px solid var(--panel-dark);
+      border-top-color: #3d4556;
+      border-left-color: #3d4556;
+      border-right-color: #b4bbcc;
+      border-bottom-color: #b4bbcc;
+      background: #c6ccda;
+      color: #111;
+      padding: 2px 6px;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .row-actions button {
+      min-height: 28px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 3px 12px;
+    }
+
+    .row-actions button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .row-actions button:disabled {
+      cursor: default;
+      opacity: .6;
+    }
+
+    .status {
+      min-height: 18px;
+      font-size: 13px;
+      line-height: 1.2;
+      color: #1f2736;
+    }
+
+    .error {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .success {
+      color: #12401d;
+      font-weight: 700;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 14px;
+    }
+
+    .toggle-row + .toggle-row {
+      border-top: 1px solid rgba(9, 10, 13, .3);
+    }
+
+    .toggle-row .label {
+      font-weight: 700;
+    }
+
+    .toggle-row .desc {
+      display: block;
+      font-weight: 400;
+      font-size: 12px;
+      color: #33394a;
+      margin-top: 2px;
+    }
+
+    .switch {
+      position: relative;
+      width: 44px;
+      height: 22px;
+      flex: 0 0 auto;
+    }
+
+    .switch input {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .switch .track {
+      position: absolute;
+      inset: 0;
+      background: #6a7284;
+      border: 2px solid #111;
+      pointer-events: none;
+    }
+
+    .switch .thumb {
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      width: 16px;
+      height: 16px;
+      background: #d8dce6;
+      border: 1px solid #111;
+      transition: transform .08s steps(2, end);
+      pointer-events: none;
+    }
+
+    .switch input:checked ~ .track {
+      background: #4f7d3a;
+    }
+
+    .switch input:checked ~ .track ~ .thumb {
+      transform: translateX(20px);
+    }
+
+    .danger-panel {
+      border-color: #7a4b4b;
+      background: var(--danger-bg);
+    }
+
+    .danger-panel h2 {
+      color: var(--danger);
+    }
+
+    .danger-confirm {
+      margin-top: 4px;
+    }
+
+    .danger-confirm input {
+      background: #d9c8c8;
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        width: 100%;
+        border: 0;
+        padding: 0 12px 32px;
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+        min-height: auto;
+        padding-bottom: 7px;
+      }
+
+      .brand {
+        width: min(260px, 100%);
+      }
+
+      .nav {
+        width: 100%;
+        padding-top: 0;
+      }
+
+      input {
+        height: 44px;
+        font-size: 16px;
+        padding: 2px 10px;
+      }
+
+      .row-actions button {
+        min-height: 44px;
+        font-size: 15px;
+        padding: 3px 16px;
+      }
+
+      label {
+        font-size: 15px;
+      }
+
+      .toggle-row {
+        font-size: 15px;
+      }
+
+      .switch {
+        width: 52px;
+        height: 28px;
+      }
+
+      .switch .thumb {
+        width: 22px;
+        height: 22px;
+      }
+
+      .switch input:checked ~ .track ~ .thumb {
+        transform: translateX(24px);
+      }
+
+      .status {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar" aria-label="Site header">
+      <img class="brand" src="Logo.png" alt="Sketchbook Trilogies">
+      <div class="topbar-menu">
+        <nav class="nav" aria-label="Primary navigation">
+          <p><span>|</span></p>
+          <p><a href="index.html">home</a></p>
+          <p><span>-</span></p>
+          <p><a href="blog.html">blog</a></p>
+          <p><span>-</span></p>
+          <p><a href="settings.html">settings</a></p>
+        </nav>
+
+      </div>
+    </header>
+
+    <h1>Settings</h1>
+    <p class="subtitle">Manage your account, preferences, and profile.</p>
+
+    <section class="state-box" id="state-box" hidden></section>
+
+    <div id="settings-body" hidden>
+      <div class="settings-tabs" role="tablist" aria-label="Settings sections">
+        <button type="button" data-tab="account" aria-selected="true">account</button>
+        <button type="button" data-tab="preferences" aria-selected="false">preferences</button>
+        <button type="button" data-tab="danger" aria-selected="false">danger zone</button>
+      </div>
+
+      <section class="panel" id="panel-account" data-panel="account">
+        <h2>Account &amp; security</h2>
+        <p class="hint">Your UID is <b id="account-uid"></b>. Changing your email or password requires re-entering your current password.</p>
+
+        <form class="field-form" id="email-form">
+          <label>
+            email address
+            <input id="new-email" type="email" required>
+          </label>
+          <label>
+            current password
+            <input id="email-current-password" type="password" required autocomplete="current-password">
+          </label>
+          <div class="row-actions">
+            <button type="submit" id="email-submit">update email</button>
+          </div>
+          <p class="status" id="email-status" aria-live="polite"></p>
+        </form>
+
+        <form class="field-form" id="password-form">
+          <label>
+            current password
+            <input id="password-current-password" type="password" required autocomplete="current-password">
+          </label>
+          <label>
+            new password
+            <input id="new-password" type="password" required minlength="6" autocomplete="new-password">
+          </label>
+          <label>
+            confirm new password
+            <input id="confirm-password" type="password" required minlength="6" autocomplete="new-password">
+          </label>
+          <div class="row-actions">
+            <button type="submit" id="password-submit">update password</button>
+          </div>
+          <p class="status" id="password-status" aria-live="polite"></p>
+        </form>
+
+        <div class="field-form">
+          <p class="hint" style="margin:0;">Want to change your display name, avatar, or bio? Head to your <a href="profile.html">profile page</a>.</p>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-preferences" data-panel="preferences" hidden>
+        <h2>Preferences</h2>
+        <p class="hint">These are saved to your account and apply everywhere you sign in.</p>
+
+        <div class="toggle-row">
+          <span>
+            <span class="label">Public profile</span>
+            <span class="desc">Let other members view your profile page.</span>
+          </span>
+          <label class="switch">
+            <input type="checkbox" id="toggle-public-profile">
+            <span class="track"></span>
+            <span class="thumb"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <span>
+            <span class="label">Email notifications</span>
+            <span class="desc">Get emailed about comments, follows, and DMs.</span>
+          </span>
+          <label class="switch">
+            <input type="checkbox" id="toggle-email-notifications">
+            <span class="track"></span>
+            <span class="thumb"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <span>
+            <span class="label">Newsletter</span>
+            <span class="desc">Occasional updates about new features and events.</span>
+          </span>
+          <label class="switch">
+            <input type="checkbox" id="toggle-newsletter">
+            <span class="track"></span>
+            <span class="thumb"></span>
+          </label>
+        </div>
+
+        <div class="row-actions" style="margin-top: 12px;">
+          <button type="button" id="preferences-save">save preferences</button>
+        </div>
+        <p class="status" id="preferences-status" aria-live="polite"></p>
+      </section>
+
+      <section class="panel danger-panel" id="panel-danger" data-panel="danger" hidden>
+        <h2>Danger zone</h2>
+        <p class="hint">Deleting your account removes your profile document and sign-in permanently. This cannot be undone.</p>
+
+        <form class="field-form" id="delete-form">
+          <label>
+            current password
+            <input id="delete-current-password" type="password" required autocomplete="current-password">
+          </label>
+          <label class="danger-confirm">
+            type DELETE to confirm
+            <input id="delete-confirm-text" type="text" autocomplete="off">
+          </label>
+          <div class="row-actions">
+            <button type="submit" id="delete-submit">delete my account</button>
+          </div>
+          <p class="status" id="delete-status" aria-live="polite"></p>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+    import {
+      deleteUser,
+      EmailAuthProvider,
+      getAuth,
+      onAuthStateChanged,
+      reauthenticateWithCredential,
+      updateEmail,
+      updatePassword,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import {
+      deleteDoc,
+      doc,
+      getDoc,
+      getFirestore,
+      setDoc,
+      updateDoc,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js";
+
+    // If this page is restored from the browser's back/forward cache (e.g.
+    // after signing in/out as a different account on another page, then
+    // hitting Back), force a fresh reload so auth-dependent UI (like
+    // "edit profile" or "account settings") re-evaluates against whoever is
+    // ACTUALLY signed in right now, instead of showing stale cached state.
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    });
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg6umXxHQ6INyc_U2AvmhF9blhQ5ZEtT8",
+      authDomain: "sketchbook-trilogies.firebaseapp.com",
+      projectId: "sketchbook-trilogies",
+      storageBucket: "sketchbook-trilogies.firebasestorage.app",
+      messagingSenderId: "564902002463",
+      appId: "1:564902002463:web:7dc95e5e857e19b959fa2a",
+      measurementId: "G-Q08PSQDHMH",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    if (await isSupported()) {
+      getAnalytics(app);
+    }
+
+    const stateBox = document.querySelector("#state-box");
+    const settingsBody = document.querySelector("#settings-body");
+    const accountUid = document.querySelector("#account-uid");
+
+    const tabButtons = document.querySelectorAll(".settings-tabs button");
+    const panels = {
+      account: document.querySelector("#panel-account"),
+      preferences: document.querySelector("#panel-preferences"),
+      danger: document.querySelector("#panel-danger"),
+    };
+
+    const emailForm = document.querySelector("#email-form");
+    const newEmail = document.querySelector("#new-email");
+    const emailCurrentPassword = document.querySelector("#email-current-password");
+    const emailStatus = document.querySelector("#email-status");
+    const emailSubmit = document.querySelector("#email-submit");
+
+    const passwordForm = document.querySelector("#password-form");
+    const passwordCurrentPassword = document.querySelector("#password-current-password");
+    const newPassword = document.querySelector("#new-password");
+    const confirmPassword = document.querySelector("#confirm-password");
+    const passwordStatus = document.querySelector("#password-status");
+    const passwordSubmit = document.querySelector("#password-submit");
+
+    const togglePublicProfile = document.querySelector("#toggle-public-profile");
+    const toggleEmailNotifications = document.querySelector("#toggle-email-notifications");
+    const toggleNewsletter = document.querySelector("#toggle-newsletter");
+    const preferencesSave = document.querySelector("#preferences-save");
+    const preferencesStatus = document.querySelector("#preferences-status");
+
+    const deleteForm = document.querySelector("#delete-form");
+    const deleteCurrentPassword = document.querySelector("#delete-current-password");
+    const deleteConfirmText = document.querySelector("#delete-confirm-text");
+    const deleteStatus = document.querySelector("#delete-status");
+    const deleteSubmit = document.querySelector("#delete-submit");
+
+    let currentUser = null;
+
+    function setStatus(element, message, kind = "") {
+      element.textContent = message;
+      element.className = kind ? `status ${kind}` : "status";
+    }
+
+    function friendlyError(error) {
+      return (error?.message || "Something went wrong.").replace("Firebase: ", "");
+    }
+
+    async function reauthenticate(password) {
+      const credential = EmailAuthProvider.credential(currentUser.email, password);
+      await reauthenticateWithCredential(currentUser, credential);
+    }
+
+    tabButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        tabButtons.forEach((btn) => btn.setAttribute("aria-selected", String(btn === button)));
+        Object.entries(panels).forEach(([name, panel]) => {
+          panel.hidden = name !== button.dataset.tab;
+        });
+      });
+    });
+
+    emailForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      emailSubmit.disabled = true;
+      setStatus(emailStatus, "updating email...");
+
+      try {
+        await reauthenticate(emailCurrentPassword.value);
+        await updateEmail(currentUser, newEmail.value.trim());
+        await updateDoc(doc(db, "users", currentUser.uid), { email: newEmail.value.trim() });
+        setStatus(emailStatus, "email updated.", "success");
+        emailCurrentPassword.value = "";
+      } catch (error) {
+        setStatus(emailStatus, friendlyError(error), "error");
+      } finally {
+        emailSubmit.disabled = false;
+      }
+    });
+
+    passwordForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (newPassword.value !== confirmPassword.value) {
+        setStatus(passwordStatus, "New passwords do not match.", "error");
+        return;
+      }
+
+      passwordSubmit.disabled = true;
+      setStatus(passwordStatus, "updating password...");
+
+      try {
+        await reauthenticate(passwordCurrentPassword.value);
+        await updatePassword(currentUser, newPassword.value);
+        setStatus(passwordStatus, "password updated.", "success");
+        passwordForm.reset();
+      } catch (error) {
+        setStatus(passwordStatus, friendlyError(error), "error");
+      } finally {
+        passwordSubmit.disabled = false;
+      }
+    });
+
+    preferencesSave.addEventListener("click", async () => {
+      preferencesSave.disabled = true;
+      setStatus(preferencesStatus, "saving...");
+
+      try {
+        await updateDoc(doc(db, "users", currentUser.uid), {
+          publicProfile: togglePublicProfile.checked,
+          emailNotifications: toggleEmailNotifications.checked,
+          newsletterOptIn: toggleNewsletter.checked,
+        });
+        setStatus(preferencesStatus, "preferences saved.", "success");
+      } catch (error) {
+        setStatus(preferencesStatus, friendlyError(error), "error");
+      } finally {
+        preferencesSave.disabled = false;
+      }
+    });
+
+    deleteForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (deleteConfirmText.value.trim() !== "DELETE") {
+        setStatus(deleteStatus, 'Type "DELETE" exactly to confirm.', "error");
+        return;
+      }
+
+      deleteSubmit.disabled = true;
+      setStatus(deleteStatus, "deleting account...");
+
+      try {
+        const uid = currentUser.uid;
+        await reauthenticate(deleteCurrentPassword.value);
+        await deleteDoc(doc(db, "users", uid));
+        await deleteUser(currentUser);
+        window.location.href = "index.html";
+      } catch (error) {
+        setStatus(deleteStatus, friendlyError(error), "error");
+        deleteSubmit.disabled = false;
+      }
+    });
+
+    async function loadPreferences(uid) {
+      try {
+        const snapshot = await getDoc(doc(db, "users", uid));
+
+        if (!snapshot.exists()) {
+          await setDoc(doc(db, "users", uid), {
+            uid,
+            displayName: currentUser.displayName || currentUser.email || "User",
+            email: currentUser.email || null,
+            photoURL: currentUser.photoURL || null,
+            bio: "",
+            followers: 0,
+            following: 0,
+            webcomics: 0,
+            posts: 0,
+            likes: 0,
+            publicProfile: true,
+            emailNotifications: true,
+            newsletterOptIn: false,
+          });
+          togglePublicProfile.checked = true;
+          toggleEmailNotifications.checked = true;
+          toggleNewsletter.checked = false;
+          return;
+        }
+
+        const data = snapshot.data();
+        togglePublicProfile.checked = data.publicProfile !== false;
+        toggleEmailNotifications.checked = data.emailNotifications !== false;
+        toggleNewsletter.checked = Boolean(data.newsletterOptIn);
+      } catch (error) {
+        console.error(error);
+        setStatus(preferencesStatus, "Could not load preferences.", "error");
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+
+      if (!user) {
+        stateBox.hidden = false;
+        stateBox.innerHTML = 'Sign in to manage your settings. <a href="auth-sign-in.html?mode=signin">Sign in</a>';
+        settingsBody.hidden = true;
+        return;
+      }
+
+      stateBox.hidden = true;
+      settingsBody.hidden = false;
+      accountUid.textContent = user.uid;
+      newEmail.value = user.email || "";
+
+      await loadPreferences(user.uid);
+    });
+  </script>
+</body>
+</html>

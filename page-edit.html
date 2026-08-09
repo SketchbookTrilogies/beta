@@ -1,0 +1,2675 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico">
+  <title>Edit Page - Sketchbook Trilogies</title>
+  <style>
+    :root {
+      --ink: #05070b;
+      --paper: #bfc7dc;
+      --panel: #8a91a1;
+      --panel-dark: #4f5666;
+      --line: #090a0d;
+      --link: #002fff;
+      --visited: #4f1eb7;
+      --bevel-light: #c8cedd;
+      --bevel-dark: #4c5363;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 1px 1px, #2a2a33 1px, transparent 1.5px) 0 0 / 7px 7px,
+        #06060a;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 1px;
+    }
+
+    a:visited {
+      color: var(--visited);
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100vw - 18px, 760px);
+      min-height: 100vh;
+      margin: 0 auto;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border-left: 4px solid #51596b;
+      border-right: 4px solid #51596b;
+      box-shadow: 0 0 0 1px #171a22;
+      padding: 0 22px 40px;
+    }
+
+    .topbar {
+      min-height: 42px;
+      display: flex;
+      align-items: start;
+      gap: 6px;
+      border-bottom: 3px double #6c758b;
+      overflow: hidden;
+    }
+
+    .brand {
+      width: 215px;
+      height: 34px;
+      object-fit: contain;
+      object-position: left center;
+      filter: contrast(1.18);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: start;
+      gap: 4px;
+      min-height: 34px;
+      padding-top: 3px;
+      font-size: 16px;
+      line-height: 1.15;
+      white-space: nowrap;
+      flex-wrap: wrap;
+    }
+
+    .nav p,
+    p {
+      margin: 0;
+    }
+
+    .back-link {
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    h1 {
+      margin: 6px 0 0;
+      font-size: 26px;
+      line-height: 1.05;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0 #e2e6f2;
+      overflow-wrap: anywhere;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      padding-bottom: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      border-bottom: 4px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .format-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 400;
+      font-family: "Courier New", monospace;
+      color: #23283a;
+      background: #c6ccda;
+      border: 1px solid #5f687d;
+      padding: 0 4px;
+      text-transform: none;
+    }
+
+    .state-box {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .state-box.error {
+      color: #650000;
+      font-weight: 700;
+    }
+
+    .state-box[hidden] {
+      display: none;
+    }
+
+    .editor-view[hidden] {
+      display: none;
+    }
+
+    .panel {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 14px;
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      text-transform: uppercase;
+    }
+
+    label {
+      display: grid;
+      gap: 3px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .rte-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 8px;
+      background: var(--panel);
+      border: 3px solid var(--panel-dark);
+      border-bottom: none;
+    }
+
+    .rte-toolbar button {
+      min-width: 30px;
+      min-height: 28px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      font-family: Georgia, "Times New Roman", serif;
+      padding: 2px 8px;
+    }
+
+    .rte-toolbar button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+      background: #7f8697;
+    }
+
+    .rte-toolbar button.active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+      background: #7bab6e;
+      color: #0d1a08;
+      font-weight: 700;
+      box-shadow: inset 0 0 0 1px #1f3d16;
+    }
+
+    .rte-toolbar label.rte-image-button,
+    .rte-toolbar button.rte-image-button {
+      min-height: 28px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      font-family: Georgia, "Times New Roman", serif;
+      padding: 2px 8px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .rte-toolbar label.rte-image-button:active,
+    .rte-toolbar button.rte-image-button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+      background: #7f8697;
+    }
+
+    .rte-toolbar .rte-sep {
+      width: 2px;
+      align-self: stretch;
+      background: #5f687d;
+      margin: 2px 4px;
+    }
+
+    .rte-toolbar select {
+      min-height: 28px;
+      border: 2px solid #111;
+      background: #a4abbc;
+      color: var(--ink);
+      font-size: 13px;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .rte-color-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      min-height: 28px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      padding: 1px 5px;
+    }
+
+    .rte-color-label {
+      font-size: 12px;
+      font-weight: 700;
+      font-family: Georgia, "Times New Roman", serif;
+      white-space: nowrap;
+    }
+
+    .rte-color-control input[type="color"] {
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      border: 1px solid #111;
+      background: none;
+      cursor: pointer;
+    }
+
+    .utility-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .utility-controls[hidden] {
+      display: none;
+    }
+
+    #page-text-input a {
+      color: var(--link);
+      text-decoration: underline;
+    }
+
+    #page-text-input .dialog-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin: 0 0 0.35em;
+      text-align: left;
+    }
+
+    #page-text-input .dialog-line + .dialog-line {
+      margin-top: -0.1em;
+    }
+
+    #page-text-input .dialog-label {
+      font-weight: 700;
+      flex: 0 0 auto;
+      min-width: 96px;
+      padding-top: 0.05em;
+      cursor: default;
+      user-select: none;
+    }
+
+    #page-text-input .dialog-content {
+      flex: 1 1 auto;
+      min-width: 0;
+      outline: none;
+      white-space: pre-wrap;
+    }
+
+    /* ---- dialog overlap: a group of dialog-lines happening at once ---- */
+    #page-text-input .dialog-overlap {
+      border-left: 3px solid currentColor;
+      padding-left: 10px;
+      margin: 0 0 0.6em;
+      opacity: .95;
+    }
+
+    #page-text-input .dialog-overlap::before {
+      content: "at the same time:";
+      display: block;
+      font-size: 10px;
+      font-style: italic;
+      opacity: .65;
+      margin-bottom: 2px;
+    }
+
+    #page-text-input .dialog-overlap .dialog-line {
+      margin-bottom: 0.15em;
+    }
+
+    #page-text-input .dialog-overlap .dialog-line:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ---- chat log messages: bubble-styled, left/right aligned ---- */
+    #page-text-input .chat-message {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      margin: 0 0 0.5em;
+      text-align: left;
+    }
+
+    #page-text-input .chat-message[data-side="right"] {
+      align-items: flex-end;
+      text-align: right;
+    }
+
+    #page-text-input .chat-sender {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 6px;
+      cursor: default;
+      user-select: none;
+    }
+
+    #page-text-input .chat-bubble {
+      display: inline-block;
+      max-width: 78%;
+      padding: 6px 11px;
+      border-radius: 14px;
+      border: 1px solid;
+      color: #1d2330;
+      white-space: pre-wrap;
+      outline: none;
+    }
+
+    /* ---- html embed: external link (Cloudinary, filegarden, etc.) ---- */
+    #page-text-input .html-embed-block {
+      margin: 0 0 1em;
+    }
+
+    #page-text-input .html-embed {
+      display: block;
+      width: 100%;
+      max-width: 480px;
+      aspect-ratio: 4 / 3;
+      margin: 0 auto;
+      border: 3px solid #090a0d;
+      background: #303545;
+      overflow: hidden;
+    }
+
+    #page-text-input .html-embed iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      pointer-events: none;
+    }
+
+    /* ---- audio embed placeholder (editor only — the real player lives on
+       the published page) ---- */
+    #page-text-input .audio-embed-block {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 480px;
+      margin: 0 auto 1em;
+      padding: 8px 12px;
+      border: 3px solid #090a0d;
+      background: #303545;
+      color: #d6dceb;
+    }
+
+    #page-text-input .audio-embed-icon {
+      font-size: 18px;
+      flex: 0 0 auto;
+    }
+
+    #page-text-input .audio-embed-info {
+      font-size: 12px;
+      font-family: "Courier New", monospace;
+      overflow-wrap: anywhere;
+    }
+
+    .character-editor-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 5, 9, .72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 320;
+    }
+
+    .character-editor-overlay[hidden] {
+      display: none;
+    }
+
+    .character-editor-panel {
+      width: min(100%, 360px);
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border: 4px solid #313644;
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark),
+        0 0 0 1px #090a0d,
+        6px 6px 0 rgba(0, 0, 0, .5);
+      padding: 18px;
+      color: var(--ink);
+    }
+
+    .character-editor-panel h2 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      text-transform: uppercase;
+    }
+
+    .character-editor-panel label {
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .character-editor-panel input[type="text"],
+    .character-editor-panel input[type="color"] {
+      border: 2px solid var(--panel-dark);
+      background: #f4f2ec;
+      color: var(--ink);
+      padding: 6px 8px;
+      width: 100%;
+      min-height: 30px;
+    }
+
+    .character-editor-panel input[type="color"] {
+      padding: 2px;
+      height: 38px;
+    }
+
+    .overlap-editor-panel {
+      width: min(100%, 460px);
+    }
+
+    .overlap-editor-panel .field-help {
+      margin: -4px 0 12px;
+    }
+
+    .overlap-line-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .overlap-line-row select {
+      flex: 0 0 auto;
+      min-height: 30px;
+      border: 2px solid var(--panel-dark);
+      background: #f4f2ec;
+      color: var(--ink);
+      font-size: 13px;
+    }
+
+    .overlap-line-row input[type="text"] {
+      flex: 1 1 auto;
+      min-height: 30px;
+      border: 2px solid var(--panel-dark);
+      background: #f4f2ec;
+      color: var(--ink);
+      padding: 4px 8px;
+    }
+
+    .overlap-line-row .overlap-line-remove {
+      flex: 0 0 auto;
+      min-height: 30px;
+      min-width: 30px;
+      border: 2px solid #111;
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .overlap-line-row .overlap-line-remove:disabled {
+      opacity: .4;
+      cursor: default;
+    }
+
+    #overlap-add-line-button {
+      min-height: 28px;
+      border: 2px solid #111;
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 3px 10px;
+      margin-bottom: 12px;
+    }
+
+    #page-text-input {
+      width: 100%;
+      min-height: 420px;
+      max-height: 70vh;
+      overflow-y: auto;
+      border: 3px solid var(--panel-dark);
+      background: #f4f2ec;
+      color: #111;
+      padding: 28px 32px;
+      font-size: 16px;
+      line-height: 1.6;
+      font-family: "Times New Roman", Georgia, serif;
+      text-align: center;
+    }
+
+    #page-text-input:focus {
+      outline: 2px dotted #111;
+      outline-offset: -4px;
+    }
+
+    #page-text-input p {
+      margin: 0 0 1em;
+    }
+
+    #page-text-input h1,
+    #page-text-input h2,
+    #page-text-input h3 {
+      margin: 0.6em 0 0.4em;
+      line-height: 1.2;
+    }
+
+    #page-text-input ul,
+    #page-text-input ol {
+      text-align: left;
+      display: inline-block;
+    }
+
+    #page-text-input img {
+      display: block;
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      margin: 0 auto 1em;
+      border: 3px solid #090a0d;
+      background: #303545;
+    }
+
+    .field-help {
+      margin: 6px 0 0;
+      font-size: 11px;
+      font-weight: 400;
+      font-style: italic;
+      color: #33394a;
+    }
+
+    .panel-list {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .panel-row {
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 10px;
+    }
+
+    .panel-row-number {
+      font-size: 11px;
+      font-family: "Courier New", monospace;
+      color: #23283a;
+      margin-bottom: 6px;
+    }
+
+    .panel-row img {
+      display: block;
+      max-width: 100%;
+      max-height: 340px;
+      margin: 0 auto;
+      border: 3px solid #090a0d;
+      background: #303545;
+    }
+
+    .panel-row-actions {
+      margin-top: 8px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .panel-row-actions button {
+      min-height: 26px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 2px 8px;
+    }
+
+    .panel-row-actions button.delete-button {
+      color: #650000;
+    }
+
+    .empty-note {
+      margin: 0 0 12px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 14px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .empty-note[hidden] {
+      display: none;
+    }
+
+    .file-button {
+      display: inline-block;
+      min-height: 28px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 3px 12px;
+    }
+
+    .composer-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 2px solid #5f687d;
+    }
+
+    .composer-row button {
+      min-height: 30px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 4px 14px;
+    }
+
+    .composer-row button:disabled {
+      cursor: default;
+      opacity: .6;
+    }
+
+    .composer-row button.primary {
+      background: #7bab6e;
+      font-weight: 700;
+    }
+
+    .composer-row button.delete-button {
+      color: #650000;
+    }
+
+    .composer-status {
+      min-height: 16px;
+      font-size: 12px;
+      color: #1f2736;
+      flex: 1 1 100%;
+    }
+
+    .composer-status.error {
+      color: #650000;
+      font-weight: 700;
+    }
+
+    .composer-status.success {
+      color: #12401d;
+      font-weight: 700;
+    }
+
+    /* Custom alert/confirm popup (replaces browser alert()/confirm()) */
+    .app-popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 5, 9, .72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 300;
+    }
+
+    .app-popup-overlay[hidden] {
+      display: none;
+    }
+
+    .app-popup-panel {
+      width: min(100%, 380px);
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border: 4px solid #313644;
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark),
+        0 0 0 1px #090a0d,
+        6px 6px 0 rgba(0, 0, 0, .5);
+      padding: 18px;
+      color: var(--ink);
+    }
+
+    .app-popup-message {
+      margin: 0 0 16px;
+      font-size: 14px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    .app-popup-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .app-popup-actions button {
+      min-height: 30px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 4px 14px;
+    }
+
+    .app-popup-actions button.primary {
+      background: #7bab6e;
+      font-weight: 700;
+    }
+
+    @media (max-width: 560px) {
+      .page {
+        width: 100%;
+        border: 0;
+        padding: 0 12px 32px;
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+        min-height: auto;
+        padding-bottom: 7px;
+      }
+
+      .brand {
+        width: min(260px, 100%);
+      }
+
+      .nav {
+        width: 100%;
+        padding-top: 0;
+      }
+
+      .rte-toolbar button,
+      .rte-toolbar label.rte-image-button,
+      .rte-toolbar button.rte-image-button {
+        min-width: 40px;
+        min-height: 40px;
+        font-size: 14px;
+        padding: 4px 10px;
+      }
+
+      .rte-toolbar select {
+        min-height: 40px;
+        font-size: 14px;
+      }
+
+      .rte-color-control {
+        min-height: 40px;
+      }
+
+      .rte-color-control input[type="color"] {
+        width: 28px;
+        height: 28px;
+      }
+
+      .utility-controls {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .character-editor-panel input[type="text"] {
+        min-height: 44px;
+        font-size: 16px;
+      }
+
+      .character-editor-panel input[type="color"] {
+        height: 44px;
+      }
+
+      .overlap-line-row {
+        flex-wrap: wrap;
+      }
+
+      .overlap-line-row select,
+      .overlap-line-row input[type="text"],
+      .overlap-line-row .overlap-line-remove {
+        min-height: 40px;
+        font-size: 14px;
+      }
+
+      #overlap-add-line-button {
+        min-height: 40px;
+        font-size: 14px;
+      }
+
+      .panel-row-actions button {
+        min-height: 40px;
+        padding: 3px 12px;
+        font-size: 13px;
+      }
+
+      .file-button,
+      .composer-row button {
+        min-height: 44px;
+        padding: 4px 16px;
+        font-size: 14px;
+      }
+
+      .app-popup-actions button {
+        min-height: 40px;
+        font-size: 14px;
+      }
+
+      #link-url-input,
+      #embed-url-input,
+      #audio-url-input {
+        min-height: 44px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-popup-overlay" id="app-popup-overlay" hidden>
+    <div class="app-popup-panel" role="alertdialog" aria-modal="true" aria-labelledby="app-popup-message">
+      <p class="app-popup-message" id="app-popup-message"></p>
+      <div class="app-popup-actions">
+        <button type="button" id="app-popup-cancel" hidden>cancel</button>
+        <button type="button" class="primary" id="app-popup-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="character-editor-overlay" id="character-editor-overlay" hidden>
+    <div class="character-editor-panel" role="dialog" aria-modal="true" aria-labelledby="character-editor-heading">
+      <h2 id="character-editor-heading">Add a character</h2>
+      <label>
+        name
+        <input type="text" id="character-name-input" maxlength="40" placeholder="e.g. Mira">
+      </label>
+      <label>
+        color
+        <input type="color" id="character-color-input" value="#8b1e1e">
+      </label>
+      <label>
+        chat handle <span style="font-weight:400;">(optional — used for chat log messages)</span>
+        <input type="text" id="character-handle-input" maxlength="30" placeholder="e.g. mira_writes">
+      </label>
+      <div class="app-popup-actions">
+        <button type="button" id="character-editor-cancel">cancel</button>
+        <button type="button" class="primary" id="character-editor-save">save character</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="character-editor-overlay" id="overlap-editor-overlay" hidden>
+    <div class="character-editor-panel overlap-editor-panel" role="dialog" aria-modal="true" aria-labelledby="overlap-editor-heading">
+      <h2 id="overlap-editor-heading">Overlapping dialogue</h2>
+      <p class="field-help">Add each character's line — they'll be grouped together as happening at the same time.</p>
+      <div id="overlap-lines"></div>
+      <button type="button" id="overlap-add-line-button">+ add another speaker</button>
+      <div class="app-popup-actions">
+        <button type="button" id="overlap-editor-cancel">cancel</button>
+        <button type="button" class="primary" id="overlap-editor-insert">insert overlap</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="character-editor-overlay" id="link-editor-overlay" hidden>
+    <div class="character-editor-panel" role="dialog" aria-modal="true" aria-labelledby="link-editor-heading">
+      <h2 id="link-editor-heading">Add a link</h2>
+      <p class="field-help" id="link-editor-help">Turns your selected text into a link.</p>
+      <label>
+        link
+        <input type="url" id="link-url-input" placeholder="https://...">
+      </label>
+      <p class="composer-status" id="link-url-status" aria-live="polite"></p>
+      <div class="app-popup-actions">
+        <button type="button" id="link-editor-cancel">cancel</button>
+        <button type="button" class="primary" id="link-editor-insert">insert link</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="character-editor-overlay" id="embed-editor-overlay" hidden>
+    <div class="character-editor-panel" role="dialog" aria-modal="true" aria-labelledby="embed-editor-heading">
+      <h2 id="embed-editor-heading">Embed a link</h2>
+      <p class="field-help">Paste a link to hosted HTML content — a Cloudinary or filegarden URL, for example. It'll display at a fixed 4:3 size, same as your other images.</p>
+      <label>
+        link
+        <input type="url" id="embed-url-input" placeholder="https://...">
+      </label>
+      <p class="composer-status" id="embed-url-status" aria-live="polite"></p>
+      <div class="app-popup-actions">
+        <button type="button" id="embed-editor-cancel">cancel</button>
+        <button type="button" class="primary" id="embed-editor-insert">insert embed</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="character-editor-overlay" id="audio-editor-overlay" hidden>
+    <div class="character-editor-panel" role="dialog" aria-modal="true" aria-labelledby="audio-editor-heading">
+      <h2 id="audio-editor-heading">Add audio</h2>
+      <p class="field-help">Paste a link to a hosted audio file (mp3, ogg, wav, etc.). Readers will get a play/pause button and a progress bar to scrub through it.</p>
+      <label>
+        link
+        <input type="url" id="audio-url-input" placeholder="https://...">
+      </label>
+      <p class="composer-status" id="audio-url-status" aria-live="polite"></p>
+      <div class="app-popup-actions">
+        <button type="button" id="audio-editor-cancel">cancel</button>
+        <button type="button" class="primary" id="audio-editor-insert">insert audio</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="page">
+    <header class="topbar" aria-label="Site header">
+      <img class="brand" src="Logo.png" alt="Sketchbook Trilogies">
+      <div class="topbar-menu">
+        <nav class="nav" aria-label="Primary navigation">
+          <p><span>|</span></p>
+          <p><a href="index.html">home</a></p>
+          <p><span>-</span></p>
+          <p><a href="blog.html">blog</a></p>
+          <p><span>-</span></p>
+          <p><a href="dashboard.html">dashboard</a></p>
+          <p><span>-</span></p>
+          <p><a href="settings.html">settings</a></p>
+        </nav>
+
+      </div>
+    </header>
+
+    <p class="back-link"><a id="back-to-editor-link" href="webcomic-edit.html">&larr; back to editor</a></p>
+
+    <h1 id="page-title">Edit Page</h1>
+    <p class="subtitle" id="page-subtitle" hidden>
+      <span id="chapter-line"></span>
+      <span class="format-tag" id="format-badge"></span>
+    </p>
+
+    <section class="state-box" id="state-box" hidden></section>
+
+    <div id="editor-root" hidden>
+      <section class="editor-view" id="text-editor-view" hidden>
+        <div class="rte-toolbar" id="rte-toolbar">
+          <select id="rte-block-select" title="Paragraph style">
+            <option value="p">Paragraph</option>
+            <option value="h1">Heading 1</option>
+            <option value="h2">Heading 2</option>
+            <option value="h3">Heading 3</option>
+          </select>
+          <select id="rte-font-select" title="Font">
+            <option value="Times New Roman">Times New Roman (default)</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Arial">Arial</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Trebuchet MS">Trebuchet MS</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Comic Sans MS">Comic Sans MS</option>
+            <option value="Impact">Impact</option>
+            <option value="cursive">Cursive</option>
+          </select>
+          <span class="rte-sep"></span>
+          <button type="button" data-cmd="bold" title="Bold"><b>B</b></button>
+          <button type="button" data-cmd="italic" title="Italic"><i>I</i></button>
+          <button type="button" data-cmd="underline" title="Underline"><u>U</u></button>
+          <button type="button" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+          <button type="button" data-cmd="superscript" title="Superscript">x<sup>2</sup></button>
+          <button type="button" data-cmd="subscript" title="Subscript">x<sub>2</sub></button>
+          <span class="rte-sep"></span>
+          <span class="rte-color-control" title="Text color">
+            <span class="rte-color-label">text</span>
+            <input type="color" id="text-color-input" value="#1d2330">
+          </span>
+          <span class="rte-color-control" title="Highlight color">
+            <span class="rte-color-label">highlight</span>
+            <input type="color" id="highlight-color-input" value="#fff59d">
+          </span>
+          <button type="button" id="clear-color-button" title="Remove text color and highlight from the selection">clear colors</button>
+          <span class="rte-sep"></span>
+          <button type="button" data-cmd="justifyLeft" title="Align left">&#8676;</button>
+          <button type="button" data-cmd="justifyCenter" title="Align center">&#8596;</button>
+          <button type="button" data-cmd="justifyRight" title="Align right">&#8677;</button>
+          <span class="rte-sep"></span>
+          <button type="button" data-cmd="insertUnorderedList" title="Bullet list">&#8226; list</button>
+          <button type="button" data-cmd="insertOrderedList" title="Numbered list">1. list</button>
+          <span class="rte-sep"></span>
+          <button type="button" data-cmd="removeFormat" title="Clear formatting">clear</button>
+          <span class="rte-sep"></span>
+          <select id="utility-select" title="Insert a utility block">
+            <option value="">utilities…</option>
+            <option value="dialogue">character dialogue</option>
+            <option value="chatlog">chat log message</option>
+            <option value="overlap">overlapping dialogue</option>
+            <option value="link">link</option>
+          </select>
+
+          <span class="utility-controls" id="dialogue-controls" hidden>
+            <select id="character-select" title="Choose a character for dialogue">
+              <option value="">select character…</option>
+            </select>
+            <button type="button" id="insert-character-button" title="Insert dialogue for the selected character">insert dialogue</button>
+          </span>
+
+          <span class="utility-controls" id="chatlog-controls" hidden>
+            <select id="chatlog-character-select" title="Choose a character for this chat message">
+              <option value="">select character…</option>
+            </select>
+            <select id="chatlog-side-select" title="Which side this message appears on">
+              <option value="left">left</option>
+              <option value="right">right</option>
+            </select>
+            <button type="button" id="insert-chatlog-button" title="Insert a chat message for the selected character">insert message</button>
+          </span>
+
+          <span class="utility-controls" id="overlap-controls" hidden>
+            <button type="button" id="open-overlap-button">add overlapping lines…</button>
+          </span>
+
+          <span class="utility-controls" id="link-controls" hidden>
+            <button type="button" id="open-link-button" title="Link the selected text">insert link…</button>
+            <button type="button" data-cmd="unlink" title="Remove link">unlink</button>
+          </span>
+          <span class="rte-sep"></span>
+          <label class="rte-image-button" title="Insert image">
+            image
+            <input type="file" id="insert-image-input" accept="image/*" style="display:none;">
+          </label>
+          <button type="button" class="rte-image-button" id="open-embed-button" title="Embed a link (Cloudinary, filegarden, etc.)">embed</button>
+          <button type="button" class="rte-image-button" id="open-audio-button" title="Add a link to hosted audio">audio</button>
+        </div>
+        <div id="page-text-input" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Page text"></div>
+        <p class="field-help">Text & Image pages can be as short or as long as the moment needs. New paragraphs are centered by default — use the align buttons to change one. Images and embeds are both 4:3. Photos up to 8MB are compressed automatically; animated GIFs can't be compressed, so keep those under about 0.9MB.</p>
+      </section>
+
+      <section class="editor-view" id="panel-editor-view" hidden>
+        <p class="empty-note" id="panel-empty" hidden>No panels yet — add one below.</p>
+        <div class="panel-list" id="panel-list"></div>
+        <div class="panel">
+          <h2>Add a panel</h2>
+          <label class="file-button">
+            choose image
+            <input type="file" id="add-panel-input" accept="image/*" style="display:none;">
+          </label>
+          <p class="field-help">Panels are stacked in order, top to bottom. They'll be stitched into one continuous page for readers later. Photos up to 8MB are accepted and compressed automatically; animated GIFs can't be compressed without losing their animation, so keep those under about 0.9MB.</p>
+          <p class="composer-status" id="panel-add-status" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <div class="composer-row">
+        <button type="button" class="delete-button" id="delete-page-button" hidden>delete this page</button>
+        <button type="button" class="primary" id="save-page-button">save page</button>
+        <p class="composer-status" id="save-status" aria-live="polite"></p>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import {
+      addDoc,
+      collection,
+      deleteDoc,
+      doc,
+      getDoc,
+      getFirestore,
+      serverTimestamp,
+      updateDoc,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js";
+
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    });
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg6umXxHQ6INyc_U2AvmhF9blhQ5ZEtT8",
+      authDomain: "sketchbook-trilogies.firebaseapp.com",
+      projectId: "sketchbook-trilogies",
+      storageBucket: "sketchbook-trilogies.firebasestorage.app",
+      messagingSenderId: "564902002463",
+      appId: "1:564902002463:web:7dc95e5e857e19b959fa2a",
+      measurementId: "G-Q08PSQDHMH",
+    };
+
+    const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
+    const COMPRESS_THRESHOLD_BYTES = 1 * 1024 * 1024;
+    const FIRESTORE_FIELD_SAFETY_BYTES = 900 * 1024;
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    if (await isSupported()) {
+      getAnalytics(app);
+    }
+
+    // ---- custom alert/confirm popup (replaces browser alert()/confirm()) ----
+    const appPopupOverlay = document.querySelector("#app-popup-overlay");
+    const appPopupMessage = document.querySelector("#app-popup-message");
+    const appPopupCancelButton = document.querySelector("#app-popup-cancel");
+    const appPopupOkButton = document.querySelector("#app-popup-ok");
+    let appPopupResolve = null;
+
+    function closeAppPopup(result) {
+      appPopupOverlay.hidden = true;
+      if (appPopupResolve) {
+        const resolve = appPopupResolve;
+        appPopupResolve = null;
+        resolve(result);
+      }
+    }
+
+    appPopupOkButton.addEventListener("click", () => closeAppPopup(true));
+    appPopupCancelButton.addEventListener("click", () => closeAppPopup(false));
+    appPopupOverlay.addEventListener("click", (event) => {
+      if (event.target === appPopupOverlay) closeAppPopup(false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !appPopupOverlay.hidden) closeAppPopup(false);
+    });
+
+    function showAppAlert(message) {
+      return new Promise((resolve) => {
+        appPopupResolve = resolve;
+        appPopupMessage.textContent = message;
+        appPopupCancelButton.hidden = true;
+        appPopupOkButton.textContent = "OK";
+        appPopupOverlay.hidden = false;
+        appPopupOkButton.focus();
+      });
+    }
+
+    function showAppConfirm(message, confirmLabel = "OK") {
+      return new Promise((resolve) => {
+        appPopupResolve = resolve;
+        appPopupMessage.textContent = message;
+        appPopupCancelButton.hidden = false;
+        appPopupOkButton.textContent = confirmLabel;
+        appPopupOverlay.hidden = false;
+        appPopupOkButton.focus();
+      });
+    }
+
+    // ---- image helpers ----
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Could not read that file."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function loadImageEl(src) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error("Could not read that image."));
+        image.src = src;
+      });
+    }
+
+    async function compressImage(file, maxDimension, quality) {
+      const dataUrl = await readFileAsDataURL(file);
+      const image = await loadImageEl(dataUrl);
+      let { width, height } = image;
+      if (width > height && width > maxDimension) {
+        height = Math.round((height * maxDimension) / width);
+        width = maxDimension;
+      } else if (height >= width && height > maxDimension) {
+        width = Math.round((width * maxDimension) / height);
+        height = maxDimension;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext("2d").drawImage(image, 0, 0, width, height);
+      return canvas.toDataURL("image/jpeg", quality);
+    }
+
+    // Animated GIFs can't go through the canvas-based crop/compress pipeline
+    // below — canvas only ever captures a single frame, so doing that would
+    // silently flatten the GIF into a static image. Instead we just check
+    // its size directly and use it as-is, keeping the animation intact.
+    function isAnimatedGifCandidate(file) {
+      return file.type === "image/gif";
+    }
+
+    async function readGifAsIs(file) {
+      const dataUrl = await readFileAsDataURL(file);
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        throw new Error("That GIF is too large to store (animated GIFs can't be auto-compressed without losing the animation). Try a smaller or shorter GIF.");
+      }
+      return dataUrl;
+    }
+
+    async function processImageFile(file) {
+      if (isAnimatedGifCandidate(file)) {
+        return readGifAsIs(file);
+      }
+
+      let dataUrl = file.size > COMPRESS_THRESHOLD_BYTES
+        ? await compressImage(file, 900, 0.82)
+        : await readFileAsDataURL(file);
+
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        dataUrl = await compressImage(file, 640, 0.7);
+      }
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        dataUrl = await compressImage(file, 480, 0.58);
+      }
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        throw new Error("That image is too detailed to compress small enough. Try a smaller image.");
+      }
+      return dataUrl;
+    }
+
+    // Text & Image inline images are always cropped to a 4:3 frame so pages
+    // read consistently regardless of what shape photo/art someone uploads.
+    function cropRect43(width, height) {
+      const targetRatio = 4 / 3;
+      const currentRatio = width / height;
+      let sx = 0, sy = 0, sw = width, sh = height;
+      if (currentRatio > targetRatio) {
+        sw = height * targetRatio;
+        sx = (width - sw) / 2;
+      } else if (currentRatio < targetRatio) {
+        sh = width / targetRatio;
+        sy = (height - sh) / 2;
+      }
+      return { sx, sy, sw, sh };
+    }
+
+    function renderCrop43(image, rect, maxWidth, quality) {
+      const outWidth = Math.min(maxWidth, rect.sw);
+      const outHeight = outWidth * (3 / 4);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(outWidth);
+      canvas.height = Math.round(outHeight);
+      canvas.getContext("2d").drawImage(image, rect.sx, rect.sy, rect.sw, rect.sh, 0, 0, canvas.width, canvas.height);
+      return canvas.toDataURL("image/jpeg", quality);
+    }
+
+    async function processInlineImage(file) {
+      if (isAnimatedGifCandidate(file)) {
+        return readGifAsIs(file);
+      }
+
+      const dataUrl = await readFileAsDataURL(file);
+      const image = await loadImageEl(dataUrl);
+      const rect = cropRect43(image.width, image.height);
+
+      let out = renderCrop43(image, rect, 900, 0.82);
+      if (out.length > FIRESTORE_FIELD_SAFETY_BYTES) out = renderCrop43(image, rect, 640, 0.7);
+      if (out.length > FIRESTORE_FIELD_SAFETY_BYTES) out = renderCrop43(image, rect, 480, 0.58);
+      if (out.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        throw new Error("That image is too detailed to compress small enough. Try a smaller image.");
+      }
+      return out;
+    }
+
+    // ---- element refs ----
+    const backToEditorLink = document.querySelector("#back-to-editor-link");
+    const pageTitle = document.querySelector("#page-title");
+    const pageSubtitle = document.querySelector("#page-subtitle");
+    const chapterLine = document.querySelector("#chapter-line");
+    const formatBadge = document.querySelector("#format-badge");
+    const stateBox = document.querySelector("#state-box");
+    const editorRoot = document.querySelector("#editor-root");
+
+    // ---- unsaved-changes warning ----
+    // Deliberately broad rather than precise: anything typed, toggled, or
+    // clicked inside the editor (besides the save button and plain links)
+    // marks things dirty. A false positive just means an occasional
+    // needless warning; a false negative means silently losing someone's
+    // work, which is worse.
+    let hasUnsavedChanges = false;
+
+    function markDirty() {
+      hasUnsavedChanges = true;
+    }
+
+    editorRoot.addEventListener("input", markDirty);
+    editorRoot.addEventListener("change", markDirty);
+    editorRoot.addEventListener("click", (event) => {
+      const target = event.target.closest("button, a");
+      if (!target || target.tagName === "A" || target.id === "save-page-button" || target.id === "delete-page-button") return;
+      markDirty();
+    });
+
+    window.addEventListener("beforeunload", (event) => {
+      if (!hasUnsavedChanges) return;
+      event.preventDefault();
+      event.returnValue = "";
+    });
+    const textEditorView = document.querySelector("#text-editor-view");
+    const pageTextInput = document.querySelector("#page-text-input");
+    const rteToolbar = document.querySelector("#rte-toolbar");
+    const rteBlockSelect = document.querySelector("#rte-block-select");
+    const rteFontSelect = document.querySelector("#rte-font-select");
+    const textColorInput = document.querySelector("#text-color-input");
+    const highlightColorInput = document.querySelector("#highlight-color-input");
+    const clearColorButton = document.querySelector("#clear-color-button");
+    const utilitySelect = document.querySelector("#utility-select");
+    const dialogueControls = document.querySelector("#dialogue-controls");
+    const chatlogControls = document.querySelector("#chatlog-controls");
+    const overlapControls = document.querySelector("#overlap-controls");
+    const linkControls = document.querySelector("#link-controls");
+    const characterSelect = document.querySelector("#character-select");
+    const insertCharacterButton = document.querySelector("#insert-character-button");
+    const chatlogCharacterSelect = document.querySelector("#chatlog-character-select");
+    const chatlogSideSelect = document.querySelector("#chatlog-side-select");
+    const insertChatlogButton = document.querySelector("#insert-chatlog-button");
+    const openOverlapButton = document.querySelector("#open-overlap-button");
+    const insertImageInput = document.querySelector("#insert-image-input");
+    const characterEditorOverlay = document.querySelector("#character-editor-overlay");
+    const characterNameInput = document.querySelector("#character-name-input");
+    const characterColorInput = document.querySelector("#character-color-input");
+    const characterHandleInput = document.querySelector("#character-handle-input");
+    const characterEditorCancelButton = document.querySelector("#character-editor-cancel");
+    const characterEditorSaveButton = document.querySelector("#character-editor-save");
+    const overlapEditorOverlay = document.querySelector("#overlap-editor-overlay");
+    const overlapLinesContainer = document.querySelector("#overlap-lines");
+    const overlapAddLineButton = document.querySelector("#overlap-add-line-button");
+    const overlapEditorCancelButton = document.querySelector("#overlap-editor-cancel");
+    const overlapEditorInsertButton = document.querySelector("#overlap-editor-insert");
+    const openLinkButton = document.querySelector("#open-link-button");
+    const linkEditorOverlay = document.querySelector("#link-editor-overlay");
+    const linkUrlInput = document.querySelector("#link-url-input");
+    const linkUrlStatus = document.querySelector("#link-url-status");
+    const linkEditorCancelButton = document.querySelector("#link-editor-cancel");
+    const linkEditorInsertButton = document.querySelector("#link-editor-insert");
+    const linkEditorHelp = document.querySelector("#link-editor-help");
+
+    const openEmbedButton = document.querySelector("#open-embed-button");
+    const embedEditorOverlay = document.querySelector("#embed-editor-overlay");
+    const embedUrlInput = document.querySelector("#embed-url-input");
+    const embedUrlStatus = document.querySelector("#embed-url-status");
+    const embedEditorCancelButton = document.querySelector("#embed-editor-cancel");
+    const embedEditorInsertButton = document.querySelector("#embed-editor-insert");
+    const openAudioButton = document.querySelector("#open-audio-button");
+    const audioEditorOverlay = document.querySelector("#audio-editor-overlay");
+    const audioUrlInput = document.querySelector("#audio-url-input");
+    const audioUrlStatus = document.querySelector("#audio-url-status");
+    const audioEditorCancelButton = document.querySelector("#audio-editor-cancel");
+    const audioEditorInsertButton = document.querySelector("#audio-editor-insert");
+    const panelEditorView = document.querySelector("#panel-editor-view");
+    const panelList = document.querySelector("#panel-list");
+    const panelEmpty = document.querySelector("#panel-empty");
+    const addPanelInput = document.querySelector("#add-panel-input");
+    const panelAddStatus = document.querySelector("#panel-add-status");
+    const deletePageButton = document.querySelector("#delete-page-button");
+    const savePageButton = document.querySelector("#save-page-button");
+    const saveStatus = document.querySelector("#save-status");
+
+    function showState(message, kind = "") {
+      stateBox.hidden = false;
+      stateBox.className = kind ? `state-box ${kind}` : "state-box";
+      stateBox.textContent = message;
+    }
+
+    let comicCharacters = [];
+    let pendingCharacterSelectEl = null; // which <select> to populate after "+ add a character"
+
+    function characterOptionsHtml({ useHandle = false } = {}) {
+      const options = [{ value: "", label: "select character…" }];
+      comicCharacters.forEach((character) => {
+        const label = useHandle
+          ? (character.chatHandle || character.name || "Character")
+          : (character.name || "Character");
+        options.push({ value: character.id, label });
+      });
+      options.push({ value: "__add__", label: "+ add a character" });
+      return options.map((option) => `<option value="${option.value}">${option.label}</option>`).join("");
+    }
+
+    function refreshSelectOptions(selectEl, { useHandle = false } = {}) {
+      const currentSelection = selectEl.value;
+      selectEl.innerHTML = characterOptionsHtml({ useHandle });
+      const stillValid = [...selectEl.options].some((option) => option.value === currentSelection);
+      selectEl.value = stillValid ? currentSelection : "";
+    }
+
+    function renderCharacterSelect() {
+      refreshSelectOptions(characterSelect, { useHandle: false });
+    }
+
+    function renderChatlogCharacterSelect() {
+      refreshSelectOptions(chatlogCharacterSelect, { useHandle: true });
+    }
+
+    // Re-renders every character <select> currently in the DOM — the fixed
+    // dialogue/chatlog ones plus any dynamically-added overlap-line rows —
+    // e.g. right after a new character is created from any of them.
+    function renderAllCharacterSelects() {
+      renderCharacterSelect();
+      renderChatlogCharacterSelect();
+      overlapLinesContainer.querySelectorAll(".overlap-line-character").forEach((selectEl) => {
+        refreshSelectOptions(selectEl, { useHandle: false });
+      });
+    }
+
+    function openCharacterEditor(requestingSelectEl = null) {
+      pendingCharacterSelectEl = requestingSelectEl;
+      characterNameInput.value = "";
+      characterColorInput.value = "#8b1e1e";
+      characterHandleInput.value = "";
+      characterEditorOverlay.hidden = false;
+      characterNameInput.focus();
+    }
+
+    function closeCharacterEditor() {
+      characterEditorOverlay.hidden = true;
+    }
+
+    async function saveCharactersToComic() {
+      if (!comicId) return;
+      await updateDoc(doc(db, "webcomics", comicId), {
+        characters: comicCharacters,
+        updatedAt: serverTimestamp(),
+      });
+      if (comic) {
+        comic.characters = comicCharacters;
+      }
+    }
+
+    function buildDialogueMarkup(character) {
+      const safeName = (character.name || "Character").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const safeColor = (character.color || "#2d3b55").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return `
+        <p class="dialog-line" data-character-id="${character.id}">
+          <span class="dialog-label" contenteditable="false" style="color:${safeColor}">${safeName}:</span>
+          <span class="dialog-content" contenteditable="true" style="color:${safeColor}">Type dialogue…</span>
+        </p>
+      `;
+    }
+
+    // Builds the same markup as an actual DOM node, for cases (like Shift+Enter
+    // below) where we need to insert it ourselves rather than via execCommand.
+    function buildDialogueElement(character) {
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = buildDialogueMarkup(character).trim();
+      return wrapper.firstElementChild;
+    }
+
+    // Inserting a block-level element (like a dialogue line) via
+    // execCommand("insertHTML", ...) breaks badly if the cursor happens to be
+    // inside another block (e.g. mid-way through someone else's dialogue) —
+    // browsers can't nest a <p> inside another <p>, so the tags get stripped
+    // and the two lines' text runs together. This instead finds whichever
+    // top-level child of the editor currently holds the cursor and inserts
+    // the new node as a proper sibling right after it, regardless of where
+    // in that block the cursor was.
+    function insertBlockAfterCursor(newNode) {
+      const selection = window.getSelection();
+      let block = selection && selection.rangeCount ? selection.getRangeAt(0).startContainer : null;
+
+      while (block && block.parentNode !== pageTextInput) {
+        block = block.parentNode;
+      }
+
+      if (!block || !pageTextInput.contains(block)) {
+        pageTextInput.appendChild(newNode);
+        return;
+      }
+
+      // If the cursor was sitting in an empty filler paragraph (e.g. the
+      // page's default blank starting line), replace it instead of leaving
+      // a blank line behind.
+      const isEmptyFiller = block.nodeType === 1
+        && block.tagName === "P"
+        && !block.classList.contains("dialog-line")
+        && !block.classList.contains("chat-message")
+        && !block.classList.contains("dialog-overlap")
+        && block.textContent.trim() === "";
+
+      if (isEmptyFiller) {
+        block.replaceWith(newNode);
+      } else {
+        block.after(newNode);
+      }
+    }
+
+    function insertDialogueForSelectedCharacter() {
+      const selectedCharacterId = characterSelect.value;
+      if (!selectedCharacterId) {
+        showAppAlert("Choose a character first.");
+        return;
+      }
+      if (selectedCharacterId === "__add__") {
+        openCharacterEditor(characterSelect);
+        return;
+      }
+
+      const character = comicCharacters.find((entry) => entry.id === selectedCharacterId);
+      if (!character) {
+        showAppAlert("That character is no longer available.");
+        return;
+      }
+
+      focusEditorAtSavedRange();
+      const newLine = buildDialogueElement(character);
+      insertBlockAfterCursor(newLine);
+      placeCaretInDialogueContent(newLine);
+      ensureEditorHasContent();
+      refreshToolbarState();
+    }
+
+    // ---- chat log messages ----
+    // Turns a hex color into a light, translucent tint for the bubble
+    // background, so the bubble reads as "belonging" to that character
+    // without needing solid, potentially-illegible colored text.
+    function hexToRgba(hex, alpha) {
+      const clean = (hex || "#2d3b55").replace("#", "");
+      const full = clean.length === 3 ? clean.split("").map((c) => c + c).join("") : clean;
+      const num = parseInt(full, 16);
+      if (Number.isNaN(num)) return `rgba(45, 59, 85, ${alpha})`;
+      const r = (num >> 16) & 255;
+      const g = (num >> 8) & 255;
+      const b = num & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function buildChatMessageMarkup(character, side) {
+      const handle = (character.chatHandle || character.name || "Character").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const safeColor = (character.color || "#2d3b55").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const tint = hexToRgba(character.color, 0.18);
+      const safeSide = side === "right" ? "right" : "left";
+      return `
+        <p class="chat-message" data-character-id="${character.id}" data-side="${safeSide}">
+          <span class="chat-sender" contenteditable="false" style="color:${safeColor}">${handle}</span>
+          <span class="chat-bubble" contenteditable="true" style="background-color:${tint}; border-color:${safeColor};">Type message…</span>
+        </p>
+      `;
+    }
+
+    function buildChatMessageElement(character, side) {
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = buildChatMessageMarkup(character, side).trim();
+      return wrapper.firstElementChild;
+    }
+
+    function insertChatMessageForSelectedCharacter() {
+      const selectedCharacterId = chatlogCharacterSelect.value;
+      if (!selectedCharacterId) {
+        showAppAlert("Choose a character first.");
+        return;
+      }
+      if (selectedCharacterId === "__add__") {
+        openCharacterEditor(chatlogCharacterSelect);
+        return;
+      }
+
+      const character = comicCharacters.find((entry) => entry.id === selectedCharacterId);
+      if (!character) {
+        showAppAlert("That character is no longer available.");
+        return;
+      }
+
+      focusEditorAtSavedRange();
+      const newLine = buildChatMessageElement(character, chatlogSideSelect.value);
+      insertBlockAfterCursor(newLine);
+      placeCaretInChatBubble(newLine);
+      ensureEditorHasContent();
+      refreshToolbarState();
+    }
+
+    // ---- rich text editor (execCommand-based, keeps things simple) ----
+    const formatButtons = Array.from(rteToolbar.querySelectorAll("button[data-cmd]"));
+    let savedRange = null;
+
+    function saveSelectionIfInEditor() {
+      const selection = window.getSelection();
+      if (!selection || !selection.rangeCount) return;
+      const range = selection.getRangeAt(0);
+      if (pageTextInput.contains(range.commonAncestorContainer)) {
+        savedRange = range.cloneRange();
+      }
+    }
+
+    function refreshToolbarState() {
+      const selection = window.getSelection();
+      const inEditor = !!(selection && selection.rangeCount && pageTextInput.contains(selection.anchorNode));
+
+      formatButtons.forEach((button) => {
+        let isActive = false;
+        if (inEditor) {
+          try {
+            isActive = document.queryCommandState(button.dataset.cmd);
+          } catch (error) {
+            isActive = false;
+          }
+        }
+        button.classList.toggle("active", isActive);
+      });
+
+      if (inEditor) {
+        let blockValue = "p";
+        try {
+          blockValue = (document.queryCommandValue("formatBlock") || "p").toLowerCase();
+        } catch (error) {
+          blockValue = "p";
+        }
+        if (![...rteBlockSelect.options].some((option) => option.value === blockValue)) {
+          blockValue = "p";
+        }
+        rteBlockSelect.value = blockValue;
+
+        // Times New Roman is the page's actual default font (see the body
+        // font-family below), so that's what the select should show
+        // whenever the cursor is somewhere with no explicit font of its
+        // own — not an empty placeholder that never reflects reality.
+        let fontValue = "Times New Roman";
+        try {
+          fontValue = (document.queryCommandValue("fontName") || "").replace(/^["']|["']$/g, "").trim() || "Times New Roman";
+        } catch (error) {
+          fontValue = "Times New Roman";
+        }
+        const matchedFont = [...rteFontSelect.options].find(
+          (option) => option.value.toLowerCase() === fontValue.toLowerCase(),
+        );
+        rteFontSelect.value = matchedFont ? matchedFont.value : "Times New Roman";
+      }
+    }
+
+    document.addEventListener("selectionchange", () => {
+      saveSelectionIfInEditor();
+      refreshToolbarState();
+    });
+    pageTextInput.addEventListener("keyup", refreshToolbarState);
+    pageTextInput.addEventListener("mouseup", refreshToolbarState);
+
+    // Finds the nearest ancestor that's a dialogue line or chat message,
+    // however deeply nested (e.g. a dialog-line inside a dialog-overlap
+    // group still counts).
+    function closestUtilityLine(node) {
+      let el = node;
+      while (el && el !== pageTextInput) {
+        if (el.nodeType === 1 && el.classList
+          && (el.classList.contains("dialog-line") || el.classList.contains("chat-message"))) {
+          return el;
+        }
+        el = el.parentNode;
+      }
+      return null;
+    }
+
+    // Walks up to whichever direct child of the editor contains `node` —
+    // used to escape all the way out of a wrapping container (like
+    // dialog-overlap) rather than just out of the inner line itself.
+    function closestTopLevelBlock(node) {
+      let el = node;
+      while (el && el.parentNode !== pageTextInput) {
+        el = el.parentNode;
+      }
+      return el;
+    }
+
+    function placeCaretInDialogueContent(lineEl) {
+      const content = lineEl.querySelector(".dialog-content");
+      if (!content) return;
+      const range = document.createRange();
+      range.selectNodeContents(content);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+
+    function placeCaretInChatBubble(lineEl) {
+      const content = lineEl.querySelector(".chat-bubble");
+      if (!content) return;
+      const range = document.createRange();
+      range.selectNodeContents(content);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+
+    function placeCaretAtStart(el) {
+      const range = document.createRange();
+      range.setStart(el, 0);
+      range.collapse(true);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+
+    // Inside a dialogue line or chat message, plain Enter exits back to a
+    // normal paragraph (so narration/action text isn't stuck being
+    // colored and locked to that character), while Shift+Enter keeps going
+    // with another line/message from the same character.
+    pageTextInput.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+
+      const selection = window.getSelection();
+      if (!selection || !selection.rangeCount) return;
+
+      const utilityLine = closestUtilityLine(selection.getRangeAt(0).startContainer);
+      if (!utilityLine) return; // normal paragraphs keep the browser's default Enter behavior
+
+      event.preventDefault();
+
+      const isChatMessage = utilityLine.classList.contains("chat-message");
+
+      if (event.shiftKey) {
+        const characterId = utilityLine.dataset.characterId;
+        const character = comicCharacters.find((entry) => entry.id === characterId);
+
+        let newLine;
+        if (isChatMessage) {
+          newLine = character
+            ? buildChatMessageElement(character, utilityLine.dataset.side)
+            : utilityLine.cloneNode(true);
+          if (!character) {
+            const bubble = newLine.querySelector(".chat-bubble");
+            if (bubble) bubble.textContent = "Type message…";
+          }
+        } else {
+          newLine = character ? buildDialogueElement(character) : utilityLine.cloneNode(true);
+          if (!character) {
+            const content = newLine.querySelector(".dialog-content");
+            if (content) content.textContent = "Type dialogue…";
+          }
+        }
+
+        utilityLine.after(newLine);
+        if (isChatMessage) {
+          placeCaretInChatBubble(newLine);
+        } else {
+          placeCaretInDialogueContent(newLine);
+        }
+      } else {
+        // Escape all the way out of any wrapping group (e.g. dialog-overlap),
+        // not just the inner line, so a plain paragraph never ends up
+        // nested inside a special container.
+        const topBlock = closestTopLevelBlock(utilityLine) || utilityLine;
+        const newParagraph = document.createElement("p");
+        newParagraph.innerHTML = "<br>";
+        topBlock.after(newParagraph);
+        placeCaretAtStart(newParagraph);
+      }
+
+      refreshToolbarState();
+    });
+
+    rteToolbar.addEventListener("mousedown", (event) => {
+      // Prevent the toolbar from stealing focus/selection away from the
+      // editable area before the click handler runs the command. (The
+      // image button is a native file-picker label, so it's excluded —
+      // preventing its mousedown would block the file dialog entirely.)
+      if (event.target.closest("button")) {
+        event.preventDefault();
+      }
+    });
+
+    formatButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        pageTextInput.focus();
+        document.execCommand(button.dataset.cmd, false, null);
+        refreshToolbarState();
+      });
+    });
+
+    rteBlockSelect.addEventListener("mousedown", () => {
+      pageTextInput.focus();
+    });
+
+    rteBlockSelect.addEventListener("change", () => {
+      pageTextInput.focus();
+      document.execCommand("formatBlock", false, rteBlockSelect.value);
+      refreshToolbarState();
+    });
+
+    rteFontSelect.addEventListener("mousedown", () => {
+      pageTextInput.focus();
+    });
+
+    rteFontSelect.addEventListener("change", () => {
+      pageTextInput.focus();
+      document.execCommand("fontName", false, rteFontSelect.value);
+      refreshToolbarState();
+    });
+
+    // Color inputs open a native OS picker, which (like the image file
+    // picker) steals focus/selection away from the editor — so we save the
+    // cursor position right before that happens and restore it once a color
+    // is actually picked.
+    textColorInput.addEventListener("mousedown", saveSelectionIfInEditor);
+    textColorInput.addEventListener("input", () => {
+      focusEditorAtSavedRange();
+      document.execCommand("foreColor", false, textColorInput.value);
+      refreshToolbarState();
+    });
+
+    highlightColorInput.addEventListener("mousedown", saveSelectionIfInEditor);
+    highlightColorInput.addEventListener("input", () => {
+      focusEditorAtSavedRange();
+      document.execCommand("hiliteColor", false, highlightColorInput.value);
+      refreshToolbarState();
+    });
+
+    clearColorButton.addEventListener("click", () => {
+      pageTextInput.focus();
+      document.execCommand("foreColor", false, "inherit");
+      document.execCommand("hiliteColor", false, "transparent");
+      refreshToolbarState();
+    });
+
+    utilitySelect.addEventListener("change", () => {
+      dialogueControls.hidden = utilitySelect.value !== "dialogue";
+      chatlogControls.hidden = utilitySelect.value !== "chatlog";
+      overlapControls.hidden = utilitySelect.value !== "overlap";
+      linkControls.hidden = utilitySelect.value !== "link";
+    });
+
+    characterSelect.addEventListener("change", () => {
+      if (characterSelect.value === "__add__") {
+        openCharacterEditor(characterSelect);
+        characterSelect.value = "";
+      }
+    });
+
+    insertCharacterButton.addEventListener("mousedown", saveSelectionIfInEditor);
+    insertCharacterButton.addEventListener("click", () => {
+      insertDialogueForSelectedCharacter();
+    });
+
+    chatlogCharacterSelect.addEventListener("change", () => {
+      if (chatlogCharacterSelect.value === "__add__") {
+        openCharacterEditor(chatlogCharacterSelect);
+        chatlogCharacterSelect.value = "";
+      }
+    });
+
+    insertChatlogButton.addEventListener("mousedown", saveSelectionIfInEditor);
+    insertChatlogButton.addEventListener("click", () => {
+      insertChatMessageForSelectedCharacter();
+    });
+
+    characterEditorCancelButton.addEventListener("click", () => {
+      pendingCharacterSelectEl = null;
+      closeCharacterEditor();
+    });
+
+    characterEditorSaveButton.addEventListener("click", async () => {
+      const name = characterNameInput.value.trim();
+      if (!name) {
+        await showAppAlert("Please give the character a name.");
+        return;
+      }
+
+      const newCharacter = {
+        id: `character-${Date.now()}`,
+        name,
+        color: characterColorInput.value || "#8b1e1e",
+        chatHandle: characterHandleInput.value.trim() || null,
+      };
+
+      comicCharacters.push(newCharacter);
+      comicCharacters.sort((a, b) => a.name.localeCompare(b.name));
+      renderAllCharacterSelects();
+
+      const targetSelect = pendingCharacterSelectEl;
+      if (targetSelect) {
+        targetSelect.value = newCharacter.id;
+      }
+
+      await saveCharactersToComic();
+      closeCharacterEditor();
+
+      // Auto-insert only makes sense for the two single-select tools —
+      // an overlap-line select just gets the new character chosen, ready
+      // for the user to type that row's dialogue.
+      if (targetSelect === characterSelect) {
+        insertDialogueForSelectedCharacter();
+      } else if (targetSelect === chatlogCharacterSelect) {
+        insertChatMessageForSelectedCharacter();
+      }
+
+      pendingCharacterSelectEl = null;
+    });
+
+    characterEditorOverlay.addEventListener("click", (event) => {
+      if (event.target === characterEditorOverlay) {
+        pendingCharacterSelectEl = null;
+        closeCharacterEditor();
+      }
+    });
+
+    // ---- overlapping dialogue builder ----
+    function buildOverlapLineRow() {
+      const row = document.createElement("div");
+      row.className = "overlap-line-row";
+
+      const select = document.createElement("select");
+      select.className = "overlap-line-character";
+      select.innerHTML = characterOptionsHtml({ useHandle: false });
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "overlap-line-text";
+      input.placeholder = "dialogue…";
+      input.maxLength = 200;
+
+      const removeButton = document.createElement("button");
+      removeButton.type = "button";
+      removeButton.className = "overlap-line-remove";
+      removeButton.textContent = "\u00d7";
+      removeButton.title = "Remove this line";
+      removeButton.addEventListener("click", () => {
+        row.remove();
+        updateOverlapRemoveButtons();
+      });
+
+      select.addEventListener("change", () => {
+        if (select.value === "__add__") {
+          openCharacterEditor(select);
+          select.value = "";
+        }
+      });
+
+      row.append(select, input, removeButton);
+      return row;
+    }
+
+    function updateOverlapRemoveButtons() {
+      const rows = overlapLinesContainer.querySelectorAll(".overlap-line-row");
+      rows.forEach((row) => {
+        row.querySelector(".overlap-line-remove").disabled = rows.length <= 2;
+      });
+    }
+
+    function openOverlapEditor() {
+      overlapLinesContainer.innerHTML = "";
+      overlapLinesContainer.append(buildOverlapLineRow(), buildOverlapLineRow());
+      updateOverlapRemoveButtons();
+      overlapEditorOverlay.hidden = false;
+    }
+
+    function closeOverlapEditor() {
+      overlapEditorOverlay.hidden = true;
+    }
+
+    openOverlapButton.addEventListener("mousedown", saveSelectionIfInEditor);
+    openOverlapButton.addEventListener("click", () => {
+      openOverlapEditor();
+    });
+
+    overlapAddLineButton.addEventListener("click", () => {
+      overlapLinesContainer.append(buildOverlapLineRow());
+      updateOverlapRemoveButtons();
+    });
+
+    overlapEditorCancelButton.addEventListener("click", () => {
+      closeOverlapEditor();
+    });
+
+    overlapEditorOverlay.addEventListener("click", (event) => {
+      if (event.target === overlapEditorOverlay) {
+        closeOverlapEditor();
+      }
+    });
+
+    overlapEditorInsertButton.addEventListener("click", async () => {
+      const rows = [...overlapLinesContainer.querySelectorAll(".overlap-line-row")];
+      const lines = [];
+
+      for (const row of rows) {
+        const characterId = row.querySelector(".overlap-line-character").value;
+        const text = row.querySelector(".overlap-line-text").value.trim();
+        if (!characterId || characterId === "__add__" || !text) continue;
+        const character = comicCharacters.find((entry) => entry.id === characterId);
+        if (character) lines.push({ character, text });
+      }
+
+      if (lines.length < 2) {
+        await showAppAlert("Add at least two lines (character + dialogue) to make an overlap.");
+        return;
+      }
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "dialog-overlap";
+      lines.forEach(({ character, text }) => {
+        const lineEl = buildDialogueElement(character);
+        lineEl.querySelector(".dialog-content").textContent = text;
+        wrapper.append(lineEl);
+      });
+
+      focusEditorAtSavedRange();
+      insertBlockAfterCursor(wrapper);
+
+      // The overlap block arrives fully written (unlike a fresh single-line
+      // placeholder), so land the cursor in a fresh paragraph right after it
+      // rather than inside one of its now-filled-in lines.
+      const trailingParagraph = document.createElement("p");
+      trailingParagraph.innerHTML = "<br>";
+      wrapper.after(trailingParagraph);
+      placeCaretAtStart(trailingParagraph);
+
+      ensureEditorHasContent();
+      refreshToolbarState();
+      closeOverlapEditor();
+    });
+
+    // ---- link (wraps the selected text in an <a>, or inserts a new one) ----
+    let linkHadSelection = false;
+
+    function openLinkEditor() {
+      linkHadSelection = !!(savedRange && !savedRange.collapsed);
+      linkEditorHelp.textContent = linkHadSelection
+        ? "Turns your selected text into a link."
+        : "Nothing was selected, so this inserts new linked text using the URL itself.";
+      linkUrlInput.value = "";
+      linkUrlStatus.className = "composer-status";
+      linkUrlStatus.textContent = "";
+      linkEditorOverlay.hidden = false;
+      linkUrlInput.focus();
+    }
+
+    function closeLinkEditor() {
+      linkEditorOverlay.hidden = true;
+    }
+
+    openLinkButton.addEventListener("mousedown", saveSelectionIfInEditor);
+    openLinkButton.addEventListener("click", () => {
+      openLinkEditor();
+    });
+
+    linkEditorCancelButton.addEventListener("click", () => {
+      closeLinkEditor();
+    });
+
+    linkEditorOverlay.addEventListener("click", (event) => {
+      if (event.target === linkEditorOverlay) {
+        closeLinkEditor();
+      }
+    });
+
+    linkUrlInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        linkEditorInsertButton.click();
+      }
+    });
+
+    linkEditorInsertButton.addEventListener("click", () => {
+      const url = linkUrlInput.value.trim();
+
+      if (!isEmbeddableUrl(url)) {
+        linkUrlStatus.className = "composer-status error";
+        linkUrlStatus.textContent = "Enter a valid link starting with https:// (or http://).";
+        return;
+      }
+
+      focusEditorAtSavedRange();
+
+      if (linkHadSelection) {
+        document.execCommand("createLink", false, url);
+      } else {
+        // No text was selected — insert the URL itself as the link's
+        // visible text rather than silently doing nothing.
+        const escaped = url.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        document.execCommand("insertHTML", false, `<a href="${escaped}" target="_blank" rel="noopener noreferrer">${escaped}</a>`);
+      }
+
+      // execCommand("createLink") doesn't set target/rel, so make sure any
+      // link(s) it just created open in a new tab like the inserted ones do.
+      pageTextInput.querySelectorAll('a[href]:not([target])').forEach((link) => {
+        link.setAttribute("target", "_blank");
+        link.setAttribute("rel", "noopener noreferrer");
+      });
+
+      ensureEditorHasContent();
+      savedRange = null;
+      refreshToolbarState();
+      closeLinkEditor();
+    });
+
+    // ---- html embed (external link) ----
+    function isEmbeddableUrl(value) {
+      try {
+        const parsed = new URL(value);
+        return parsed.protocol === "https:" || parsed.protocol === "http:";
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function buildEmbedElement(url) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "html-embed-block";
+      wrapper.contentEditable = "false";
+
+      const frameBox = document.createElement("div");
+      frameBox.className = "html-embed";
+
+      const iframe = document.createElement("iframe");
+      iframe.src = url;
+      iframe.loading = "lazy";
+      iframe.title = "Embedded content";
+      iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-pointer-lock");
+      frameBox.append(iframe);
+
+      wrapper.append(frameBox);
+      return wrapper;
+    }
+
+    function openEmbedEditor() {
+      embedUrlInput.value = "";
+      embedUrlStatus.className = "composer-status";
+      embedUrlStatus.textContent = "";
+      embedEditorOverlay.hidden = false;
+      embedUrlInput.focus();
+    }
+
+    function closeEmbedEditor() {
+      embedEditorOverlay.hidden = true;
+    }
+
+    openEmbedButton.addEventListener("mousedown", saveSelectionIfInEditor);
+    openEmbedButton.addEventListener("click", () => {
+      openEmbedEditor();
+    });
+
+    embedEditorCancelButton.addEventListener("click", () => {
+      closeEmbedEditor();
+    });
+
+    embedEditorOverlay.addEventListener("click", (event) => {
+      if (event.target === embedEditorOverlay) {
+        closeEmbedEditor();
+      }
+    });
+
+    embedUrlInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        embedEditorInsertButton.click();
+      }
+    });
+
+    embedEditorInsertButton.addEventListener("click", () => {
+      const url = embedUrlInput.value.trim();
+
+      if (!isEmbeddableUrl(url)) {
+        embedUrlStatus.className = "composer-status error";
+        embedUrlStatus.textContent = "Enter a valid link starting with https:// (or http://).";
+        return;
+      }
+
+      const embedEl = buildEmbedElement(url);
+      focusEditorAtSavedRange();
+      insertBlockAfterCursor(embedEl);
+
+      // Like overlaps, an embed arrives fully formed, so land the cursor in
+      // a fresh paragraph right after it rather than inside the locked block.
+      const trailingParagraph = document.createElement("p");
+      trailingParagraph.innerHTML = "<br>";
+      embedEl.after(trailingParagraph);
+      placeCaretAtStart(trailingParagraph);
+
+      ensureEditorHasContent();
+      refreshToolbarState();
+      closeEmbedEditor();
+    });
+
+    // ---- audio (external link, played with a custom widget in page-read) ----
+    function buildAudioElement(url) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "audio-embed-block";
+      wrapper.contentEditable = "false";
+      wrapper.dataset.audioUrl = url;
+
+      const icon = document.createElement("span");
+      icon.className = "audio-embed-icon";
+      icon.textContent = "\u266a";
+
+      const info = document.createElement("span");
+      info.className = "audio-embed-info";
+      info.textContent = `audio: ${url}`;
+
+      wrapper.append(icon, info);
+      return wrapper;
+    }
+
+    function openAudioEditor() {
+      audioUrlInput.value = "";
+      audioUrlStatus.className = "composer-status";
+      audioUrlStatus.textContent = "";
+      audioEditorOverlay.hidden = false;
+      audioUrlInput.focus();
+    }
+
+    function closeAudioEditor() {
+      audioEditorOverlay.hidden = true;
+    }
+
+    openAudioButton.addEventListener("mousedown", saveSelectionIfInEditor);
+    openAudioButton.addEventListener("click", () => {
+      openAudioEditor();
+    });
+
+    audioEditorCancelButton.addEventListener("click", () => {
+      closeAudioEditor();
+    });
+
+    audioEditorOverlay.addEventListener("click", (event) => {
+      if (event.target === audioEditorOverlay) {
+        closeAudioEditor();
+      }
+    });
+
+    audioUrlInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        audioEditorInsertButton.click();
+      }
+    });
+
+    audioEditorInsertButton.addEventListener("click", () => {
+      const url = audioUrlInput.value.trim();
+
+      if (!isEmbeddableUrl(url)) {
+        audioUrlStatus.className = "composer-status error";
+        audioUrlStatus.textContent = "Enter a valid link starting with https:// (or http://).";
+        return;
+      }
+
+      const audioEl = buildAudioElement(url);
+      focusEditorAtSavedRange();
+      insertBlockAfterCursor(audioEl);
+
+      const trailingParagraph = document.createElement("p");
+      trailingParagraph.innerHTML = "<br>";
+      audioEl.after(trailingParagraph);
+      placeCaretAtStart(trailingParagraph);
+
+      ensureEditorHasContent();
+      refreshToolbarState();
+      closeAudioEditor();
+    });
+
+    function ensureEditorHasContent() {
+      if (!pageTextInput.innerHTML.trim()) {
+        pageTextInput.innerHTML = "<p><br></p>";
+      }
+    }
+
+    pageTextInput.addEventListener("blur", ensureEditorHasContent);
+
+    // The image label triggers a native file picker, which steals focus/
+    // selection away from the editor before the change event ever fires —
+    // so without this, the browser falls back to inserting at the very
+    // start of the content. Capture the cursor position right before the
+    // dialog opens, then restore it once we're ready to insert.
+    document.querySelector(".rte-image-button").addEventListener("mousedown", saveSelectionIfInEditor);
+
+    function focusEditorAtSavedRange() {
+      pageTextInput.focus();
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      const range = savedRange ? savedRange.cloneRange() : document.createRange();
+      if (!savedRange) {
+        range.selectNodeContents(pageTextInput);
+        range.collapse(false); // no saved position — insert at the end, not the start
+      }
+      selection.addRange(range);
+    }
+
+    insertImageInput.addEventListener("change", async () => {
+      const file = insertImageInput.files?.[0];
+      if (!file) return;
+
+      if (!file.type.startsWith("image/")) {
+        await showAppAlert("Please choose an image file.");
+        insertImageInput.value = "";
+        return;
+      }
+      if (file.size > MAX_UPLOAD_BYTES) {
+        await showAppAlert("That file is too large (max 8MB).");
+        insertImageInput.value = "";
+        return;
+      }
+
+      try {
+        const dataUrl = await processInlineImage(file);
+        focusEditorAtSavedRange();
+        document.execCommand("insertHTML", false, `<img src="${dataUrl}" alt="">`);
+        ensureEditorHasContent();
+        savedRange = null;
+        refreshToolbarState();
+      } catch (error) {
+        console.error(error);
+        await showAppAlert(error.message || "Could not process that image.");
+      } finally {
+        insertImageInput.value = "";
+      }
+    });
+
+    function legacyTextToHtml(text) {
+      const escaped = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+      return escaped
+        .split(/\n{2,}/)
+        .map((para) => `<p>${para.replace(/\n/g, "<br>") || "<br>"}</p>`)
+        .join("");
+    }
+
+    // ---- state ----
+    const params = new URLSearchParams(window.location.search);
+    const comicId = params.get("id");
+    const chapterId = params.get("chapter");
+    const pageId = params.get("page");
+
+    let currentUser = null;
+    let comic = null;
+    let chapter = null;
+    let panels = [];
+
+    backToEditorLink.href = comicId ? `webcomic-edit.html?id=${encodeURIComponent(comicId)}` : "webcomic-edit.html";
+
+    async function bumpPageCount(delta) {
+      const newCount = Math.max(0, (comic.pageCount || 0) + delta);
+      await updateDoc(doc(db, "webcomics", comicId), { pageCount: newCount, updatedAt: serverTimestamp() });
+      comic.pageCount = newCount;
+    }
+
+    function renderPanelList() {
+      panelList.innerHTML = "";
+      panelEmpty.hidden = panels.length > 0;
+      panels.forEach((panelImage, index) => {
+        const row = document.createElement("div");
+        row.className = "panel-row";
+
+        const numberEl = document.createElement("p");
+        numberEl.className = "panel-row-number";
+        numberEl.textContent = `panel ${index + 1}`;
+        row.append(numberEl);
+
+        const img = document.createElement("img");
+        img.alt = "";
+        img.src = panelImage;
+        row.append(img);
+
+        const actions = document.createElement("div");
+        actions.className = "panel-row-actions";
+
+        const upButton = document.createElement("button");
+        upButton.type = "button";
+        upButton.textContent = "\u2191";
+        upButton.disabled = index === 0;
+        upButton.addEventListener("click", () => {
+          [panels[index - 1], panels[index]] = [panels[index], panels[index - 1]];
+          renderPanelList();
+        });
+
+        const downButton = document.createElement("button");
+        downButton.type = "button";
+        downButton.textContent = "\u2193";
+        downButton.disabled = index === panels.length - 1;
+        downButton.addEventListener("click", () => {
+          [panels[index + 1], panels[index]] = [panels[index], panels[index + 1]];
+          renderPanelList();
+        });
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className = "delete-button";
+        removeButton.textContent = "remove";
+        removeButton.addEventListener("click", () => {
+          panels.splice(index, 1);
+          renderPanelList();
+        });
+
+        actions.append(upButton, downButton, removeButton);
+        row.append(actions);
+        panelList.append(row);
+      });
+    }
+
+    addPanelInput.addEventListener("change", async () => {
+      const file = addPanelInput.files?.[0];
+      if (!file) return;
+
+      if (!file.type.startsWith("image/")) {
+        panelAddStatus.className = "composer-status error";
+        panelAddStatus.textContent = "Please choose an image file.";
+        addPanelInput.value = "";
+        return;
+      }
+      if (file.size > MAX_UPLOAD_BYTES) {
+        panelAddStatus.className = "composer-status error";
+        panelAddStatus.textContent = "That file is too large (max 8MB).";
+        addPanelInput.value = "";
+        return;
+      }
+
+      panelAddStatus.className = "composer-status";
+      panelAddStatus.textContent = file.size > COMPRESS_THRESHOLD_BYTES ? "compressing panel..." : "processing panel...";
+
+      try {
+        const dataUrl = await processImageFile(file);
+        panels.push(dataUrl);
+        renderPanelList();
+        panelAddStatus.className = "composer-status success";
+        panelAddStatus.textContent = "panel added.";
+        addPanelInput.value = "";
+      } catch (error) {
+        console.error(error);
+        panelAddStatus.className = "composer-status error";
+        panelAddStatus.textContent = error.message || "Could not process that image.";
+        addPanelInput.value = "";
+      }
+    });
+
+    savePageButton.addEventListener("click", async () => {
+      savePageButton.disabled = true;
+      saveStatus.className = "composer-status";
+      saveStatus.textContent = "saving...";
+
+      try {
+        ensureEditorHasContent();
+        const isTextImage = comic.format === "text_image";
+        const fields = isTextImage
+          ? { html: pageTextInput.innerHTML }
+          : { panels };
+
+        if (pageId) {
+          await updateDoc(doc(db, "webcomics", comicId, "chapters", chapterId, "pages", pageId), {
+            ...fields,
+            updatedAt: serverTimestamp(),
+          });
+        } else {
+          await addDoc(collection(db, "webcomics", comicId, "chapters", chapterId, "pages"), {
+            ...fields,
+            order: Date.now(),
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
+          await updateDoc(doc(db, "webcomics", comicId, "chapters", chapterId), { updatedAt: serverTimestamp() });
+          await bumpPageCount(1);
+        }
+
+        hasUnsavedChanges = false;
+        window.location.href = `webcomic-edit.html?id=${encodeURIComponent(comicId)}`;
+      } catch (error) {
+        console.error(error);
+        saveStatus.className = "composer-status error";
+        saveStatus.textContent = "Could not save this page. Please try again.";
+        savePageButton.disabled = false;
+      }
+    });
+
+    deletePageButton.addEventListener("click", async () => {
+      if (comic.status === "published" && (comic.pageCount || 0) <= 1) {
+        await showAppAlert("This is the only page keeping this webcomic published. Add another page first, or unpublish it from your dashboard before deleting this one.");
+        return;
+      }
+      const confirmed = await showAppConfirm("Delete this page? This can't be undone.", "delete");
+      if (!confirmed) return;
+
+      deletePageButton.disabled = true;
+      try {
+        await deleteDoc(doc(db, "webcomics", comicId, "chapters", chapterId, "pages", pageId));
+        await bumpPageCount(-1);
+        hasUnsavedChanges = false;
+        window.location.href = `webcomic-edit.html?id=${encodeURIComponent(comicId)}`;
+      } catch (error) {
+        console.error(error);
+        await showAppAlert("Could not delete that page. Please try again.");
+        deletePageButton.disabled = false;
+      }
+    });
+
+    async function loadAll() {
+      if (!comicId || !chapterId) {
+        showState("This link is missing information about which webcomic or chapter to edit.", "error");
+        return;
+      }
+
+      try {
+        const comicSnap = await getDoc(doc(db, "webcomics", comicId));
+        if (!comicSnap.exists()) {
+          showState("That webcomic doesn't exist, or has been deleted.", "error");
+          return;
+        }
+        comic = { id: comicSnap.id, ...comicSnap.data() };
+
+        const isOwner = Boolean(currentUser && currentUser.uid === comic.authorUid);
+        if (!isOwner) {
+          showState(currentUser
+            ? "Only this webcomic's creator can edit its pages."
+            : "Sign in as this webcomic's creator to edit its pages.", "error");
+          return;
+        }
+
+        const chapterSnap = await getDoc(doc(db, "webcomics", comicId, "chapters", chapterId));
+        if (!chapterSnap.exists()) {
+          showState("That chapter doesn't exist, or has been deleted.", "error");
+          return;
+        }
+        chapter = { id: chapterSnap.id, ...chapterSnap.data() };
+
+        let pageDoc = null;
+        if (pageId) {
+          const pageSnap = await getDoc(doc(db, "webcomics", comicId, "chapters", chapterId, "pages", pageId));
+          if (!pageSnap.exists()) {
+            showState("That page doesn't exist, or has been deleted.", "error");
+            return;
+          }
+          pageDoc = { id: pageSnap.id, ...pageSnap.data() };
+        }
+
+        pageTitle.textContent = pageId ? "Edit Page" : "Add A New Page";
+        document.title = `${pageId ? "Edit Page" : "Add A New Page"} \u2014 ${comic.title || "Untitled"} - Sketchbook Trilogies`;
+        pageSubtitle.hidden = false;
+        chapterLine.textContent = chapter.subtitle
+          ? `in "${chapter.subtitle}"`
+          : "in this chapter";
+        const formatLabels = { text_image: "Text & Image", panel: "Continuous Panel" };
+        formatBadge.textContent = formatLabels[comic.format] || comic.format || "";
+
+        deletePageButton.hidden = !pageId;
+
+        const isTextImage = comic.format === "text_image";
+        textEditorView.hidden = !isTextImage;
+        panelEditorView.hidden = isTextImage;
+
+        comicCharacters = Array.isArray(comic.characters) ? comic.characters : [];
+        comicCharacters.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+        renderAllCharacterSelects();
+
+        if (isTextImage) {
+          if (pageDoc?.html) {
+            pageTextInput.innerHTML = pageDoc.html;
+          } else if (pageDoc?.text) {
+            pageTextInput.innerHTML = legacyTextToHtml(pageDoc.text);
+          } else {
+            pageTextInput.innerHTML = "<p><br></p>";
+          }
+        } else {
+          panels = Array.isArray(pageDoc?.panels) ? [...pageDoc.panels] : [];
+          renderPanelList();
+        }
+
+        editorRoot.hidden = false;
+        hasUnsavedChanges = false; // ignore anything the load itself just populated
+      } catch (error) {
+        console.error("Could not load page editor:", error);
+        showState("Could not load this page. Please try again.", "error");
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      await loadAll();
+    });
+  </script>
+</body>
+</html>

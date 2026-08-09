@@ -1,0 +1,1649 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard - Sketchbook Trilogies</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    :root {
+      --ink: #05070b;
+      --paper: #bfc7dc;
+      --panel: #8a91a1;
+      --panel-dark: #4f5666;
+      --line: #090a0d;
+      --link: #002fff;
+      --visited: #4f1eb7;
+      --bevel-light: #c8cedd;
+      --bevel-dark: #4c5363;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 1px 1px, #2a2a33 1px, transparent 1.5px) 0 0 / 7px 7px,
+        #06060a;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 1px;
+    }
+
+    a:visited {
+      color: var(--visited);
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100vw - 18px, 900px);
+      min-height: 100vh;
+      margin: 0 auto;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border-left: 4px solid #51596b;
+      border-right: 4px solid #51596b;
+      box-shadow: 0 0 0 1px #171a22;
+      padding: 0 22px 40px;
+    }
+
+    .topbar {
+      min-height: 42px;
+      display: flex;
+      align-items: start;
+      gap: 6px;
+      border-bottom: 3px double #6c758b;
+      overflow: hidden;
+    }
+
+    .brand {
+      width: 215px;
+      height: 34px;
+      object-fit: contain;
+      object-position: left center;
+      filter: contrast(1.18);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: start;
+      gap: 4px;
+      min-height: 34px;
+      padding-top: 3px;
+      font-size: 16px;
+      line-height: 1.15;
+      white-space: nowrap;
+      flex-wrap: wrap;
+    }
+
+    .nav p,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      margin: 14px 0 0;
+      font-size: 26px;
+      line-height: 1.05;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0 #e2e6f2;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      padding-bottom: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      border-bottom: 4px solid var(--line);
+    }
+
+    .state-box {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .state-box.error {
+      color: #650000;
+      font-weight: 700;
+    }
+
+    /* Composer */
+    .composer {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 16px;
+    }
+
+    .composer[hidden] {
+      display: none;
+    }
+
+    .composer-kicker {
+      margin: 0 0 4px;
+      font-size: 11px;
+      font-family: "Courier New", monospace;
+      letter-spacing: 1.5px;
+      color: #23283a;
+      text-transform: uppercase;
+    }
+
+    .composer h2 {
+      margin: 0 0 8px;
+      font-size: 19px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      border-bottom: 2px solid #5f687d;
+      padding-bottom: 8px;
+    }
+
+    .composer-intro {
+      margin: 0 0 14px;
+      font-size: 13px;
+      line-height: 1.4;
+      color: #1d2330;
+      max-width: 58ch;
+    }
+
+    .field-help {
+      margin: -6px 0 10px;
+      font-size: 11px;
+      font-weight: 400;
+      font-style: italic;
+      color: #33394a;
+    }
+
+    label {
+      display: grid;
+      gap: 3px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      border: 2px solid var(--panel-dark);
+      border-top-color: #3d4556;
+      border-left-color: #3d4556;
+      border-right-color: #b4bbcc;
+      border-bottom-color: #b4bbcc;
+      background: #c6ccda;
+      color: #111;
+      padding: 6px 8px;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    .cover-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .cover-preview {
+      width: 72px;
+      height: 96px;
+      border: 3px solid #090a0d;
+      object-fit: cover;
+      background: #303545;
+      display: none;
+    }
+
+    .cover-preview.visible {
+      display: block;
+    }
+
+    .cover-placeholder {
+      width: 72px;
+      height: 96px;
+      border: 3px dashed #5f687d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      text-align: center;
+      color: #33394a;
+      background: #a9b0c0;
+    }
+
+    .ratio-tag {
+      display: inline-block;
+      margin-left: 6px;
+      font-size: 10px;
+      font-weight: 400;
+      font-family: "Courier New", monospace;
+      color: #23283a;
+      background: #c6ccda;
+      border: 1px solid #5f687d;
+      padding: 0 4px;
+      vertical-align: middle;
+      text-transform: none;
+    }
+
+    .composer-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 2px solid #5f687d;
+    }
+
+    .composer-row button,
+    .composer-row .file-button {
+      min-height: 28px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 3px 12px;
+    }
+
+    .composer-row button:active,
+    .composer-row .file-button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .composer-row button:disabled {
+      cursor: default;
+      opacity: .6;
+    }
+
+    .composer-row button.primary {
+      background: #7bab6e;
+      font-weight: 700;
+      letter-spacing: .3px;
+    }
+
+    .composer-status {
+      min-height: 16px;
+      font-size: 12px;
+      color: #1f2736;
+      flex: 1 1 100%;
+    }
+
+    .composer-status.error {
+      color: #650000;
+      font-weight: 700;
+    }
+
+    .composer-status.success {
+      color: #12401d;
+      font-weight: 700;
+    }
+
+    /* Start CTA (replaces the always-open composer) */
+    .start-cta {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 16px;
+    }
+
+    .start-cta h2 {
+      margin: 0 0 8px;
+      font-size: 19px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      border-bottom: 2px solid #5f687d;
+      padding-bottom: 8px;
+    }
+
+    .start-cta p {
+      margin: 0 0 14px;
+      font-size: 13px;
+      line-height: 1.4;
+      color: #1d2330;
+      max-width: 58ch;
+    }
+
+    .primary-cta {
+      min-height: 36px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #7bab6e;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .3px;
+      padding: 6px 18px;
+    }
+
+    .primary-cta:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    /* Onboarding modal */
+    /* Custom alert/confirm popup (replaces browser alert()/confirm()) */
+    .app-popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 5, 9, .72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 300;
+    }
+
+    .app-popup-overlay[hidden] {
+      display: none;
+    }
+
+    .app-popup-panel {
+      width: min(100%, 380px);
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border: 4px solid #313644;
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark),
+        0 0 0 1px #090a0d,
+        6px 6px 0 rgba(0, 0, 0, .5);
+      padding: 18px;
+      color: var(--ink);
+    }
+
+    .app-popup-message {
+      margin: 0 0 16px;
+      font-size: 14px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    .app-popup-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .app-popup-actions button {
+      min-height: 30px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 4px 14px;
+    }
+
+    .app-popup-actions button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .app-popup-actions button.primary {
+      background: #7bab6e;
+      font-weight: 700;
+    }
+
+    .onboarding-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 5, 9, .72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 100;
+    }
+
+    .onboarding-overlay[hidden] {
+      display: none;
+    }
+
+    .onboarding-panel {
+      position: relative;
+      width: min(100%, 460px);
+      max-height: calc(100vh - 36px);
+      overflow-y: auto;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border: 4px solid #313644;
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark),
+        0 0 0 1px #090a0d,
+        6px 6px 0 rgba(0, 0, 0, .5);
+      padding: 20px;
+    }
+
+    .onboarding-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 26px;
+      height: 26px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .onboarding-step[hidden] {
+      display: none;
+    }
+
+    .onboarding-step h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      padding-right: 26px;
+    }
+
+    .onboarding-copy {
+      margin: 0 0 16px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #1d2330;
+    }
+
+    .onboarding-error {
+      margin: -6px 0 12px;
+      font-size: 12px;
+      color: #650000;
+      font-weight: 700;
+    }
+
+    .onboarding-error[hidden] {
+      display: none;
+    }
+
+    .format-options {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .format-option {
+      display: block;
+      border: 3px solid #5f687d;
+      background: #a2aabc;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+
+    .format-option:has(input:checked) {
+      border-color: #12401d;
+      background: #c3d6b9;
+      box-shadow: inset 0 0 0 1px #12401d;
+    }
+
+    .format-option input {
+      margin-right: 6px;
+    }
+
+    .format-option-title {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .format-option-desc {
+      display: block;
+      margin: 4px 0 0 22px;
+      font-size: 12px;
+      line-height: 1.35;
+      color: #23283a;
+    }
+
+    .format-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-family: "Courier New", monospace;
+      color: #23283a;
+      background: #c6ccda;
+      border: 1px solid #5f687d;
+      padding: 0 4px;
+      text-transform: uppercase;
+    }
+
+    .onboarding-review {
+      border: 3px solid #5f687d;
+      background: #a2aabc;
+      padding: 10px;
+      display: flex;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .onboarding-review-info {
+      min-width: 0;
+    }
+
+    .onboarding-review-info .review-title {
+      display: block;
+      font-size: 16px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .onboarding-review-info .review-description {
+      display: block;
+      margin-top: 4px;
+      font-size: 12px;
+      color: #23283a;
+      line-height: 1.3;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .onboarding-review-info .review-description.empty {
+      font-style: italic;
+      color: #5a6072;
+    }
+
+    @media (max-width: 520px) {
+      .onboarding-panel {
+        padding: 16px;
+      }
+    }
+
+    .section-heading {
+      margin-top: 20px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 18px;
+      text-transform: uppercase;
+    }
+
+    .section-heading .count {
+      font-size: 12px;
+      color: #cfd4e0;
+      font-family: "Courier New", monospace;
+    }
+
+    .comics-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .comic-row {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 12px;
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 12px;
+    }
+
+    .comic-row .cover-preview,
+    .comic-row .cover-placeholder {
+      width: 72px;
+      height: 96px;
+    }
+
+    .comic-row .cover-preview {
+      display: block;
+    }
+
+    .comic-info {
+      min-width: 0;
+    }
+
+    .comic-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .comic-title-row h3 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .status-badge {
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 2px 6px;
+      border: 2px solid #090a0d;
+      font-family: "Courier New", monospace;
+    }
+
+    .status-badge.published {
+      background: #7bab6e;
+    }
+
+    .status-badge.draft {
+      background: #c9c07a;
+    }
+
+    .comic-description {
+      margin: 6px 0 0;
+      font-size: 13px;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .comic-stats-row {
+      margin-top: 8px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      font-family: "Courier New", monospace;
+      color: #23283a;
+    }
+
+    .comic-actions {
+      margin-top: 8px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .comic-actions button {
+      min-height: 24px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 2px 9px;
+    }
+
+    .comic-actions button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .comic-actions button.delete-button {
+      color: #650000;
+    }
+
+    .edit-panel {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 3px solid var(--line);
+    }
+
+    .edit-panel[hidden] {
+      display: none;
+    }
+
+    .empty-note {
+      margin-top: 10px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 14px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    @media (max-width: 560px) {
+      .page {
+        width: 100%;
+        border: 0;
+        padding: 0 12px 32px;
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+        min-height: auto;
+        padding-bottom: 7px;
+      }
+
+      .brand {
+        width: min(260px, 100%);
+      }
+
+      .nav {
+        width: 100%;
+        padding-top: 0;
+      }
+
+      .comic-row {
+        grid-template-columns: 56px 1fr;
+      }
+
+      .comic-row .cover-preview,
+      .comic-row .cover-placeholder {
+        width: 56px;
+        height: 74px;
+      }
+
+      .comic-actions button {
+        min-height: 40px;
+        padding: 2px 14px;
+        font-size: 14px;
+      }
+
+      .composer-row button,
+      .composer-row .file-button {
+        min-height: 44px;
+        padding: 3px 16px;
+        font-size: 14px;
+      }
+
+      .onboarding-panel {
+        padding: 16px;
+        max-height: calc(100vh - 24px);
+      }
+
+      .onboarding-close {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+      }
+
+      .format-option {
+        padding: 14px;
+      }
+
+      .format-option-title {
+        font-size: 15px;
+      }
+
+      .format-option-desc {
+        font-size: 13px;
+      }
+
+      .primary-cta {
+        min-height: 44px;
+        font-size: 15px;
+      }
+
+      input[type="text"],
+      textarea {
+        min-height: 44px;
+        font-size: 16px;
+        padding: 8px 10px;
+      }
+
+      label {
+        font-size: 15px;
+      }
+
+      .cover-row .file-button,
+      .cover-row button {
+        min-height: 44px;
+        padding: 3px 16px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar" aria-label="Site header">
+      <img class="brand" src="Logo.png" alt="Sketchbook Trilogies">
+      <div class="topbar-menu">
+        <nav class="nav" aria-label="Primary navigation">
+          <p><span>|</span></p>
+          <p><a href="index.html">home</a></p>
+          <p><span>-</span></p>
+          <p><a href="blog.html">blog</a></p>
+          <p><span>-</span></p>
+          <p><a href="settings.html">settings</a></p>
+        </nav>
+
+      </div>
+    </header>
+
+    <h1>Dashboard</h1>
+    <p class="subtitle">Your webcomics — drafts, published, and how they're doing.</p>
+
+    <section class="state-box" id="signed-out-box" hidden>
+      Sign in to manage your webcomics. <a href="auth-sign-in.html?mode=signin">Sign in</a>
+    </section>
+
+    <div id="dashboard-body" hidden>
+      <section class="start-cta">
+        <p class="composer-kicker">New Series &mdash; Permanent Catalog Entry</p>
+        <h2>Begin a New Webcomic</h2>
+        <p>A webcomic here is a real, lasting thing — not a placeholder. When you're ready to commit to one, start the process below.</p>
+        <button type="button" class="primary-cta" id="open-onboarding-button">begin a new webcomic &rarr;</button>
+      </section>
+
+      <div class="section-heading">
+        <h2>Published</h2>
+        <span class="count" id="published-count"></span>
+      </div>
+      <div class="comics-list" id="published-list"></div>
+      <p class="empty-note" id="published-empty" hidden>Nothing published yet.</p>
+
+      <div class="section-heading">
+        <h2>Drafts</h2>
+        <span class="count" id="drafts-count"></span>
+      </div>
+      <div class="comics-list" id="drafts-list"></div>
+      <p class="empty-note" id="drafts-empty" hidden>No drafts sitting around.</p>
+    </div>
+  </main>
+
+  <div class="app-popup-overlay" id="app-popup-overlay" hidden>
+    <div class="app-popup-panel" role="alertdialog" aria-modal="true" aria-labelledby="app-popup-message">
+      <p class="app-popup-message" id="app-popup-message"></p>
+      <div class="app-popup-actions">
+        <button type="button" id="app-popup-cancel" hidden>cancel</button>
+        <button type="button" class="primary" id="app-popup-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="onboarding-overlay" id="onboarding-overlay" hidden>
+    <div class="onboarding-panel" role="dialog" aria-modal="true" aria-labelledby="onboarding-heading">
+      <button type="button" class="onboarding-close" id="onboarding-close-button" aria-label="Cancel">&times;</button>
+
+      <div class="onboarding-step" data-step="intro">
+        <p class="composer-kicker">Get ready to make</p>
+        <h2 id="onboarding-heading">YOUR OWN WEBCOMIC</h2>
+        <p class="onboarding-copy">Take this seriously. This is the start of your passion project.</p>
+        <div class="composer-row">
+          <button type="button" id="onboarding-cancel-intro">cancel</button>
+          <button type="button" class="primary" id="onboarding-begin-button">i understand &mdash; begin</button>
+        </div>
+      </div>
+
+      <div class="onboarding-step" data-step="format" hidden>
+        <p class="composer-kicker">Step 1 of 4 &mdash; Format</p>
+        <h2>Choose A Format</h2>
+        <p class="onboarding-copy">This shapes how your pages work once you're in the editor. Pick whichever actually matches what you're making — you can't switch later.</p>
+        <div class="format-options">
+          <label class="format-option">
+            <input type="radio" name="ob-format" value="text_image">
+            <span class="format-option-title">Text &amp; Image</span>
+            <span class="format-option-desc">Will comprise of text and images, like a picture book. Bets for Homestuck inspired comics.</span>
+          </label>
+          <label class="format-option">
+            <input type="radio" name="ob-format" value="panel">
+            <span class="format-option-title">Continuous Panel</span>
+            <span class="format-option-desc">The traditional webcomic — one image per page, read in sequence.</span>
+          </label>
+        </div>
+        <p class="onboarding-error" id="ob-format-error" hidden>Pick a format before continuing.</p>
+        <div class="composer-row">
+          <button type="button" id="ob-format-back">back</button>
+          <button type="button" class="primary" id="ob-format-next">continue</button>
+        </div>
+      </div>
+
+      <div class="onboarding-step" data-step="title" hidden>
+        <p class="composer-kicker">Step 2 of 4 &mdash; Title</p>
+        <h2>Give It A Title</h2>
+        <p class="onboarding-copy">This is the name your series will carry for as long as it exists. Choose it like you mean it.</p>
+        <label>
+          title
+          <input type="text" id="ob-title" maxlength="80">
+        </label>
+        <p class="onboarding-error" id="ob-title-error" hidden>Give it a title before continuing.</p>
+        <div class="composer-row">
+          <button type="button" id="ob-title-back">back</button>
+          <button type="button" class="primary" id="ob-title-next">continue</button>
+        </div>
+      </div>
+
+      <div class="onboarding-step" data-step="description" hidden>
+        <p class="composer-kicker">Step 3 of 4 &mdash; Description</p>
+        <h2>What Is It About?</h2>
+        <p class="onboarding-copy">This will be a short window into your webcomic for people.</p>
+        <label>
+          description
+          <textarea id="ob-description" maxlength="500" placeholder="What is this story about, and why should someone start reading it?"></textarea>
+        </label>
+        <div class="composer-row">
+          <button type="button" id="ob-description-back">back</button>
+          <button type="button" class="primary" id="ob-description-next">continue</button>
+        </div>
+      </div>
+
+      <div class="onboarding-step" data-step="cover" hidden>
+        <p class="composer-kicker">Step 4 of 4 &mdash; Cover</p>
+        <h2>Add A Cover <span class="ratio-tag">3:4</span></h2>
+        <p class="onboarding-copy">This is what people will first see of your webcomic. Make sure to use an image that will catch people's attention.</p>
+        <div class="cover-row">
+          <div class="cover-placeholder" id="ob-cover-placeholder">no cover</div>
+          <img class="cover-preview" id="ob-cover-preview" alt="Cover preview">
+          <label class="file-button" style="margin:0;">
+            [choose image]
+            <input id="ob-cover-input" type="file" accept="image/*" style="display:none;">
+          </label>
+          <button type="button" id="ob-remove-cover-button" hidden>remove cover</button>
+        </div>
+        <p class="composer-status" id="ob-cover-status" aria-live="polite"></p>
+        <div class="composer-row">
+          <button type="button" id="ob-cover-back">back</button>
+          <button type="button" class="primary" id="ob-cover-next">continue</button>
+        </div>
+      </div>
+
+      <div class="onboarding-step" data-step="review" hidden>
+        <p class="composer-kicker">Final Step &mdash; Review</p>
+        <h2>Review &amp; Commit</h2>
+        <div class="onboarding-review">
+          <div id="ob-review-cover-slot"></div>
+          <div class="onboarding-review-info">
+            <span class="format-tag" id="ob-review-format"></span>
+            <span class="review-title" id="ob-review-title"></span>
+            <span class="review-description" id="ob-review-description"></span>
+          </div>
+        </div>
+        <p class="onboarding-copy">This will be saved as a draft, visible only to you. Once you've added at least one page in the editor, you'll be able to publish it from your dashboard — a webcomic with nothing to read yet can't go public.</p>
+        <div class="composer-row">
+          <button type="button" id="ob-review-back">back</button>
+          <button type="button" class="primary" id="ob-save-draft-button">create as draft</button>
+        </div>
+        <p class="composer-status" id="onboarding-status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import {
+      addDoc,
+      collection,
+      deleteDoc,
+      doc,
+      getDoc,
+      getDocs,
+      getFirestore,
+      query,
+      serverTimestamp,
+      updateDoc,
+      where,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js";
+
+    // If this page is restored from the browser's back/forward cache (e.g.
+    // after signing in/out as a different account on another page, then
+    // hitting Back), force a fresh reload so auth-dependent UI re-evaluates
+    // against whoever is ACTUALLY signed in right now, instead of showing stale cached state.
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    });
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg6umXxHQ6INyc_U2AvmhF9blhQ5ZEtT8",
+      authDomain: "sketchbook-trilogies.firebaseapp.com",
+      projectId: "sketchbook-trilogies",
+      storageBucket: "sketchbook-trilogies.firebasestorage.app",
+      messagingSenderId: "564902002463",
+      appId: "1:564902002463:web:7dc95e5e857e19b959fa2a",
+      measurementId: "G-Q08PSQDHMH",
+    };
+
+    const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
+    const COMPRESS_THRESHOLD_BYTES = 1 * 1024 * 1024; // files over 1MB get compressed
+    const FIRESTORE_FIELD_SAFETY_BYTES = 900 * 1024; // stay under Firestore's 1MiB document cap
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    if (await isSupported()) {
+      getAnalytics(app);
+    }
+
+    // ---- custom alert/confirm popup (replaces browser alert()/confirm()) ----
+    const appPopupOverlay = document.querySelector("#app-popup-overlay");
+    const appPopupMessage = document.querySelector("#app-popup-message");
+    const appPopupCancelButton = document.querySelector("#app-popup-cancel");
+    const appPopupOkButton = document.querySelector("#app-popup-ok");
+    let appPopupResolve = null;
+
+    function closeAppPopup(result) {
+      appPopupOverlay.hidden = true;
+      if (appPopupResolve) {
+        const resolve = appPopupResolve;
+        appPopupResolve = null;
+        resolve(result);
+      }
+    }
+
+    appPopupOkButton.addEventListener("click", () => closeAppPopup(true));
+    appPopupCancelButton.addEventListener("click", () => closeAppPopup(false));
+    appPopupOverlay.addEventListener("click", (event) => {
+      if (event.target === appPopupOverlay) closeAppPopup(false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !appPopupOverlay.hidden) closeAppPopup(false);
+    });
+
+    function showAppAlert(message) {
+      return new Promise((resolve) => {
+        appPopupResolve = resolve;
+        appPopupMessage.textContent = message;
+        appPopupCancelButton.hidden = true;
+        appPopupOkButton.textContent = "OK";
+        appPopupOverlay.hidden = false;
+        appPopupOkButton.focus();
+      });
+    }
+
+    function showAppConfirm(message, confirmLabel = "OK") {
+      return new Promise((resolve) => {
+        appPopupResolve = resolve;
+        appPopupMessage.textContent = message;
+        appPopupCancelButton.hidden = false;
+        appPopupOkButton.textContent = confirmLabel;
+        appPopupOverlay.hidden = false;
+        appPopupOkButton.focus();
+      });
+    }
+
+    const signedOutBox = document.querySelector("#signed-out-box");
+    const dashboardBody = document.querySelector("#dashboard-body");
+
+    const openOnboardingButton = document.querySelector("#open-onboarding-button");
+    const onboardingOverlay = document.querySelector("#onboarding-overlay");
+    const onboardingCloseButton = document.querySelector("#onboarding-close-button");
+    const onboardingSteps = document.querySelectorAll(".onboarding-step");
+
+    const onboardingCancelIntro = document.querySelector("#onboarding-cancel-intro");
+    const onboardingBeginButton = document.querySelector("#onboarding-begin-button");
+
+    const obFormatInputs = document.querySelectorAll('input[name="ob-format"]');
+    const obFormatError = document.querySelector("#ob-format-error");
+    const obFormatBack = document.querySelector("#ob-format-back");
+    const obFormatNext = document.querySelector("#ob-format-next");
+
+    const obTitle = document.querySelector("#ob-title");
+    const obTitleError = document.querySelector("#ob-title-error");
+    const obTitleBack = document.querySelector("#ob-title-back");
+    const obTitleNext = document.querySelector("#ob-title-next");
+
+    const obDescription = document.querySelector("#ob-description");
+    const obDescriptionBack = document.querySelector("#ob-description-back");
+    const obDescriptionNext = document.querySelector("#ob-description-next");
+
+    const obCoverInput = document.querySelector("#ob-cover-input");
+    const obCoverPreview = document.querySelector("#ob-cover-preview");
+    const obCoverPlaceholder = document.querySelector("#ob-cover-placeholder");
+    const obRemoveCoverButton = document.querySelector("#ob-remove-cover-button");
+    const obCoverStatus = document.querySelector("#ob-cover-status");
+    const obCoverBack = document.querySelector("#ob-cover-back");
+    const obCoverNext = document.querySelector("#ob-cover-next");
+
+    const obReviewCoverSlot = document.querySelector("#ob-review-cover-slot");
+    const obReviewFormat = document.querySelector("#ob-review-format");
+    const obReviewTitle = document.querySelector("#ob-review-title");
+    const obReviewDescription = document.querySelector("#ob-review-description");
+    const obReviewBack = document.querySelector("#ob-review-back");
+    const obSaveDraftButton = document.querySelector("#ob-save-draft-button");
+    const onboardingStatus = document.querySelector("#onboarding-status");
+
+    const FORMAT_LABELS = { text_image: "Text & Image", panel: "Continuous Panel" };
+    let obFormat = null;
+
+    const publishedList = document.querySelector("#published-list");
+    const publishedCount = document.querySelector("#published-count");
+    const publishedEmpty = document.querySelector("#published-empty");
+    const draftsList = document.querySelector("#drafts-list");
+    const draftsCount = document.querySelector("#drafts-count");
+    const draftsEmpty = document.querySelector("#drafts-empty");
+
+    let currentUser = null;
+    let currentUserDoc = null;
+    let obPendingCover = null;
+
+    function setOnboardingStatus(message, kind = "") {
+      onboardingStatus.textContent = message;
+      onboardingStatus.className = kind ? `composer-status ${kind}` : "composer-status";
+    }
+
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Could not read that file."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function loadImageEl(src) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error("Could not read that image."));
+        image.src = src;
+      });
+    }
+
+    async function compressImage(file, maxDimension, quality) {
+      const dataUrl = await readFileAsDataURL(file);
+      const image = await loadImageEl(dataUrl);
+
+      let { width, height } = image;
+      if (width > height && width > maxDimension) {
+        height = Math.round((height * maxDimension) / width);
+        width = maxDimension;
+      } else if (height >= width && height > maxDimension) {
+        width = Math.round((width * maxDimension) / height);
+        height = maxDimension;
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext("2d").drawImage(image, 0, 0, width, height);
+      return canvas.toDataURL("image/jpeg", quality);
+    }
+
+    // Files over 1MB get resized/recompressed; smaller files are base64-encoded as-is.
+    async function processImageFile(file) {
+      let dataUrl = file.size > COMPRESS_THRESHOLD_BYTES
+        ? await compressImage(file, 900, 0.82)
+        : await readFileAsDataURL(file);
+
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        dataUrl = await compressImage(file, 640, 0.7);
+      }
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        dataUrl = await compressImage(file, 480, 0.58);
+      }
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        throw new Error("That image is too detailed to compress small enough. Try a smaller image.");
+      }
+
+      return dataUrl;
+    }
+
+    // ---- onboarding wizard ----
+    function showOnboardingStep(stepName) {
+      onboardingSteps.forEach((el) => {
+        el.hidden = el.dataset.step !== stepName;
+      });
+    }
+
+    function resetOnboarding() {
+      obFormat = null;
+      obFormatInputs.forEach((input) => { input.checked = false; });
+      obFormatError.hidden = true;
+
+      obTitle.value = "";
+      obTitleError.hidden = true;
+      obDescription.value = "";
+
+      obCoverInput.value = "";
+      obCoverPreview.src = "";
+      obCoverPreview.classList.remove("visible");
+      obCoverPlaceholder.style.display = "flex";
+      obRemoveCoverButton.hidden = true;
+      obPendingCover = null;
+      obCoverStatus.textContent = "";
+      obCoverStatus.className = "composer-status";
+
+      onboardingStatus.textContent = "";
+      onboardingStatus.className = "composer-status";
+
+      showOnboardingStep("intro");
+    }
+
+    function openOnboarding() {
+      resetOnboarding();
+      onboardingOverlay.hidden = false;
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeOnboarding() {
+      onboardingOverlay.hidden = true;
+      document.body.style.overflow = "";
+    }
+
+    openOnboardingButton.addEventListener("click", openOnboarding);
+    onboardingCloseButton.addEventListener("click", closeOnboarding);
+    onboardingCancelIntro.addEventListener("click", closeOnboarding);
+
+    onboardingOverlay.addEventListener("click", (event) => {
+      if (event.target === onboardingOverlay) closeOnboarding();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !onboardingOverlay.hidden) closeOnboarding();
+    });
+
+    onboardingBeginButton.addEventListener("click", () => {
+      showOnboardingStep("format");
+    });
+
+    obFormatInputs.forEach((input) => {
+      input.addEventListener("change", () => {
+        obFormat = input.value;
+        obFormatError.hidden = true;
+      });
+    });
+
+    obFormatBack.addEventListener("click", () => showOnboardingStep("intro"));
+    obFormatNext.addEventListener("click", () => {
+      if (!obFormat) {
+        obFormatError.hidden = false;
+        return;
+      }
+      showOnboardingStep("title");
+      obTitle.focus();
+    });
+
+    obTitleBack.addEventListener("click", () => showOnboardingStep("format"));
+    obTitleNext.addEventListener("click", () => {
+      if (!obTitle.value.trim()) {
+        obTitleError.hidden = false;
+        obTitle.focus();
+        return;
+      }
+      obTitleError.hidden = true;
+      showOnboardingStep("description");
+      obDescription.focus();
+    });
+
+    obTitle.addEventListener("input", () => {
+      if (obTitle.value.trim()) obTitleError.hidden = true;
+    });
+
+    obDescriptionBack.addEventListener("click", () => showOnboardingStep("title"));
+    obDescriptionNext.addEventListener("click", () => showOnboardingStep("cover"));
+
+    obCoverInput.addEventListener("change", async () => {
+      const file = obCoverInput.files?.[0];
+      if (!file) return;
+
+      if (!file.type.startsWith("image/")) {
+        obCoverStatus.className = "composer-status error";
+        obCoverStatus.textContent = "Please choose an image file.";
+        obCoverInput.value = "";
+        return;
+      }
+
+      if (file.size > MAX_UPLOAD_BYTES) {
+        obCoverStatus.className = "composer-status error";
+        obCoverStatus.textContent = "That file is too large (max 8MB).";
+        obCoverInput.value = "";
+        return;
+      }
+
+      obCoverStatus.className = "composer-status";
+      obCoverStatus.textContent = file.size > COMPRESS_THRESHOLD_BYTES ? "compressing cover..." : "processing cover...";
+
+      try {
+        const dataUrl = await processImageFile(file);
+        obPendingCover = dataUrl;
+        obCoverPreview.src = dataUrl;
+        obCoverPreview.classList.add("visible");
+        obCoverPlaceholder.style.display = "none";
+        obRemoveCoverButton.hidden = false;
+        obCoverStatus.className = "composer-status success";
+        obCoverStatus.textContent = "cover ready.";
+      } catch (error) {
+        console.error(error);
+        obCoverStatus.className = "composer-status error";
+        obCoverStatus.textContent = error.message || "Could not process that image.";
+        obCoverInput.value = "";
+      }
+    });
+
+    obRemoveCoverButton.addEventListener("click", () => {
+      obPendingCover = "";
+      obCoverInput.value = "";
+      obCoverPreview.src = "";
+      obCoverPreview.classList.remove("visible");
+      obCoverPlaceholder.style.display = "flex";
+      obRemoveCoverButton.hidden = true;
+      obCoverStatus.textContent = "";
+    });
+
+    obCoverBack.addEventListener("click", () => showOnboardingStep("description"));
+    obCoverNext.addEventListener("click", () => {
+      obReviewFormat.textContent = FORMAT_LABELS[obFormat] || obFormat;
+      obReviewTitle.textContent = obTitle.value.trim();
+      const descriptionValue = obDescription.value.trim();
+      obReviewDescription.textContent = descriptionValue || "(no description yet)";
+      obReviewDescription.classList.toggle("empty", !descriptionValue);
+
+      obReviewCoverSlot.innerHTML = "";
+      if (obPendingCover) {
+        const img = document.createElement("img");
+        img.className = "cover-preview visible";
+        img.alt = "";
+        img.src = obPendingCover;
+        obReviewCoverSlot.append(img);
+      } else {
+        const placeholder = document.createElement("div");
+        placeholder.className = "cover-placeholder";
+        placeholder.textContent = "no cover";
+        obReviewCoverSlot.append(placeholder);
+      }
+
+      onboardingStatus.textContent = "";
+      onboardingStatus.className = "composer-status";
+      showOnboardingStep("review");
+    });
+
+    obReviewBack.addEventListener("click", () => showOnboardingStep("cover"));
+
+    async function submitWebcomic() {
+      const title = obTitle.value.trim();
+      if (!title) {
+        showOnboardingStep("title");
+        obTitleError.hidden = false;
+        obTitle.focus();
+        return;
+      }
+
+      if (!obFormat) {
+        showOnboardingStep("format");
+        obFormatError.hidden = false;
+        return;
+      }
+
+      obSaveDraftButton.disabled = true;
+      setOnboardingStatus("saving draft...");
+
+      try {
+        await addDoc(collection(db, "webcomics"), {
+          authorUid: currentUser.uid,
+          authorName: currentUserDoc?.displayName || currentUser.displayName || currentUser.email || "User",
+          authorPhotoURL: currentUserDoc?.photoURL || null,
+          title,
+          description: obDescription.value.trim(),
+          coverImage: obPendingCover || null,
+          format: obFormat,
+          status: "draft",
+          pageCount: 0,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+
+        try {
+          const newCount = (currentUserDoc?.webcomics || 0) + 1;
+          await updateDoc(doc(db, "users", currentUser.uid), { webcomics: newCount });
+          if (currentUserDoc) currentUserDoc.webcomics = newCount;
+        } catch (countError) {
+          console.error("Could not update webcomics count:", countError);
+        }
+
+        closeOnboarding();
+        await loadMyWebcomics();
+      } catch (error) {
+        console.error(error);
+        setOnboardingStatus("Could not save that. Please try again.", "error");
+      } finally {
+        obSaveDraftButton.disabled = false;
+      }
+    }
+
+    obSaveDraftButton.addEventListener("click", submitWebcomic);
+
+
+    function formatDate(timestamp) {
+      if (!timestamp) return "";
+      const date = typeof timestamp.toDate === "function" ? timestamp.toDate() : new Date(timestamp);
+      if (Number.isNaN(date.getTime())) return "";
+      return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    }
+
+    async function loadReactionSummary(comicId) {
+      const snapshot = await getDocs(collection(db, "webcomics", comicId, "reactions"));
+      let likes = 0;
+      let dislikes = 0;
+      snapshot.forEach((docSnap) => {
+        const type = docSnap.data().type;
+        if (type === "like") likes += 1;
+        else if (type === "dislike") dislikes += 1;
+      });
+      return { likes, dislikes };
+    }
+
+    function buildComicRow(comic) {
+      const row = document.createElement("article");
+      row.className = "comic-row";
+
+      if (comic.coverImage) {
+        const cover = document.createElement("img");
+        cover.className = "cover-preview visible";
+        cover.alt = "";
+        cover.src = comic.coverImage;
+        row.append(cover);
+      } else {
+        const placeholder = document.createElement("div");
+        placeholder.className = "cover-placeholder";
+        placeholder.textContent = "no cover";
+        row.append(placeholder);
+      }
+
+      const info = document.createElement("div");
+      info.className = "comic-info";
+
+      const titleRow = document.createElement("div");
+      titleRow.className = "comic-title-row";
+      const titleEl = document.createElement("h3");
+      titleEl.textContent = comic.title || "Untitled";
+      const badge = document.createElement("span");
+      badge.className = `status-badge ${comic.status}`;
+      badge.textContent = comic.status;
+      titleRow.append(titleEl, badge);
+      if (comic.format) {
+        const formatBadge = document.createElement("span");
+        formatBadge.className = "format-tag";
+        formatBadge.textContent = FORMAT_LABELS[comic.format] || comic.format;
+        titleRow.append(formatBadge);
+      }
+      info.append(titleRow);
+
+      if (comic.description) {
+        const desc = document.createElement("p");
+        desc.className = "comic-description";
+        desc.textContent = comic.description;
+        info.append(desc);
+      }
+
+      const statsRow = document.createElement("div");
+      statsRow.className = "comic-stats-row";
+      const likesEl = document.createElement("span");
+      likesEl.textContent = "loading stats...";
+      statsRow.append(likesEl);
+      const pagesEl = document.createElement("span");
+      pagesEl.textContent = `${comic.pageCount || 0} page${comic.pageCount === 1 ? "" : "s"}`;
+      statsRow.append(pagesEl);
+      const datesEl = document.createElement("span");
+      datesEl.textContent = `updated ${formatDate(comic.updatedAt || comic.createdAt)}`;
+      statsRow.append(datesEl);
+      info.append(statsRow);
+
+      loadReactionSummary(comic.id).then(({ likes, dislikes }) => {
+        likesEl.textContent = `${likes} likes, ${dislikes} dislikes`;
+      }).catch(() => {
+        likesEl.textContent = "stats unavailable";
+      });
+
+      const actions = document.createElement("div");
+      actions.className = "comic-actions";
+
+      const editButton = document.createElement("button");
+      editButton.type = "button";
+      editButton.textContent = "edit";
+      editButton.addEventListener("click", () => {
+        window.location.href = `webcomic-edit.html?id=${encodeURIComponent(comic.id)}`;
+      });
+
+      const toggleStatusButton = document.createElement("button");
+      toggleStatusButton.type = "button";
+      toggleStatusButton.textContent = comic.status === "published" ? "unpublish" : "publish";
+      toggleStatusButton.addEventListener("click", async () => {
+        if (!currentUser || currentUser.uid !== comic.authorUid) return;
+        const newStatus = comic.status === "published" ? "draft" : "published";
+        if (newStatus === "published" && !((comic.pageCount || 0) >= 1)) {
+          await showAppAlert("This webcomic doesn't have any pages yet. Add at least one page in the editor before publishing it.");
+          return;
+        }
+        toggleStatusButton.disabled = true;
+        try {
+          await updateDoc(doc(db, "webcomics", comic.id), { status: newStatus, updatedAt: serverTimestamp() });
+          await loadMyWebcomics();
+        } catch (error) {
+          console.error(error);
+          await showAppAlert("Could not update that webcomic. Please try again.");
+          toggleStatusButton.disabled = false;
+        }
+      });
+
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.className = "delete-button";
+      deleteButton.textContent = "delete";
+      deleteButton.addEventListener("click", async () => {
+        if (!currentUser || currentUser.uid !== comic.authorUid) return;
+        const confirmed = await showAppConfirm(`Delete "${comic.title}"? This can't be undone.`, "delete");
+        if (!confirmed) return;
+        try {
+          await deleteDoc(doc(db, "webcomics", comic.id));
+          try {
+            const newCount = Math.max(0, (currentUserDoc?.webcomics || 0) - 1);
+            await updateDoc(doc(db, "users", currentUser.uid), { webcomics: newCount });
+            if (currentUserDoc) currentUserDoc.webcomics = newCount;
+          } catch (countError) {
+            console.error("Could not update webcomics count:", countError);
+          }
+          await loadMyWebcomics();
+        } catch (error) {
+          console.error(error);
+          await showAppAlert("Could not delete that webcomic. Please try again.");
+        }
+      });
+
+      actions.append(editButton, toggleStatusButton, deleteButton);
+      info.append(actions);
+
+      row.append(info);
+      return row;
+    }
+
+    function renderList(container, countEl, emptyEl, comics) {
+      container.innerHTML = "";
+      countEl.textContent = `(${comics.length})`;
+      emptyEl.hidden = comics.length > 0;
+      comics.forEach((comic) => container.append(buildComicRow(comic)));
+    }
+
+    async function loadMyWebcomics() {
+      if (!currentUser) return;
+
+      try {
+        const webcomicsQuery = query(collection(db, "webcomics"), where("authorUid", "==", currentUser.uid));
+        const snapshot = await getDocs(webcomicsQuery);
+        const mine = snapshot.docs
+          .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+
+        const toMillis = (t) => (t && typeof t.toMillis === "function" ? t.toMillis() : 0);
+        mine.sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
+
+        renderList(publishedList, publishedCount, publishedEmpty, mine.filter((c) => c.status === "published"));
+        renderList(draftsList, draftsCount, draftsEmpty, mine.filter((c) => c.status !== "published"));
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+
+      if (!user) {
+        signedOutBox.hidden = false;
+        dashboardBody.hidden = true;
+        return;
+      }
+
+      signedOutBox.hidden = true;
+      dashboardBody.hidden = false;
+
+      try {
+        const snapshot = await getDoc(doc(db, "users", user.uid));
+        currentUserDoc = snapshot.exists() ? snapshot.data() : null;
+      } catch (error) {
+        console.error("Could not load your profile doc:", error);
+        currentUserDoc = null;
+      }
+
+      await loadMyWebcomics();
+    });
+  </script>
+</body>
+</html>

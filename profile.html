@@ -1,0 +1,1207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico">
+  <title>Profile - Sketchbook Trilogies</title>
+  <style>
+    :root {
+      --ink: #05070b;
+      --paper: #bfc7dc;
+      --panel: #8a91a1;
+      --panel-dark: #4f5666;
+      --line: #090a0d;
+      --link: #002fff;
+      --visited: #4f1eb7;
+      --bevel-light: #c8cedd;
+      --bevel-dark: #4c5363;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 1px 1px, #2a2a33 1px, transparent 1.5px) 0 0 / 7px 7px,
+        #06060a;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 1px;
+    }
+
+    a:visited {
+      color: var(--visited);
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100vw - 18px, 720px);
+      min-height: 100vh;
+      margin: 0 auto;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border-left: 4px solid #51596b;
+      border-right: 4px solid #51596b;
+      box-shadow: 0 0 0 1px #171a22;
+      padding: 0 22px 32px;
+    }
+
+    .topbar {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 3px double #6c758b;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .brand {
+      width: 215px;
+      height: 34px;
+      object-fit: contain;
+      object-position: left center;
+      filter: contrast(1.18);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding-top: 3px;
+      font-size: 16px;
+      line-height: 1.15;
+      white-space: nowrap;
+    }
+
+    .topbar-menu {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .menu-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 6px 10px;
+      text-decoration: none;
+    }
+
+    .menu-toggle:focus {
+      outline: 2px solid #002fff;
+      outline-offset: 2px;
+    }
+
+
+    .nav p,
+    p {
+      margin: 0;
+    }
+
+    h1,
+    h2 {
+      margin: 0;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0 #e2e6f2;
+    }
+
+    h1 {
+      font-size: 26px;
+      line-height: 1.05;
+    }
+
+    .state-box {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .profile-card {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 14px;
+    }
+
+    .profile-hero {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 14px;
+      align-items: start;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--line);
+    }
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border: 4px solid #090a0d;
+      border-radius: 50%;
+      background: #303545;
+      object-fit: cover;
+      object-position: center;
+      box-shadow: 2px 2px 0 #303545;
+    }
+
+    .display-name {
+      font-size: 24px;
+    }
+
+    .username {
+      margin-top: 2px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #33394a;
+      font-family: "Courier New", monospace;
+    }
+
+    .username.empty {
+      font-weight: 400;
+      font-style: italic;
+      color: #5a6072;
+    }
+
+    .field-help {
+      margin: -6px 0 4px;
+      font-size: 11px;
+      font-weight: 400;
+      font-style: italic;
+      color: #33394a;
+    }
+
+    .uid-row {
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      font-family: "Courier New", monospace;
+      font-size: 12px;
+      color: #2c3140;
+    }
+
+    .uid-value {
+      background: #6f7789;
+      color: #e7eaf2;
+      padding: 2px 5px;
+      border: 1px solid #363c4a;
+      word-break: break-all;
+    }
+
+    .uid-copy {
+      min-height: 20px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      cursor: pointer;
+      font-size: 11px;
+      padding: 1px 6px;
+    }
+
+    .uid-copy:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .joined {
+      margin-top: 4px;
+      font-size: 12px;
+      color: #2c3140;
+    }
+
+    .bio {
+      margin-top: 10px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .bio.empty {
+      font-style: italic;
+      color: #3a4051;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 4px solid var(--line);
+      font-family: "Courier New", monospace;
+      font-size: 12px;
+      color: #23283a;
+    }
+
+    .stat-tile {
+      background: #a4abbc;
+      border: 2px solid #5f687d;
+      padding: 6px;
+      text-align: center;
+    }
+
+    .stat-tile b {
+      display: block;
+      font-size: 17px;
+      color: #101423;
+    }
+
+    .actions-row {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .actions-row[hidden] {
+      display: none;
+    }
+
+    .profile-section {
+      margin-top: 18px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .comics-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .comic-card {
+      display: block;
+      border: 4px solid #5f687d;
+      background: #d0d5e0;
+      color: inherit;
+      text-decoration: none;
+      overflow: hidden;
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+    }
+
+    .comic-art {
+      width: 100%;
+      height: 132px;
+      background: #6f7789 center/cover no-repeat;
+    }
+
+    .comic-meta {
+      padding: 12px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .comic-title {
+      font-size: 15px;
+      font-weight: 700;
+      display: block;
+    }
+
+    .comic-author,
+    .comic-stats {
+      font-size: 12px;
+      color: #23283a;
+      line-height: 1.4;
+    }
+
+    .empty-state {
+      margin: 0;
+      padding: 14px;
+      border: 2px solid #5f687d;
+      background: #c6ccda;
+      color: #23283a;
+      font-size: 14px;
+    }
+
+    .actions-row button,
+    .actions-row a.button-link {
+      min-height: 26px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 3px 10px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .actions-row button:active,
+    .actions-row a.button-link:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .avatar-preview-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .avatar-preview {
+      width: 56px;
+      height: 56px;
+      border: 3px solid #090a0d;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #303545;
+    }
+
+    .avatar-preview-row button {
+      min-height: 26px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 3px 9px;
+    }
+
+    .avatar-preview-row button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .avatar-preview-row .status {
+      font-size: 12px;
+      min-height: auto;
+    }
+
+    .edit-form {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 4px solid var(--line);
+      display: grid;
+      gap: 10px;
+    }
+
+    .edit-form[hidden] {
+      display: none;
+    }
+
+    label {
+      display: grid;
+      gap: 3px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input,
+    textarea {
+      border: 2px solid var(--panel-dark);
+      border-top-color: #3d4556;
+      border-left-color: #3d4556;
+      border-right-color: #b4bbcc;
+      border-bottom-color: #b4bbcc;
+      background: #c6ccda;
+      color: #111;
+      padding: 4px 6px;
+    }
+
+    input {
+      height: 28px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    .status {
+      min-height: 18px;
+      color: #1f2736;
+      font-size: 13px;
+      line-height: 1.2;
+    }
+
+    .error {
+      color: #650000;
+      font-weight: 700;
+    }
+
+    .success {
+      color: #12401d;
+      font-weight: 700;
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        width: 100%;
+        border: 0;
+        padding: 0 12px 24px;
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+        min-height: auto;
+        padding-bottom: 7px;
+      }
+
+      .brand {
+        width: min(260px, 100%);
+      }
+
+      .nav {
+        width: 100%;
+        padding-top: 0;
+      }
+
+      .profile-hero {
+        grid-template-columns: 56px 1fr;
+      }
+
+      .avatar {
+        width: 56px;
+        height: 56px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .actions-row button,
+      .actions-row a.button-link,
+      .avatar-preview-row button,
+      #copy-uid-button {
+        min-height: 44px;
+        font-size: 15px;
+        padding: 3px 14px;
+      }
+
+      #edit-display-name,
+      #edit-username,
+      #edit-bio {
+        min-height: 44px;
+        font-size: 16px;
+      }
+
+      #save-button {
+        min-height: 44px;
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar" aria-label="Site header">
+      <img class="brand" src="Logo.png" alt="Sketchbook Trilogies">
+      <div class="topbar-menu">
+        <nav class="nav" aria-label="Primary navigation">
+          <p><a href="index.html">home</a></p>
+          <p><span>-</span></p>
+          <p><a href="blog.html">blog</a></p>
+        </nav>
+      </div>
+    </header>
+
+    <section>
+      <h1>Profile</h1>
+    </section>
+
+    <section class="state-box" id="state-box" hidden></section>
+
+    <section class="profile-card" id="profile-card" hidden>
+      <div class="profile-hero">
+          <img class="avatar" id="profile-avatar" alt="Profile avatar" src="default-avatar.png" onerror="this.onerror=null;this.src='default-avatar.png';">
+        <div>
+          <h2 class="display-name" id="profile-name">User</h2>
+          <p class="username" id="profile-username" hidden></p>
+          <div class="uid-row">
+            <span>UID:</span>
+            <span class="uid-value" id="profile-uid"></span>
+            <button type="button" class="uid-copy" id="copy-uid-button">copy</button>
+          </div>
+          <p class="joined" id="profile-joined"></p>
+        </div>
+      </div>
+
+      <p class="bio" id="profile-bio"></p>
+
+      <div class="stats-grid" id="profile-stats"></div>
+
+      <div class="actions-row" id="public-actions">
+        <a class="button-link" id="view-posts-link" href="blog.html">view posts</a>
+        <a class="button-link" id="message-link" href="dms.html" hidden>message</a>
+      </div>
+
+      <div class="actions-row" id="owner-actions" hidden>
+        <button type="button" id="edit-toggle-button">edit profile</button>
+        <a class="button-link" href="settings.html">account settings</a>
+      </div>
+
+      <div class="profile-section" id="profile-webcomics-section">
+        <div class="section-heading">
+          <h2>Webcomics</h2>
+        </div>
+        <div class="comics-grid" id="profile-comics-grid"></div>
+      </div>
+
+      <form class="edit-form" id="edit-form" hidden>
+        <label>
+          display name
+          <input id="edit-display-name" type="text" maxlength="32">
+        </label>
+        <label>
+          username
+          <input id="edit-username" type="text" maxlength="20" placeholder="e.g. yourfavoritedemimale_brad" pattern="[a-z0-9_]{3,20}" autocapitalize="off" autocorrect="off" spellcheck="false">
+        </label>
+        <p class="field-help">3-20 characters: lowercase letters, numbers, and underscores only. Must be unique, like on Roblox or YouTube.</p>
+        <label>
+          avatar image
+          <input id="edit-photo-file" type="file" accept="image/*">
+        </label>
+        <p class="field-help">Photos up to 8MB are accepted and compressed automatically. Animated GIFs can't be compressed without losing their animation, so keep those under about 0.9MB.</p>
+        <div class="avatar-preview-row">
+          <img class="avatar-preview" id="avatar-preview" alt="Avatar preview" src="default-avatar.png" onerror="this.onerror=null;this.src='default-avatar.png';">
+          <button type="button" id="remove-avatar-button">remove photo</button>
+          <span class="status" id="avatar-status" aria-live="polite"></span>
+        </div>
+        <label>
+          bio
+          <textarea id="edit-bio" maxlength="280"></textarea>
+        </label>
+        <div class="actions-row">
+          <button type="submit" id="save-button">save changes</button>
+          <button type="button" id="cancel-edit-button">cancel</button>
+        </div>
+        <p class="status" id="edit-status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+    import { getAuth, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import {
+      collection,
+      deleteDoc,
+      doc,
+      getDoc,
+      getDocs,
+      getFirestore,
+      orderBy,
+      query,
+      serverTimestamp,
+      setDoc,
+      updateDoc,
+      where,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js";
+
+    // If this page is restored from the browser's back/forward cache (e.g.
+    // after signing in/out as a different account on another page, then
+    // hitting Back), force a fresh reload so auth-dependent UI (like
+    // "edit profile" or "account settings") re-evaluates against whoever is
+    // ACTUALLY signed in right now, instead of showing stale cached state.
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    });
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg6umXxHQ6INyc_U2AvmhF9blhQ5ZEtT8",
+      authDomain: "sketchbook-trilogies.firebaseapp.com",
+      projectId: "sketchbook-trilogies",
+      storageBucket: "sketchbook-trilogies.firebasestorage.app",
+      messagingSenderId: "564902002463",
+      appId: "1:564902002463:web:7dc95e5e857e19b959fa2a",
+      measurementId: "G-Q08PSQDHMH",
+    };
+
+    const sampleAvatar = "default-avatar.png";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    if (await isSupported()) {
+      getAnalytics(app);
+    }
+
+    const stateBox = document.querySelector("#state-box");
+    const profileCard = document.querySelector("#profile-card");
+    const profileWebcomicsGrid = document.querySelector("#profile-comics-grid");
+    const profileAvatar = document.querySelector("#profile-avatar");
+    const profileName = document.querySelector("#profile-name");
+    const profileUsername = document.querySelector("#profile-username");
+    const profileUid = document.querySelector("#profile-uid");
+    const profileJoined = document.querySelector("#profile-joined");
+    const profileBio = document.querySelector("#profile-bio");
+    const profileStats = document.querySelector("#profile-stats");
+    const copyUidButton = document.querySelector("#copy-uid-button");
+    const ownerActions = document.querySelector("#owner-actions");
+    const viewPostsLink = document.querySelector("#view-posts-link");
+    const messageLink = document.querySelector("#message-link");
+    const editToggleButton = document.querySelector("#edit-toggle-button");
+    const editForm = document.querySelector("#edit-form");
+    const cancelEditButton = document.querySelector("#cancel-edit-button");
+    const editDisplayName = document.querySelector("#edit-display-name");
+    const editUsername = document.querySelector("#edit-username");
+    const editPhotoFile = document.querySelector("#edit-photo-file");
+    const avatarPreview = document.querySelector("#avatar-preview");
+    const removeAvatarButton = document.querySelector("#remove-avatar-button");
+    const avatarStatus = document.querySelector("#avatar-status");
+    const editBio = document.querySelector("#edit-bio");
+    const editStatus = document.querySelector("#edit-status");
+    const saveButton = document.querySelector("#save-button");
+
+    const MAX_UPLOAD_BYTES = 8 * 1024 * 1024; // reject anything absurdly large before we even try to read it
+    const COMPRESS_THRESHOLD_BYTES = 1 * 1024 * 1024; // files over 1MB get compressed
+    const FIRESTORE_FIELD_SAFETY_BYTES = 900 * 1024; // stay comfortably under Firestore's 1MiB document cap
+
+    // currentPhotoURL tracks what will actually be saved: null (no change),
+    // "" (explicit removal), or a data: URL from a freshly chosen file.
+    let currentPhotoURL = null;
+    let avatarProcessing = false;
+
+    // A profile is always addressed by its UID: /profile.html?uid=<UID>
+    // With no uid param, this page falls back to the signed-in user's own UID.
+    const params = new URLSearchParams(window.location.search);
+    const requestedUid = params.get("uid");
+
+    let currentUser = null;
+    let viewedUid = requestedUid;
+    let currentProfileUsername = null;
+
+    function showState(message, isError = false) {
+      stateBox.hidden = false;
+      stateBox.textContent = message;
+      stateBox.classList.toggle("error", isError);
+      profileCard.hidden = true;
+    }
+
+    function formatJoined(timestamp) {
+      if (!timestamp) {
+        return "";
+      }
+      const date = typeof timestamp.toDate === "function" ? timestamp.toDate() : new Date(timestamp);
+      if (Number.isNaN(date.getTime())) {
+        return "";
+      }
+      return `joined ${date.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}`;
+    }
+
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Could not read that file."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error("Could not read that image."));
+        image.src = src;
+      });
+    }
+
+    async function compressImage(file, maxDimension, quality) {
+      const dataUrl = await readFileAsDataURL(file);
+      const image = await loadImage(dataUrl);
+
+      let { width, height } = image;
+      if (width > height && width > maxDimension) {
+        height = Math.round((height * maxDimension) / width);
+        width = maxDimension;
+      } else if (height >= width && height > maxDimension) {
+        width = Math.round((width * maxDimension) / height);
+        height = maxDimension;
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext("2d").drawImage(image, 0, 0, width, height);
+      return canvas.toDataURL("image/jpeg", quality);
+    }
+
+    // Animated GIFs can't go through the canvas-based compression below —
+    // canvas only ever captures a single frame, so doing that would
+    // silently flatten the GIF into a static image. Instead we just check
+    // its size directly and use it as-is, keeping the animation intact.
+    function isAnimatedGifCandidate(file) {
+      return file.type === "image/gif";
+    }
+
+    async function readGifAsIs(file) {
+      const dataUrl = await readFileAsDataURL(file);
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        throw new Error("That GIF is too large to store (animated GIFs can't be auto-compressed without losing the animation). Try a smaller or shorter GIF.");
+      }
+      return dataUrl;
+    }
+
+    // Files over 1MB get resized/recompressed; smaller files are base64-encoded as-is.
+    // Either way, we fall back to progressively harder compression if the encoded
+    // result would still be too large to safely store as a single Firestore field.
+    async function processAvatarFile(file) {
+      if (isAnimatedGifCandidate(file)) {
+        return readGifAsIs(file);
+      }
+
+      let dataUrl = file.size > COMPRESS_THRESHOLD_BYTES
+        ? await compressImage(file, 800, 0.82)
+        : await readFileAsDataURL(file);
+
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        dataUrl = await compressImage(file, 640, 0.72);
+      }
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        dataUrl = await compressImage(file, 480, 0.6);
+      }
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        throw new Error("That image is too detailed to compress small enough. Try a smaller photo.");
+      }
+
+      return dataUrl;
+    }
+
+    function renderProfile(uid, data, isOwner) {
+
+      stateBox.hidden = true;
+      profileCard.hidden = false;
+
+      currentProfileUsername = data.username || null;
+
+      profileAvatar.src = data.photoURL || sampleAvatar;
+      profileName.textContent = data.displayName || "User";
+      document.title = `${data.displayName || "User"} - Sketchbook Trilogies`;
+
+      if (data.username) {
+        profileUsername.hidden = false;
+        profileUsername.textContent = `@${data.username}`;
+        profileUsername.classList.remove("empty");
+      } else if (isOwner) {
+        profileUsername.hidden = false;
+        profileUsername.textContent = "no username set yet";
+        profileUsername.classList.add("empty");
+      } else {
+        profileUsername.hidden = true;
+      }
+
+      profileUid.textContent = uid;
+      profileJoined.textContent = formatJoined(data.createdAt);
+      viewPostsLink.href = `blog.html?uid=${encodeURIComponent(uid)}`;
+
+      const bio = (data.bio || "").trim();
+      profileBio.textContent = bio || "No bio yet.";
+      profileBio.classList.toggle("empty", !bio);
+
+      const stats = [
+        ["followers", data.followers ?? 0],
+        ["following", data.following ?? 0],
+        ["webcomics", data.webcomics ?? 0],
+        ["posts", data.posts ?? 0],
+        ["total likes", data.likes ?? 0],
+      ];
+      profileStats.innerHTML = stats
+        .map(([label, value]) => `<div class="stat-tile"><b>${value}</b>${label}</div>`)
+        .join("");
+
+      ownerActions.hidden = !isOwner;
+      if (!isOwner) {
+        editForm.hidden = true;
+      }
+
+      if (!isOwner && currentUser) {
+        messageLink.hidden = false;
+        messageLink.href = `dms.html?to=${encodeURIComponent(uid)}`;
+      } else {
+        messageLink.hidden = true;
+      }
+
+      editDisplayName.value = data.displayName || "";
+      editUsername.value = data.username || "";
+      editBio.value = data.bio || "";
+      editPhotoFile.value = "";
+      currentPhotoURL = null;
+      avatarStatus.textContent = "";
+      avatarPreview.src = data.photoURL || sampleAvatar;
+    }
+
+    // Hearts/saves/reads are one-doc-per-user subcollections, not counter
+    // fields on the webcomic doc (see webcomic-view.html / firestore.rules),
+    // so we fetch the size of each subcollection per comic here.
+    async function loadComicStats(comics) {
+      const statsMap = new Map();
+      await Promise.all(comics.map(async (comic) => {
+        try {
+          const [heartsSnap, savesSnap, viewsSnap] = await Promise.all([
+            getDocs(collection(db, "webcomics", comic.id, "hearts")),
+            getDocs(collection(db, "webcomics", comic.id, "saves")),
+            getDocs(collection(db, "webcomics", comic.id, "views")),
+          ]);
+          statsMap.set(comic.id, { hearts: heartsSnap.size, saves: savesSnap.size, reads: viewsSnap.size });
+        } catch (error) {
+          statsMap.set(comic.id, { hearts: 0, saves: 0, reads: 0 });
+        }
+      }));
+      return statsMap;
+    }
+
+    function renderProfileComics(comics, comicStats = new Map()) {
+      profileWebcomicsGrid.innerHTML = "";
+
+      if (!comics.length) {
+        profileWebcomicsGrid.innerHTML = `<p class="empty-state">No published webcomics yet.</p>`;
+        return;
+      }
+
+      comics.forEach((comic) => {
+        const card = document.createElement("a");
+        card.className = "comic-card";
+        card.href = `webcomic-view.html?id=${encodeURIComponent(comic.id || "")}`;
+
+        const art = document.createElement("div");
+        art.className = "comic-art";
+        art.setAttribute("aria-hidden", "true");
+        if (comic.coverImage) {
+          art.style.backgroundImage = `url("${comic.coverImage}")`;
+        }
+
+        const meta = document.createElement("div");
+        meta.className = "comic-meta";
+        const title = document.createElement("span");
+        title.className = "comic-title";
+        title.textContent = comic.title || "Untitled";
+        const author = document.createElement("span");
+        author.className = "comic-author";
+        author.textContent = `by ${comic.authorName || "their creator"}`;
+        const stats = document.createElement("span");
+        stats.className = "comic-stats";
+        const s = comicStats.get(comic.id) || { reads: 0, hearts: 0, saves: 0 };
+        stats.textContent = `${s.reads} reads · ${s.hearts} hearts · ${s.saves} saves`;
+
+        meta.append(title, author, stats);
+        card.append(art, meta);
+        profileWebcomicsGrid.append(card);
+      });
+    }
+
+    async function loadUserWebcomics(uid) {
+      const comicsQuery = query(
+        collection(db, "webcomics"),
+        where("authorUid", "==", uid),
+        where("status", "==", "published"),
+      );
+      const snapshot = await getDocs(comicsQuery);
+      const comics = snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+      return comics.sort((a, b) => {
+        const aTime = a.createdAt && typeof a.createdAt.toMillis === "function" ? a.createdAt.toMillis() : 0;
+        const bTime = b.createdAt && typeof b.createdAt.toMillis === "function" ? b.createdAt.toMillis() : 0;
+        return bTime - aTime;
+      });
+    }
+
+    async function ensureDefaultProfile(uid) {
+      const fallback = {
+        uid,
+        displayName: currentUser?.displayName || currentUser?.email || "User",
+        username: null,
+        email: currentUser?.email || null,
+        photoURL: currentUser?.photoURL || null,
+        bio: "",
+        followers: 0,
+        following: 0,
+        webcomics: 0,
+        posts: 0,
+        likes: 0,
+        createdAt: serverTimestamp(),
+      };
+      await setDoc(doc(db, "users", uid), fallback);
+      return fallback;
+    }
+
+    async function loadProfile(uid) {
+      try {
+        const snapshot = await getDoc(doc(db, "users", uid));
+        const isOwner = Boolean(currentUser && currentUser.uid === uid);
+
+        if (snapshot.exists()) {
+          renderProfile(uid, snapshot.data(), isOwner);
+          const comics = await loadUserWebcomics(uid);
+          const comicStats = await loadComicStats(comics);
+          renderProfileComics(comics, comicStats);
+          return;
+        }
+
+        if (isOwner) {
+          // Older accounts (created before profile documents existed) get one now.
+          const created = await ensureDefaultProfile(uid);
+          renderProfile(uid, created, true);
+          const comics = await loadUserWebcomics(uid);
+          const comicStats = await loadComicStats(comics);
+          renderProfileComics(comics, comicStats);
+          return;
+        }
+
+        showState(`No profile found for UID "${uid}".`, true);
+      } catch (error) {
+        console.error(error);
+        showState("Could not load this profile. Please try again.", true);
+      }
+    }
+
+    function refresh() {
+      if (!viewedUid) {
+        if (currentUser) {
+          viewedUid = currentUser.uid;
+          window.history.replaceState(null, "", `profile.html?uid=${encodeURIComponent(viewedUid)}`);
+        } else {
+          showState("Sign in to view your profile, or open a profile link that includes a UID.");
+          return;
+        }
+      }
+      loadProfile(viewedUid);
+    }
+
+    copyUidButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(profileUid.textContent);
+        copyUidButton.textContent = "copied!";
+      } catch (error) {
+        copyUidButton.textContent = "copy failed";
+      }
+      setTimeout(() => {
+        copyUidButton.textContent = "copy";
+      }, 1500);
+    });
+
+    editToggleButton.addEventListener("click", () => {
+      editForm.hidden = !editForm.hidden;
+      editStatus.textContent = "";
+      editStatus.className = "status";
+    });
+
+    cancelEditButton.addEventListener("click", () => {
+      editForm.hidden = true;
+      editStatus.textContent = "";
+      editStatus.className = "status";
+    });
+
+    editPhotoFile.addEventListener("change", async () => {
+      const file = editPhotoFile.files?.[0];
+      if (!file) {
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        avatarStatus.className = "status error";
+        avatarStatus.textContent = "Please choose an image file.";
+        editPhotoFile.value = "";
+        return;
+      }
+
+      if (file.size > MAX_UPLOAD_BYTES) {
+        avatarStatus.className = "status error";
+        avatarStatus.textContent = "That file is too large (max 8MB).";
+        editPhotoFile.value = "";
+        return;
+      }
+
+      avatarProcessing = true;
+      avatarStatus.className = "status";
+      avatarStatus.textContent = file.size > COMPRESS_THRESHOLD_BYTES ? "compressing..." : "processing...";
+
+      try {
+        const dataUrl = await processAvatarFile(file);
+        currentPhotoURL = dataUrl;
+        avatarPreview.src = dataUrl;
+        avatarStatus.className = "status success";
+        avatarStatus.textContent = file.size > COMPRESS_THRESHOLD_BYTES ? "compressed and ready." : "ready.";
+      } catch (error) {
+        console.error(error);
+        avatarStatus.className = "status error";
+        avatarStatus.textContent = error.message || "Could not process that image.";
+        editPhotoFile.value = "";
+      } finally {
+        avatarProcessing = false;
+      }
+    });
+
+    removeAvatarButton.addEventListener("click", () => {
+      currentPhotoURL = "";
+      editPhotoFile.value = "";
+      avatarPreview.src = sampleAvatar;
+      avatarStatus.className = "status";
+      avatarStatus.textContent = "photo will be removed on save.";
+    });
+
+    const USERNAME_PATTERN = /^[a-z0-9_]{3,20}$/;
+
+    // Claims `rawValue` for the current user, releasing `previousUsername`
+    // (if any) only once the new one is safely reserved. Reserving-then-
+    // releasing (rather than the other way around) means a failed claim
+    // never leaves someone without any username at all. Returns the
+    // normalized username to save, or undefined if nothing changed.
+    async function claimUsername(rawValue, previousUsername) {
+      const next = rawValue.trim().toLowerCase();
+
+      if (next === (previousUsername || "")) {
+        return undefined; // unchanged — don't touch anything
+      }
+      if (next && !USERNAME_PATTERN.test(next)) {
+        throw new Error("Usernames must be 3-20 characters: lowercase letters, numbers, and underscores only.");
+      }
+
+      if (next) {
+        try {
+          await setDoc(doc(db, "usernames", next), { uid: currentUser.uid });
+        } catch (error) {
+          throw new Error(`"${next}" is already taken. Try another one.`);
+        }
+      }
+
+      if (previousUsername) {
+        try {
+          await deleteDoc(doc(db, "usernames", previousUsername));
+        } catch (error) {
+          console.error("Could not release the old username reservation:", error);
+        }
+      }
+
+      return next || null;
+    }
+
+    editForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (!currentUser || currentUser.uid !== viewedUid) {
+        return;
+      }
+
+      if (avatarProcessing) {
+        editStatus.className = "status error";
+        editStatus.textContent = "Still processing your image, hang on a second.";
+        return;
+      }
+
+      saveButton.disabled = true;
+      editStatus.className = "status";
+      editStatus.textContent = "saving...";
+
+      try {
+        const updates = {
+          displayName: editDisplayName.value.trim() || null,
+          bio: editBio.value.trim(),
+        };
+
+        const claimedUsername = await claimUsername(editUsername.value, currentProfileUsername);
+        if (claimedUsername !== undefined) {
+          updates.username = claimedUsername;
+        }
+
+        // currentPhotoURL is null when the photo wasn't touched, "" when the
+        // person removed it, or a data: URL when they picked a new file.
+        if (currentPhotoURL !== null) {
+          updates.photoURL = currentPhotoURL || null;
+        }
+
+        await updateDoc(doc(db, "users", viewedUid), updates);
+
+        // Firebase Auth's photoURL field has a strict length cap that a base64
+        // image will almost always blow past, so only push it there when it's
+        // short (e.g. cleared) — Firestore stays the source of truth either way.
+        try {
+          const authUpdates = { displayName: updates.displayName };
+          if ("photoURL" in updates && (!updates.photoURL || updates.photoURL.length < 1500)) {
+            authUpdates.photoURL = updates.photoURL;
+          }
+          await updateProfile(currentUser, authUpdates);
+        } catch (authError) {
+          console.error("Could not sync Auth profile (Firestore copy is still saved):", authError);
+        }
+
+        editStatus.className = "status success";
+        editStatus.textContent = "saved.";
+        await loadProfile(viewedUid);
+        editForm.hidden = true;
+      } catch (error) {
+        console.error(error);
+        editStatus.className = "status error";
+        editStatus.textContent = error.message || "Could not save changes. Please try again.";
+      } finally {
+        saveButton.disabled = false;
+      }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      await loadProfile(viewedUid);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1946 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico">
+  <title>Edit Webcomic - Sketchbook Trilogies</title>
+  <style>
+    :root {
+      --ink: #05070b;
+      --paper: #bfc7dc;
+      --panel: #8a91a1;
+      --panel-dark: #4f5666;
+      --line: #090a0d;
+      --link: #002fff;
+      --visited: #4f1eb7;
+      --bevel-light: #c8cedd;
+      --bevel-dark: #4c5363;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 1px 1px, #2a2a33 1px, transparent 1.5px) 0 0 / 7px 7px,
+        #06060a;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 1px;
+    }
+
+    a:visited {
+      color: var(--visited);
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100vw - 18px, 900px);
+      min-height: 100vh;
+      margin: 0 auto;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border-left: 4px solid #51596b;
+      border-right: 4px solid #51596b;
+      box-shadow: 0 0 0 1px #171a22;
+      padding: 0 22px 40px;
+    }
+
+    .topbar {
+      min-height: 42px;
+      display: flex;
+      align-items: start;
+      gap: 6px;
+      border-bottom: 3px double #6c758b;
+      overflow: hidden;
+    }
+
+    .brand {
+      width: 215px;
+      height: 34px;
+      object-fit: contain;
+      object-position: left center;
+      filter: contrast(1.18);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: start;
+      gap: 4px;
+      min-height: 34px;
+      padding-top: 3px;
+      font-size: 16px;
+      line-height: 1.15;
+      white-space: nowrap;
+      flex-wrap: wrap;
+    }
+
+    .nav p,
+    p {
+      margin: 0;
+    }
+
+    .back-link {
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    h1 {
+      margin: 6px 0 0;
+      font-size: 26px;
+      line-height: 1.05;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0 #e2e6f2;
+      overflow-wrap: anywhere;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      padding-bottom: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      border-bottom: 4px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .status-badge {
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 2px 6px;
+      border: 2px solid #090a0d;
+      font-family: "Courier New", monospace;
+    }
+
+    .status-badge.published {
+      background: #7bab6e;
+    }
+
+    .status-badge.draft {
+      background: #c9c07a;
+    }
+
+    .state-box {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .state-box.error {
+      color: #650000;
+      font-weight: 700;
+    }
+
+    .state-box[hidden] {
+      display: none;
+    }
+
+    .lock-banner {
+      margin-top: 14px;
+      border: 4px solid #7a6a2e;
+      background: #d8cf9e;
+      color: #3a3110;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .lock-banner[hidden] {
+      display: none;
+    }
+
+    /* Custom alert/confirm popup (replaces browser alert()/confirm()) */
+    .app-popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 5, 9, .72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 300;
+    }
+
+    .app-popup-overlay[hidden] {
+      display: none;
+    }
+
+    .app-popup-panel {
+      width: min(100%, 380px);
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border: 4px solid #313644;
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark),
+        0 0 0 1px #090a0d,
+        6px 6px 0 rgba(0, 0, 0, .5);
+      padding: 18px;
+      color: var(--ink);
+    }
+
+    .app-popup-message {
+      margin: 0 0 16px;
+      font-size: 14px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    .app-popup-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .app-popup-actions button {
+      min-height: 30px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 4px 14px;
+    }
+
+    .app-popup-actions button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .app-popup-actions button.primary {
+      background: #7bab6e;
+      font-weight: 700;
+    }
+
+    .comic-head {
+      margin-top: 14px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .comic-head[hidden] {
+      display: none;
+    }
+
+    .comic-head-info {
+      flex: 1 1 240px;
+      min-width: 0;
+    }
+
+    .comic-head-info p {
+      font-size: 13px;
+      line-height: 1.3;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .cover-preview {
+      border: 3px solid #090a0d;
+      object-fit: cover;
+      background: #303545;
+      display: none;
+    }
+
+    .cover-preview.visible {
+      display: block;
+    }
+
+    .cover-placeholder {
+      border: 3px dashed #5f687d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      text-align: center;
+      color: #33394a;
+      background: #a9b0c0;
+    }
+
+    .ratio-tag,
+    .format-tag {
+      display: inline-block;
+      margin-left: 6px;
+      font-size: 10px;
+      font-weight: 400;
+      font-family: "Courier New", monospace;
+      color: #23283a;
+      background: #c6ccda;
+      border: 1px solid #5f687d;
+      padding: 0 4px;
+      vertical-align: middle;
+      text-transform: none;
+    }
+
+    .cover-preview.ratio-3-4,
+    .cover-placeholder.ratio-3-4 {
+      width: 72px;
+      height: 96px;
+    }
+
+    .link-button {
+      background: none;
+      border: none;
+      color: var(--link);
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 13px;
+      padding: 0;
+      font: inherit;
+    }
+
+    /* Composer-style panels (details editor, add-chapter, add-page) */
+    .panel {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 14px;
+    }
+
+    .panel[hidden] {
+      display: none;
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      text-transform: uppercase;
+    }
+
+    label {
+      display: grid;
+      gap: 3px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .field-help {
+      margin: -6px 0 10px;
+      font-size: 11px;
+      font-weight: 400;
+      font-style: italic;
+      color: #33394a;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      border: 2px solid var(--panel-dark);
+      border-top-color: #3d4556;
+      border-left-color: #3d4556;
+      border-right-color: #b4bbcc;
+      border-bottom-color: #b4bbcc;
+      background: #c6ccda;
+      color: #111;
+      padding: 6px 8px;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    textarea.css-textarea {
+      min-height: 110px;
+      font-family: "Courier New", monospace;
+      font-size: 12px;
+      background: #21242e;
+      color: #d6dceb;
+      border-color: #111;
+    }
+
+    .cover-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .composer-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .composer-row button,
+    .composer-row .file-button,
+    .file-button {
+      min-height: 28px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 3px 12px;
+    }
+
+    .composer-row button:active,
+    .composer-row .file-button:active,
+    .file-button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .composer-row button:disabled {
+      cursor: default;
+      opacity: .6;
+    }
+
+    .composer-row button.primary {
+      background: #7bab6e;
+      font-weight: 700;
+    }
+
+    .composer-row button.delete-button {
+      color: #650000;
+    }
+
+    .composer-status {
+      min-height: 16px;
+      font-size: 12px;
+      color: #1f2736;
+      flex: 1 1 100%;
+    }
+
+    .composer-status.error {
+      color: #650000;
+      font-weight: 700;
+    }
+
+    .composer-status.success {
+      color: #12401d;
+      font-weight: 700;
+    }
+
+    .section-heading {
+      margin-top: 20px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 18px;
+      text-transform: uppercase;
+    }
+
+    .section-heading .count {
+      font-size: 12px;
+      color: #cfd4e0;
+      font-family: "Courier New", monospace;
+    }
+
+    .chapter-prefix-row {
+      margin-top: 14px;
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    .add-chapter-preview {
+      margin: -4px 0 10px;
+      font-size: 12px;
+      font-family: "Courier New", monospace;
+      color: #23283a;
+    }
+
+    /* Chapters */
+    .chapters-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .chapter-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 10px 12px;
+    }
+
+    .chapter-open {
+      flex: 1 1 auto;
+      min-width: 0;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+      color: var(--ink);
+      padding: 0;
+    }
+
+    .chapter-open h3 {
+      margin: 0;
+      font-size: 16px;
+      overflow-wrap: anywhere;
+    }
+
+    .chapter-open .chapter-meta {
+      display: block;
+      margin-top: 3px;
+      font-size: 11px;
+      font-family: "Courier New", monospace;
+      color: #23283a;
+    }
+
+    .chapter-actions {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      flex: 0 0 auto;
+    }
+
+    .chapter-actions button {
+      min-height: 24px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 2px 7px;
+    }
+
+    .chapter-actions button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .chapter-actions button.delete-button {
+      color: #650000;
+    }
+
+    .chapter-rename-panel {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 3px solid var(--line);
+    }
+
+    .chapter-rename-panel[hidden] {
+      display: none;
+    }
+
+    .chapter-row-wrap {
+      display: grid;
+      gap: 0;
+    }
+
+    /* Pages view */
+    .pages-heading-row {
+      margin-top: 20px;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pages-heading-row h2 {
+      margin: 0;
+      font-size: 18px;
+      text-transform: uppercase;
+      overflow-wrap: anywhere;
+    }
+
+    .pages-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .page-row {
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 12px;
+    }
+
+    .page-image {
+      display: block;
+      max-width: 100%;
+      max-height: 520px;
+      margin: 0 auto;
+      border: 3px solid #090a0d;
+      background: #303545;
+    }
+
+    .page-number {
+      font-size: 11px;
+      font-family: "Courier New", monospace;
+      color: #23283a;
+      margin-bottom: 6px;
+    }
+
+    .page-caption {
+      margin: 8px 0 0;
+      font-size: 13px;
+      line-height: 1.3;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .page-caption.empty {
+      font-style: italic;
+      color: #5a6072;
+    }
+
+    .page-text-html {
+      margin: 8px 0 0;
+      padding: 16px 18px;
+      background: #f4f2ec;
+      border: 3px solid #090a0d;
+      font-size: 14px;
+      line-height: 1.5;
+      font-family: "Times New Roman", Georgia, serif;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
+    .page-text-html.empty {
+      font-style: italic;
+      color: #5a6072;
+      text-align: left;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    .page-text-html p {
+      margin: 0 0 1em;
+    }
+
+    .page-text-html p:last-child {
+      margin-bottom: 0;
+    }
+
+    .page-text-html h1,
+    .page-text-html h2,
+    .page-text-html h3 {
+      margin: 0.6em 0 0.4em;
+      line-height: 1.2;
+    }
+
+    .page-text-html ul,
+    .page-text-html ol {
+      text-align: left;
+      display: inline-block;
+    }
+
+    .page-text-html img {
+      display: block;
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      margin: 0 auto 1em;
+      border: 3px solid #090a0d;
+      background: #303545;
+    }
+
+    .page-actions {
+      margin-top: 8px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .page-actions button {
+      min-height: 24px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 2px 7px;
+    }
+
+    .page-actions button.delete-button {
+      color: #650000;
+    }
+
+    .page-edit-panel {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 3px solid var(--line);
+    }
+
+    .page-edit-panel[hidden] {
+      display: none;
+    }
+
+    .empty-note {
+      margin-top: 10px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 14px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 560px) {
+      .page {
+        width: 100%;
+        border: 0;
+        padding: 0 12px 32px;
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+        min-height: auto;
+        padding-bottom: 7px;
+      }
+
+      .brand {
+        width: min(260px, 100%);
+      }
+
+      .nav {
+        width: 100%;
+        padding-top: 0;
+      }
+
+      .cover-preview.ratio-3-4,
+      .cover-placeholder.ratio-3-4 {
+        width: 56px;
+        height: 74px;
+      }
+
+      .chapter-row {
+        flex-wrap: wrap;
+      }
+
+      .chapter-actions button,
+      .page-actions button {
+        min-height: 40px;
+        padding: 3px 12px;
+        font-size: 13px;
+      }
+
+      .composer-row button,
+      .composer-row .file-button,
+      .file-button {
+        min-height: 44px;
+        padding: 3px 16px;
+        font-size: 14px;
+      }
+
+      .app-popup-actions button {
+        min-height: 40px;
+        font-size: 14px;
+      }
+
+      input[type="text"],
+      textarea {
+        min-height: 44px;
+        font-size: 16px;
+        padding: 8px 10px;
+      }
+
+      label {
+        font-size: 15px;
+      }
+
+      .link-button {
+        font-size: 14px;
+      }
+
+      .page-image {
+        max-height: 340px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-popup-overlay" id="app-popup-overlay" hidden>
+    <div class="app-popup-panel" role="alertdialog" aria-modal="true" aria-labelledby="app-popup-message">
+      <p class="app-popup-message" id="app-popup-message"></p>
+      <div class="app-popup-actions">
+        <button type="button" id="app-popup-cancel" hidden>cancel</button>
+        <button type="button" class="primary" id="app-popup-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="page">
+    <header class="topbar" aria-label="Site header">
+      <img class="brand" src="Logo.png" alt="Sketchbook Trilogies">
+      <div class="topbar-menu">
+        <nav class="nav" aria-label="Primary navigation">
+          <p><span>|</span></p>
+          <p><a href="index.html">home</a></p>
+          <p><span>-</span></p>
+          <p><a href="blog.html">blog</a></p>
+          <p><span>-</span></p>
+          <p><a href="dashboard.html">dashboard</a></p>
+          <p><span>-</span></p>
+          <p><a href="settings.html">settings</a></p>
+        </nav>
+
+      </div>
+    </header>
+
+    <p class="back-link"><a href="dashboard.html">&larr; back to dashboard</a></p>
+
+    <h1 id="page-title">Edit Webcomic</h1>
+    <p class="subtitle" id="page-subtitle" hidden>
+      <span id="author-line"></span>
+      <span class="status-badge" id="status-badge"></span>
+      <span class="format-tag" id="format-badge"></span>
+    </p>
+
+    <section class="state-box" id="state-box" hidden></section>
+    <section class="lock-banner" id="lock-banner" hidden></section>
+
+    <section class="comic-head" id="comic-head" hidden>
+      <div id="cover-slot"></div>
+      <div class="comic-head-info">
+        <p id="comic-description"></p>
+        <button type="button" class="link-button" id="edit-details-toggle" hidden>edit title / description / cover</button>
+      </div>
+    </section>
+
+    <form class="panel" id="details-panel" hidden>
+      <h2>Edit details</h2>
+      <label>
+        title
+        <input type="text" id="details-title" maxlength="80" required>
+      </label>
+      <label>
+        description
+        <textarea id="details-description" maxlength="500"></textarea>
+      </label>
+
+      <label>cover <span class="ratio-tag">3:4</span></label>
+      <div class="cover-row">
+        <div class="cover-placeholder ratio-3-4" id="details-cover-placeholder">no cover</div>
+        <img class="cover-preview ratio-3-4" id="details-cover-preview" alt="Cover preview">
+        <label class="file-button" style="margin:0;">
+          change cover
+          <input id="details-cover-input" type="file" accept="image/*" style="display:none;">
+        </label>
+        <button type="button" id="details-remove-cover-button" hidden>remove cover</button>
+      </div>
+      <p class="field-help">Photos up to 8MB are accepted and compressed automatically. Animated GIFs can't be compressed without losing their animation, so keep those under about 0.9MB.</p>
+
+      <label>
+        custom CSS &mdash; main page
+        <span class="field-help">Advanced. Applied on this webcomic's info page (the one readers land on for chapters/comments).</span>
+        <textarea id="details-css-main" class="css-textarea" maxlength="20000" placeholder="/* e.g. .comic-head { background: #111; } */" spellcheck="false"></textarea>
+      </label>
+
+      <label>
+        custom CSS &mdash; pages
+        <span class="field-help">Advanced. Applied on the reader page when someone reads this webcomic's pages.</span>
+        <textarea id="details-css-pages" class="css-textarea" maxlength="20000" placeholder="/* e.g. .page-text-html { font-family: monospace; } */" spellcheck="false"></textarea>
+      </label>
+
+      <div class="composer-row">
+        <button type="button" class="primary" id="details-save-button">save changes</button>
+        <button type="button" id="details-cancel-button">cancel</button>
+        <p class="composer-status" id="details-status" aria-live="polite"></p>
+      </div>
+    </form>
+
+    <div id="chapters-view" hidden>
+      <p class="chapter-prefix-row" id="chapter-prefix-row">
+        Chapters are labeled <strong id="chapter-prefix-label">Chapter 1, Chapter 2, &hellip;</strong> automatically based on their order.
+        <button type="button" class="link-button" id="edit-prefix-toggle" hidden>change prefix</button>
+      </p>
+
+      <form class="panel" id="prefix-panel" hidden>
+        <h2>Chapter numbering prefix</h2>
+        <label>
+          prefix
+          <input type="text" id="prefix-input" maxlength="40" placeholder="e.g. Chapter, Act, Part">
+        </label>
+        <div class="composer-row">
+          <button type="button" class="primary" id="prefix-save-button">save</button>
+          <button type="button" id="prefix-cancel-button">cancel</button>
+          <p class="composer-status" id="prefix-status" aria-live="polite"></p>
+        </div>
+      </form>
+
+      <form class="panel" id="add-chapter-panel" hidden>
+        <h2>Add a chapter</h2>
+        <label>
+          type
+          <select id="new-chapter-type">
+            <option value="">regular chapter</option>
+            <option value="prologue">prologue</option>
+            <option value="epilogue">epilogue</option>
+          </select>
+        </label>
+        <label>
+          subtitle (optional)
+          <input type="text" id="new-chapter-subtitle" maxlength="80" placeholder="e.g. The Beginning">
+        </label>
+        <p class="add-chapter-preview" id="add-chapter-preview"></p>
+        <div class="composer-row">
+          <button type="button" class="primary" id="add-chapter-button">add chapter</button>
+          <p class="composer-status" id="add-chapter-status" aria-live="polite"></p>
+        </div>
+      </form>
+
+      <div class="section-heading">
+        <h2>Chapters</h2>
+        <span class="count" id="chapters-count"></span>
+      </div>
+      <div class="chapters-list" id="chapters-list"></div>
+      <p class="empty-note" id="chapters-empty" hidden>No chapters yet.</p>
+    </div>
+
+    <div id="pages-view" hidden>
+      <p class="back-link"><button type="button" class="link-button" id="back-to-chapters-button">&larr; back to chapters</button></p>
+
+      <div class="pages-heading-row">
+        <h2 id="pages-chapter-title">Chapter</h2>
+        <span class="count" id="pages-count"></span>
+      </div>
+
+      <div class="panel" id="add-page-panel" hidden>
+        <h2>Add a page</h2>
+        <p class="field-help" id="add-page-help"></p>
+        <div class="composer-row">
+          <button type="button" class="primary" id="add-page-button">open page editor &rarr;</button>
+        </div>
+      </div>
+
+      <div class="pages-list" id="pages-list"></div>
+      <p class="empty-note" id="pages-empty" hidden>No pages in this chapter yet.</p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import {
+      addDoc,
+      collection,
+      deleteDoc,
+      doc,
+      getDoc,
+      getDocs,
+      getFirestore,
+      serverTimestamp,
+      updateDoc,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js";
+
+    // If this page is restored from the browser's back/forward cache (e.g.
+    // after signing in/out as a different account on another page, then
+    // hitting Back), force a fresh reload so auth-dependent UI re-evaluates
+    // against whoever is ACTUALLY signed in right now.
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    });
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg6umXxHQ6INyc_U2AvmhF9blhQ5ZEtT8",
+      authDomain: "sketchbook-trilogies.firebaseapp.com",
+      projectId: "sketchbook-trilogies",
+      storageBucket: "sketchbook-trilogies.firebasestorage.app",
+      messagingSenderId: "564902002463",
+      appId: "1:564902002463:web:7dc95e5e857e19b959fa2a",
+      measurementId: "G-Q08PSQDHMH",
+    };
+
+    const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
+    const COMPRESS_THRESHOLD_BYTES = 1 * 1024 * 1024; // files over 1MB get compressed
+    const FIRESTORE_FIELD_SAFETY_BYTES = 900 * 1024; // stay under Firestore's 1MiB document cap
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    if (await isSupported()) {
+      getAnalytics(app);
+    }
+
+    // ---- custom alert/confirm popup (replaces browser alert()/confirm()) ----
+    const appPopupOverlay = document.querySelector("#app-popup-overlay");
+    const appPopupMessage = document.querySelector("#app-popup-message");
+    const appPopupCancelButton = document.querySelector("#app-popup-cancel");
+    const appPopupOkButton = document.querySelector("#app-popup-ok");
+    let appPopupResolve = null;
+
+    function closeAppPopup(result) {
+      appPopupOverlay.hidden = true;
+      if (appPopupResolve) {
+        const resolve = appPopupResolve;
+        appPopupResolve = null;
+        resolve(result);
+      }
+    }
+
+    appPopupOkButton.addEventListener("click", () => closeAppPopup(true));
+    appPopupCancelButton.addEventListener("click", () => closeAppPopup(false));
+    appPopupOverlay.addEventListener("click", (event) => {
+      if (event.target === appPopupOverlay) closeAppPopup(false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !appPopupOverlay.hidden) closeAppPopup(false);
+    });
+
+    function showAppAlert(message) {
+      return new Promise((resolve) => {
+        appPopupResolve = resolve;
+        appPopupMessage.textContent = message;
+        appPopupCancelButton.hidden = true;
+        appPopupOkButton.textContent = "OK";
+        appPopupOverlay.hidden = false;
+        appPopupOkButton.focus();
+      });
+    }
+
+    function showAppConfirm(message, confirmLabel = "OK") {
+      return new Promise((resolve) => {
+        appPopupResolve = resolve;
+        appPopupMessage.textContent = message;
+        appPopupCancelButton.hidden = false;
+        appPopupOkButton.textContent = confirmLabel;
+        appPopupOverlay.hidden = false;
+        appPopupOkButton.focus();
+      });
+    }
+
+    // ---- element refs ----
+    const pageTitle = document.querySelector("#page-title");
+    const pageSubtitle = document.querySelector("#page-subtitle");
+    const authorLine = document.querySelector("#author-line");
+    const statusBadge = document.querySelector("#status-badge");
+    const formatBadge = document.querySelector("#format-badge");
+
+    const stateBox = document.querySelector("#state-box");
+    const lockBanner = document.querySelector("#lock-banner");
+
+    const comicHead = document.querySelector("#comic-head");
+    const coverSlot = document.querySelector("#cover-slot");
+    const comicDescriptionEl = document.querySelector("#comic-description");
+    const editDetailsToggle = document.querySelector("#edit-details-toggle");
+
+    const detailsPanel = document.querySelector("#details-panel");
+    const detailsTitleInput = document.querySelector("#details-title");
+    const detailsDescriptionInput = document.querySelector("#details-description");
+    const detailsCssMainInput = document.querySelector("#details-css-main");
+    const detailsCssPagesInput = document.querySelector("#details-css-pages");
+    const detailsCoverPreview = document.querySelector("#details-cover-preview");
+    const detailsCoverPlaceholder = document.querySelector("#details-cover-placeholder");
+    const detailsCoverInput = document.querySelector("#details-cover-input");
+    const detailsRemoveCoverButton = document.querySelector("#details-remove-cover-button");
+    const detailsSaveButton = document.querySelector("#details-save-button");
+    const detailsCancelButton = document.querySelector("#details-cancel-button");
+    const detailsStatus = document.querySelector("#details-status");
+
+    // ---- unsaved-changes warning (details form only — chapters, pages, and
+    // characters all save themselves immediately, so there's nothing
+    // "unsaved" to lose there) ----
+    let hasUnsavedChanges = false;
+
+    function markDirty() {
+      hasUnsavedChanges = true;
+    }
+
+    detailsPanel.addEventListener("input", markDirty);
+    detailsPanel.addEventListener("change", markDirty);
+
+    window.addEventListener("beforeunload", (event) => {
+      if (!hasUnsavedChanges) return;
+      event.preventDefault();
+      event.returnValue = "";
+    });
+
+    const chaptersView = document.querySelector("#chapters-view");
+    const chapterPrefixLabel = document.querySelector("#chapter-prefix-label");
+    const editPrefixToggle = document.querySelector("#edit-prefix-toggle");
+    const prefixPanel = document.querySelector("#prefix-panel");
+    const prefixInput = document.querySelector("#prefix-input");
+    const prefixSaveButton = document.querySelector("#prefix-save-button");
+    const prefixCancelButton = document.querySelector("#prefix-cancel-button");
+    const prefixStatus = document.querySelector("#prefix-status");
+    const addChapterPanel = document.querySelector("#add-chapter-panel");
+    const newChapterType = document.querySelector("#new-chapter-type");
+    const newChapterSubtitle = document.querySelector("#new-chapter-subtitle");
+    const addChapterPreview = document.querySelector("#add-chapter-preview");
+    const addChapterButton = document.querySelector("#add-chapter-button");
+    const addChapterStatus = document.querySelector("#add-chapter-status");
+    const chaptersList = document.querySelector("#chapters-list");
+    const chaptersCount = document.querySelector("#chapters-count");
+    const chaptersEmpty = document.querySelector("#chapters-empty");
+
+    const pagesView = document.querySelector("#pages-view");
+    const backToChaptersButton = document.querySelector("#back-to-chapters-button");
+    const pagesChapterTitle = document.querySelector("#pages-chapter-title");
+    const pagesCount = document.querySelector("#pages-count");
+    const addPagePanel = document.querySelector("#add-page-panel");
+    const addPageHelp = document.querySelector("#add-page-help");
+    const addPageButton = document.querySelector("#add-page-button");
+    const pagesList = document.querySelector("#pages-list");
+    const pagesEmpty = document.querySelector("#pages-empty");
+
+    // ---- state ----
+    const params = new URLSearchParams(window.location.search);
+    const comicId = params.get("id");
+
+    let currentUser = null;
+    let comic = null;
+    let isOwner = false;
+    let chapters = [];
+    let currentChapter = null;
+    let pages = [];
+    let pendingDetailsCover = null; // null = unchanged, "" = remove, data URL = new cover
+
+    function showState(message, kind = "") {
+      stateBox.hidden = false;
+      stateBox.className = kind ? `state-box ${kind}` : "state-box";
+      stateBox.textContent = message;
+    }
+
+    function hideState() {
+      stateBox.hidden = true;
+    }
+
+    // ---- image helpers (shared by cover + page uploads) ----
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Could not read that file."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function loadImageEl(src) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error("Could not read that image."));
+        image.src = src;
+      });
+    }
+
+    async function compressImage(file, maxDimension, quality) {
+      const dataUrl = await readFileAsDataURL(file);
+      const image = await loadImageEl(dataUrl);
+
+      let { width, height } = image;
+      if (width > height && width > maxDimension) {
+        height = Math.round((height * maxDimension) / width);
+        width = maxDimension;
+      } else if (height >= width && height > maxDimension) {
+        width = Math.round((width * maxDimension) / height);
+        height = maxDimension;
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext("2d").drawImage(image, 0, 0, width, height);
+      return canvas.toDataURL("image/jpeg", quality);
+    }
+
+    // Animated GIFs can't go through the canvas-based compression below —
+    // canvas only ever captures a single frame, so doing that would
+    // silently flatten the GIF into a static image. Instead we just check
+    // its size directly and use it as-is, keeping the animation intact.
+    function isAnimatedGifCandidate(file) {
+      return file.type === "image/gif";
+    }
+
+    async function readGifAsIs(file) {
+      const dataUrl = await readFileAsDataURL(file);
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        throw new Error("That GIF is too large to store (animated GIFs can't be auto-compressed without losing the animation). Try a smaller or shorter GIF.");
+      }
+      return dataUrl;
+    }
+
+    async function processImageFile(file) {
+      if (isAnimatedGifCandidate(file)) {
+        return readGifAsIs(file);
+      }
+
+      let dataUrl = file.size > COMPRESS_THRESHOLD_BYTES
+        ? await compressImage(file, 900, 0.82)
+        : await readFileAsDataURL(file);
+
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        dataUrl = await compressImage(file, 640, 0.7);
+      }
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        dataUrl = await compressImage(file, 480, 0.58);
+      }
+      if (dataUrl.length > FIRESTORE_FIELD_SAFETY_BYTES) {
+        throw new Error("That image is too detailed to compress small enough. Try a smaller image.");
+      }
+
+      return dataUrl;
+    }
+
+    function formatDate(timestamp) {
+      if (!timestamp) return "";
+      const date = typeof timestamp.toDate === "function" ? timestamp.toDate() : new Date(timestamp);
+      if (Number.isNaN(date.getTime())) return "";
+      return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    }
+
+    // ---- header / details ----
+    function renderHeader() {
+      pageTitle.textContent = comic.title || "Untitled";
+      document.title = `Edit \u2014 ${comic.title || "Untitled"} - Sketchbook Trilogies`;
+      pageSubtitle.hidden = false;
+      authorLine.textContent = `by ${comic.authorName || "someone"}`;
+      statusBadge.textContent = comic.status;
+      statusBadge.className = `status-badge ${comic.status}`;
+      const formatLabels = { text_image: "Text & Image", panel: "Continuous Panel" };
+      formatBadge.textContent = formatLabels[comic.format] || comic.format || "";
+
+      comicHead.hidden = false;
+      coverSlot.innerHTML = "";
+      if (comic.coverImage) {
+        const img = document.createElement("img");
+        img.className = "cover-preview ratio-3-4 visible";
+        img.alt = "";
+        img.src = comic.coverImage;
+        coverSlot.append(img);
+      } else {
+        const placeholder = document.createElement("div");
+        placeholder.className = "cover-placeholder ratio-3-4";
+        placeholder.textContent = "no cover";
+        coverSlot.append(placeholder);
+      }
+
+      comicDescriptionEl.textContent = comic.description || "";
+      editDetailsToggle.hidden = !isOwner;
+
+      if (!isOwner) {
+        lockBanner.hidden = false;
+        lockBanner.textContent = `\uD83D\uDD12 This webcomic belongs to ${comic.authorName || "its creator"}. You're viewing it in read-only mode \u2014 only they can edit it.`;
+      } else {
+        lockBanner.hidden = true;
+      }
+    }
+
+    function resetDetailsPanel() {
+      detailsTitleInput.value = comic.title || "";
+      detailsDescriptionInput.value = comic.description || "";
+      detailsCssMainInput.value = comic.customCssMain || "";
+      detailsCssPagesInput.value = comic.customCssPages || "";
+      pendingDetailsCover = null;
+      detailsCoverInput.value = "";
+      if (comic.coverImage) {
+        detailsCoverPreview.src = comic.coverImage;
+        detailsCoverPreview.classList.add("visible");
+        detailsCoverPlaceholder.style.display = "none";
+        detailsRemoveCoverButton.hidden = false;
+      } else {
+        detailsCoverPreview.src = "";
+        detailsCoverPreview.classList.remove("visible");
+        detailsCoverPlaceholder.style.display = "flex";
+        detailsRemoveCoverButton.hidden = true;
+      }
+      detailsStatus.textContent = "";
+      detailsStatus.className = "composer-status";
+    }
+
+    editDetailsToggle.addEventListener("click", () => {
+      resetDetailsPanel();
+      detailsPanel.hidden = false;
+    });
+
+    detailsCancelButton.addEventListener("click", () => {
+      detailsPanel.hidden = true;
+      hasUnsavedChanges = false;
+    });
+
+    detailsCoverInput.addEventListener("change", async () => {
+      const file = detailsCoverInput.files?.[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        detailsStatus.className = "composer-status error";
+        detailsStatus.textContent = "Please choose an image file.";
+        detailsCoverInput.value = "";
+        return;
+      }
+      if (file.size > MAX_UPLOAD_BYTES) {
+        detailsStatus.className = "composer-status error";
+        detailsStatus.textContent = "That file is too large (max 8MB).";
+        detailsCoverInput.value = "";
+        return;
+      }
+      try {
+        const dataUrl = await processImageFile(file);
+        pendingDetailsCover = dataUrl;
+        detailsCoverPreview.src = dataUrl;
+        detailsCoverPreview.classList.add("visible");
+        detailsCoverPlaceholder.style.display = "none";
+        detailsRemoveCoverButton.hidden = false;
+      } catch (error) {
+        console.error(error);
+        detailsStatus.className = "composer-status error";
+        detailsStatus.textContent = error.message || "Could not process that image.";
+        detailsCoverInput.value = "";
+      }
+    });
+
+    detailsRemoveCoverButton.addEventListener("click", () => {
+      pendingDetailsCover = "";
+      detailsCoverInput.value = "";
+      detailsCoverPreview.src = "";
+      detailsCoverPreview.classList.remove("visible");
+      detailsCoverPlaceholder.style.display = "flex";
+      detailsRemoveCoverButton.hidden = true;
+    });
+
+    detailsSaveButton.addEventListener("click", async () => {
+      if (!isOwner) return;
+      const newTitleValue = detailsTitleInput.value.trim();
+      if (!newTitleValue) {
+        detailsStatus.className = "composer-status error";
+        detailsStatus.textContent = "Title can't be empty.";
+        return;
+      }
+      detailsSaveButton.disabled = true;
+      detailsStatus.className = "composer-status";
+      detailsStatus.textContent = "saving...";
+      try {
+        const updates = {
+          title: newTitleValue,
+          description: detailsDescriptionInput.value.trim(),
+          customCssMain: detailsCssMainInput.value,
+          customCssPages: detailsCssPagesInput.value,
+          updatedAt: serverTimestamp(),
+        };
+        if (pendingDetailsCover !== null) {
+          updates.coverImage = pendingDetailsCover || null;
+        }
+        await updateDoc(doc(db, "webcomics", comicId), updates);
+        comic = { ...comic, ...updates };
+        renderHeader();
+        detailsStatus.className = "composer-status success";
+        detailsStatus.textContent = "saved.";
+        detailsPanel.hidden = true;
+        hasUnsavedChanges = false;
+      } catch (error) {
+        console.error(error);
+        detailsStatus.className = "composer-status error";
+        detailsStatus.textContent = "Could not save changes.";
+      } finally {
+        detailsSaveButton.disabled = false;
+      }
+    });
+
+    // ---- chapters ----
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function stripHtml(html) {
+      const scratch = document.createElement("div");
+      scratch.innerHTML = html;
+      return scratch.textContent || "";
+    }
+
+    function getChapterPrefix() {
+      return (comic?.chapterPrefix || "Chapter").trim() || "Chapter";
+    }
+
+    function chapterLabel(position, chapter) {
+      const subtitle = (chapter.subtitle ?? chapter.title ?? "").trim();
+      if (chapter.chapterType === "prologue") {
+        return subtitle ? `Prologue: ${subtitle}` : "Prologue";
+      }
+      if (chapter.chapterType === "epilogue") {
+        return subtitle ? `Epilogue: ${subtitle}` : "Epilogue";
+      }
+      const prefix = getChapterPrefix();
+      return subtitle ? `${prefix} ${position}: ${subtitle}` : `${prefix} ${position}`;
+    }
+
+    // Prologues/epilogues sit outside normal chapter numbering — they never
+    // take up a number, and regular chapters count only each other, so
+    // "Chapter 1" is still Chapter 1 even with a prologue in front of it.
+    // Returns an array the same length/order as `chapters`, where each
+    // entry is the regular chapter number (or null for a prologue/epilogue).
+    function computeChapterPositions(chapters) {
+      let count = 0;
+      return chapters.map((chapter) => {
+        if (chapter.chapterType === "prologue" || chapter.chapterType === "epilogue") {
+          return null;
+        }
+        count += 1;
+        return count;
+      });
+    }
+
+    function renderChapterPrefixUI() {
+      const prefix = getChapterPrefix();
+      chapterPrefixLabel.textContent = `${prefix} 1, ${prefix} 2, \u2026`;
+      editPrefixToggle.hidden = !isOwner;
+      updateAddChapterPreview();
+    }
+
+    editPrefixToggle.addEventListener("click", () => {
+      prefixInput.value = getChapterPrefix();
+      prefixStatus.textContent = "";
+      prefixStatus.className = "composer-status";
+      prefixPanel.hidden = false;
+    });
+
+    prefixCancelButton.addEventListener("click", () => {
+      prefixPanel.hidden = true;
+    });
+
+    prefixSaveButton.addEventListener("click", async () => {
+      if (!isOwner) return;
+      const value = prefixInput.value.trim() || "Chapter";
+      prefixSaveButton.disabled = true;
+      prefixStatus.className = "composer-status";
+      prefixStatus.textContent = "saving...";
+      try {
+        await updateDoc(doc(db, "webcomics", comicId), {
+          chapterPrefix: value,
+          updatedAt: serverTimestamp(),
+        });
+        comic.chapterPrefix = value;
+        renderChapterPrefixUI();
+        renderChapters();
+        prefixStatus.className = "composer-status success";
+        prefixStatus.textContent = "saved.";
+        prefixPanel.hidden = true;
+      } catch (error) {
+        console.error(error);
+        prefixStatus.className = "composer-status error";
+        prefixStatus.textContent = "Could not save that.";
+      } finally {
+        prefixSaveButton.disabled = false;
+      }
+    });
+
+    function updateAddChapterPreview() {
+      const chapterType = newChapterType.value;
+      const subtitle = newChapterSubtitle.value.trim();
+      if (chapterType) {
+        addChapterPreview.textContent = `will be added as: ${chapterLabel(null, { subtitle, chapterType })}`;
+        return;
+      }
+      const regularCount = chapters.filter((c) => c.chapterType !== "prologue" && c.chapterType !== "epilogue").length;
+      addChapterPreview.textContent = `will be added as: ${chapterLabel(regularCount + 1, { subtitle })}`;
+    }
+
+    newChapterType.addEventListener("change", updateAddChapterPreview);
+    newChapterSubtitle.addEventListener("input", updateAddChapterPreview);
+
+    function showChaptersView() {
+      currentChapter = null;
+      pagesView.hidden = true;
+      chaptersView.hidden = false;
+    }
+
+    function showPagesView() {
+      chaptersView.hidden = true;
+      pagesView.hidden = false;
+    }
+
+    async function loadChapters() {
+      try {
+        const snapshot = await getDocs(collection(db, "webcomics", comicId, "chapters"));
+        chapters = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+        chapters.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        renderChapterPrefixUI();
+        renderChapters();
+      } catch (error) {
+        console.error("Could not load chapters:", error);
+        renderChapterPrefixUI();
+        renderChapters();
+      }
+    }
+
+    function renderChapters() {
+      chaptersList.innerHTML = "";
+      chaptersCount.textContent = `(${chapters.length})`;
+      chaptersEmpty.hidden = chapters.length > 0;
+      addChapterPanel.hidden = !isOwner;
+      updateAddChapterPreview();
+
+      const positions = computeChapterPositions(chapters);
+
+      chapters.forEach((chapter, index) => {
+        const wrap = document.createElement("div");
+        wrap.className = "chapter-row-wrap";
+
+        const row = document.createElement("div");
+        row.className = "chapter-row";
+
+        const openButton = document.createElement("button");
+        openButton.type = "button";
+        openButton.className = "chapter-open";
+        const titleEl = document.createElement("h3");
+        titleEl.textContent = chapterLabel(positions[index], chapter);
+        const metaEl = document.createElement("span");
+        metaEl.className = "chapter-meta";
+        metaEl.textContent = "loading pages...";
+        openButton.append(titleEl, metaEl);
+        openButton.addEventListener("click", () => openChapter(chapter));
+        row.append(openButton);
+
+        getDocs(collection(db, "webcomics", comicId, "chapters", chapter.id, "pages"))
+          .then((snap) => {
+            metaEl.textContent = `${snap.size} page${snap.size === 1 ? "" : "s"}`;
+          })
+          .catch(() => {
+            metaEl.textContent = "";
+          });
+
+        let renamePanel = null;
+
+        if (isOwner) {
+          const actions = document.createElement("div");
+          actions.className = "chapter-actions";
+
+          const upButton = document.createElement("button");
+          upButton.type = "button";
+          upButton.textContent = "\u2191";
+          upButton.disabled = index === 0;
+          upButton.addEventListener("click", () => moveChapter(index, -1));
+
+          const downButton = document.createElement("button");
+          downButton.type = "button";
+          downButton.textContent = "\u2193";
+          downButton.disabled = index === chapters.length - 1;
+          downButton.addEventListener("click", () => moveChapter(index, 1));
+
+          const renameButton = document.createElement("button");
+          renameButton.type = "button";
+          renameButton.textContent = "edit";
+          renameButton.addEventListener("click", () => {
+            renamePanel.hidden = !renamePanel.hidden;
+          });
+
+          const deleteButton = document.createElement("button");
+          deleteButton.type = "button";
+          deleteButton.className = "delete-button";
+          deleteButton.textContent = "delete";
+          deleteButton.addEventListener("click", () => deleteChapter(chapter, index));
+
+          actions.append(upButton, downButton, renameButton, deleteButton);
+          row.append(actions);
+
+          renamePanel = document.createElement("div");
+          renamePanel.className = "chapter-rename-panel";
+          renamePanel.hidden = true;
+
+          const renameTypeLabel = document.createElement("label");
+          renameTypeLabel.textContent = "type";
+          const renameTypeSelect = document.createElement("select");
+          renameTypeSelect.innerHTML = `
+            <option value="">regular chapter</option>
+            <option value="prologue">prologue</option>
+            <option value="epilogue">epilogue</option>
+          `;
+          renameTypeSelect.value = chapter.chapterType || "";
+          renameTypeLabel.append(renameTypeSelect);
+
+          const renameLabel = document.createElement("label");
+          renameLabel.textContent = "subtitle (optional)";
+          const renameInput = document.createElement("input");
+          renameInput.type = "text";
+          renameInput.maxLength = 80;
+          renameInput.value = chapter.subtitle ?? chapter.title ?? "";
+          renameLabel.append(renameInput);
+          const renamePreview = document.createElement("p");
+          renamePreview.className = "add-chapter-preview";
+          const updateRenamePreview = () => {
+            const typeValue = renameTypeSelect.value;
+            const previewChapter = { subtitle: renameInput.value.trim(), chapterType: typeValue || null };
+            const previewPosition = typeValue ? null : positions[index];
+            renamePreview.textContent = `will show as: ${chapterLabel(previewPosition, previewChapter)}`;
+          };
+          updateRenamePreview();
+          renameInput.addEventListener("input", updateRenamePreview);
+          renameTypeSelect.addEventListener("change", updateRenamePreview);
+          const renameRow = document.createElement("div");
+          renameRow.className = "composer-row";
+          const renameSaveButton = document.createElement("button");
+          renameSaveButton.type = "button";
+          renameSaveButton.className = "primary";
+          renameSaveButton.textContent = "save";
+          const renameCancelButton = document.createElement("button");
+          renameCancelButton.type = "button";
+          renameCancelButton.textContent = "cancel";
+          const renameStatus = document.createElement("p");
+          renameStatus.className = "composer-status";
+          renameRow.append(renameSaveButton, renameCancelButton, renameStatus);
+
+          renameSaveButton.addEventListener("click", async () => {
+            const value = renameInput.value.trim();
+            renameSaveButton.disabled = true;
+            try {
+              await updateDoc(doc(db, "webcomics", comicId, "chapters", chapter.id), {
+                subtitle: value,
+                chapterType: renameTypeSelect.value || null,
+                updatedAt: serverTimestamp(),
+              });
+              await loadChapters();
+            } catch (error) {
+              console.error(error);
+              renameStatus.className = "composer-status error";
+              renameStatus.textContent = "Could not save that.";
+              renameSaveButton.disabled = false;
+            }
+          });
+
+          renameCancelButton.addEventListener("click", () => {
+            renamePanel.hidden = true;
+          });
+
+          renamePanel.append(renameTypeLabel, renameLabel, renamePreview, renameRow);
+        }
+
+        wrap.append(row);
+        if (renamePanel) wrap.append(renamePanel);
+        chaptersList.append(wrap);
+      });
+    }
+
+    async function moveChapter(index, direction) {
+      const neighborIndex = index + direction;
+      if (neighborIndex < 0 || neighborIndex >= chapters.length) return;
+      const a = chapters[index];
+      const b = chapters[neighborIndex];
+      const aOrder = a.order ?? 0;
+      const bOrder = b.order ?? 0;
+      try {
+        await updateDoc(doc(db, "webcomics", comicId, "chapters", a.id), { order: bOrder });
+        await updateDoc(doc(db, "webcomics", comicId, "chapters", b.id), { order: aOrder });
+        await loadChapters();
+      } catch (error) {
+        console.error("Could not reorder chapters:", error);
+      }
+    }
+
+    async function deleteChapter(chapter, index) {
+      const label = chapterLabel(computeChapterPositions(chapters)[index], chapter);
+      const confirmed = await showAppConfirm(`Delete "${label}" and all of its pages? This can't be undone.`, "delete");
+      if (!confirmed) return;
+      try {
+        const pagesSnap = await getDocs(collection(db, "webcomics", comicId, "chapters", chapter.id, "pages"));
+        if (comic.status === "published" && (comic.pageCount || 0) - pagesSnap.size < 1) {
+          await showAppAlert("Deleting this chapter would leave this webcomic with no pages, but it's currently published. Unpublish it from your dashboard first, or keep at least one page somewhere.");
+          return;
+        }
+        for (const pageDoc of pagesSnap.docs) {
+          await deleteDoc(doc(db, "webcomics", comicId, "chapters", chapter.id, "pages", pageDoc.id));
+        }
+        await deleteDoc(doc(db, "webcomics", comicId, "chapters", chapter.id));
+        if (pagesSnap.size > 0) await bumpPageCount(-pagesSnap.size);
+        await loadChapters();
+      } catch (error) {
+        console.error(error);
+        await showAppAlert("Could not delete that chapter. Please try again.");
+      }
+    }
+
+    newChapterSubtitle.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        addChapterButton.click();
+      }
+    });
+
+    addChapterButton.addEventListener("click", async () => {
+      if (!isOwner) return;
+      const subtitle = newChapterSubtitle.value.trim();
+      const chapterType = newChapterType.value || null;
+      addChapterButton.disabled = true;
+      addChapterStatus.className = "composer-status";
+      addChapterStatus.textContent = "adding...";
+      try {
+        await addDoc(collection(db, "webcomics", comicId, "chapters"), {
+          subtitle,
+          chapterType,
+          order: Date.now(),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+        newChapterSubtitle.value = "";
+        newChapterType.value = "";
+        addChapterStatus.className = "composer-status success";
+        addChapterStatus.textContent = "chapter added.";
+        await loadChapters();
+      } catch (error) {
+        console.error(error);
+        addChapterStatus.className = "composer-status error";
+        addChapterStatus.textContent = "Could not add that chapter.";
+      } finally {
+        addChapterButton.disabled = false;
+      }
+    });
+
+    // ---- pages ----
+    async function openChapter(chapter) {
+      currentChapter = chapter;
+      const rawIndex = chapters.findIndex((c) => c.id === chapter.id);
+      const position = rawIndex >= 0 ? computeChapterPositions(chapters)[rawIndex] : 1;
+      pagesChapterTitle.textContent = chapterLabel(position, chapter);
+      addPagePanel.hidden = !isOwner;
+      addPageHelp.textContent = comic.format === "text_image"
+        ? "Text & Image pages are written in their own editor."
+        : "Panel pages are built in their own editor — add and reorder as many panels as the page needs.";
+      showPagesView();
+      await loadPages();
+    }
+
+    addPageButton.addEventListener("click", () => {
+      if (!currentChapter) return;
+      window.location.href = `page-edit.html?id=${encodeURIComponent(comicId)}&chapter=${encodeURIComponent(currentChapter.id)}`;
+    });
+
+    backToChaptersButton.addEventListener("click", showChaptersView);
+
+    async function loadPages() {
+      if (!currentChapter) return;
+      try {
+        const snapshot = await getDocs(collection(db, "webcomics", comicId, "chapters", currentChapter.id, "pages"));
+        pages = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+        pages.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        renderPages();
+      } catch (error) {
+        console.error("Could not load pages:", error);
+        pages = [];
+        renderPages();
+      }
+    }
+
+    function renderPages() {
+      pagesList.innerHTML = "";
+      pagesCount.textContent = `(${pages.length})`;
+      pagesEmpty.hidden = pages.length > 0;
+      const isTextImage = comic.format === "text_image";
+
+      pages.forEach((pageDoc, index) => {
+        const row = document.createElement("article");
+        row.className = "page-row";
+
+        const numberEl = document.createElement("p");
+        numberEl.className = "page-number";
+        numberEl.textContent = `page ${index + 1}`;
+        row.append(numberEl);
+
+        if (isTextImage) {
+          const html = pageDoc.html || (pageDoc.text ? `<p>${escapeHtml(pageDoc.text).replace(/\n/g, "<br>")}</p>` : "");
+          const isEmpty = !html || !stripHtml(html).trim();
+          const textEl = document.createElement("div");
+          textEl.className = "page-text-html";
+          if (isEmpty) {
+            textEl.classList.add("empty");
+            textEl.textContent = "(empty page \u2014 open the editor to add text)";
+          } else {
+            textEl.innerHTML = html;
+          }
+          row.append(textEl);
+        } else {
+          const panels = Array.isArray(pageDoc.panels) ? pageDoc.panels : [];
+          if (panels.length === 0) {
+            const empty = document.createElement("p");
+            empty.className = "page-caption empty";
+            empty.textContent = "(no panels yet \u2014 open the editor to add some)";
+            row.append(empty);
+          } else {
+            panels.forEach((panelImage) => {
+              const panelImg = document.createElement("img");
+              panelImg.className = "page-image";
+              panelImg.alt = "";
+              panelImg.src = panelImage;
+              row.append(panelImg);
+            });
+          }
+        }
+
+        if (isOwner) {
+          const actions = document.createElement("div");
+          actions.className = "page-actions";
+
+          const upButton = document.createElement("button");
+          upButton.type = "button";
+          upButton.textContent = "\u2191";
+          upButton.disabled = index === 0;
+          upButton.addEventListener("click", () => movePage(index, -1));
+
+          const downButton = document.createElement("button");
+          downButton.type = "button";
+          downButton.textContent = "\u2193";
+          downButton.disabled = index === pages.length - 1;
+          downButton.addEventListener("click", () => movePage(index, 1));
+
+          const editButton = document.createElement("button");
+          editButton.type = "button";
+          editButton.textContent = "edit";
+          editButton.addEventListener("click", () => {
+            window.location.href = `page-edit.html?id=${encodeURIComponent(comicId)}&chapter=${encodeURIComponent(currentChapter.id)}&page=${encodeURIComponent(pageDoc.id)}`;
+          });
+
+          const deleteButton = document.createElement("button");
+          deleteButton.type = "button";
+          deleteButton.className = "delete-button";
+          deleteButton.textContent = "delete";
+          deleteButton.addEventListener("click", () => deletePage(pageDoc));
+
+          actions.append(upButton, downButton, editButton, deleteButton);
+          row.append(actions);
+        }
+
+        pagesList.append(row);
+      });
+    }
+
+    async function movePage(index, direction) {
+      const neighborIndex = index + direction;
+      if (neighborIndex < 0 || neighborIndex >= pages.length) return;
+      const a = pages[index];
+      const b = pages[neighborIndex];
+      const aOrder = a.order ?? 0;
+      const bOrder = b.order ?? 0;
+      try {
+        await updateDoc(doc(db, "webcomics", comicId, "chapters", currentChapter.id, "pages", a.id), { order: bOrder });
+        await updateDoc(doc(db, "webcomics", comicId, "chapters", currentChapter.id, "pages", b.id), { order: aOrder });
+        await loadPages();
+      } catch (error) {
+        console.error("Could not reorder pages:", error);
+      }
+    }
+
+    async function bumpPageCount(delta) {
+      const newCount = Math.max(0, (comic.pageCount || 0) + delta);
+      await updateDoc(doc(db, "webcomics", comicId), { pageCount: newCount, updatedAt: serverTimestamp() });
+      comic.pageCount = newCount;
+    }
+
+    async function deletePage(pageDoc) {
+      if (comic.status === "published" && (comic.pageCount || 0) <= 1) {
+        await showAppAlert("This is the only page keeping this webcomic published. Add another page first, or unpublish it from your dashboard before deleting this one.");
+        return;
+      }
+      const confirmed = await showAppConfirm("Delete this page? This can't be undone.", "delete");
+      if (!confirmed) return;
+      try {
+        await deleteDoc(doc(db, "webcomics", comicId, "chapters", currentChapter.id, "pages", pageDoc.id));
+        await bumpPageCount(-1);
+        await loadPages();
+      } catch (error) {
+        console.error(error);
+        await showAppAlert("Could not delete that page. Please try again.");
+      }
+    }
+
+    // ---- boot ----
+    async function loadComic() {
+      if (!comicId) {
+        showState("No webcomic was specified.", "error");
+        return;
+      }
+
+      try {
+        const snapshot = await getDoc(doc(db, "webcomics", comicId));
+        if (!snapshot.exists()) {
+          showState("That webcomic doesn't exist, or has been deleted.", "error");
+          return;
+        }
+
+        comic = { id: snapshot.id, ...snapshot.data() };
+        isOwner = Boolean(currentUser && currentUser.uid === comic.authorUid);
+
+        if (!isOwner && comic.status !== "published") {
+          showState("This webcomic isn't available to view.", "error");
+          return;
+        }
+
+        hideState();
+        renderHeader();
+        showChaptersView();
+        await loadChapters();
+      } catch (error) {
+        console.error("Could not load webcomic:", error);
+        showState("Could not load that webcomic. Please try again.", "error");
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      await loadComic();
+    });
+  </script>
+</body>
+</html>

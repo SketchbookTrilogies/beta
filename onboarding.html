@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico">
+  <title>Set Up Your Profile - Sketchbook Trilogies</title>
+  <style>
+    :root {
+      --ink: #05070b;
+      --paper: #bfc7dc;
+      --panel: #8a91a1;
+      --panel-dark: #4f5666;
+      --line: #090a0d;
+      --link: #002fff;
+      --visited: #4f1eb7;
+      --bevel-light: #c8cedd;
+      --bevel-dark: #4c5363;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 1px 1px, #2a2a33 1px, transparent 1.5px) 0 0 / 7px 7px,
+        #06060a;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 1px;
+    }
+
+    a:visited {
+      color: var(--visited);
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100vw - 18px, 620px);
+      min-height: 100vh;
+      margin: 0 auto;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border-left: 4px solid #51596b;
+      border-right: 4px solid #51596b;
+      box-shadow: 0 0 0 1px #171a22;
+      padding: 0 22px 32px;
+    }
+
+    .topbar {
+      min-height: 42px;
+      display: flex;
+      align-items: start;
+      gap: 6px;
+      border-bottom: 3px double #6c758b;
+      overflow: hidden;
+    }
+
+    .brand {
+      width: 215px;
+      height: 34px;
+      object-fit: contain;
+      object-position: left center;
+      filter: contrast(1.18);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: start;
+      gap: 4px;
+      min-height: 34px;
+      padding-top: 3px;
+      font-size: 16px;
+      line-height: 1.15;
+      white-space: nowrap;
+    }
+
+    .nav p,
+    p {
+      margin: 0;
+    }
+
+    .intro {
+      padding: 10px 0 20px;
+      border-bottom: 4px solid var(--line);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.05;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0 #e2e6f2;
+    }
+
+    .intro p {
+      max-width: 520px;
+      font-size: 15px;
+      line-height: 1.22;
+      font-weight: 700;
+    }
+
+    .auth-box {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 12px;
+    }
+
+    .onboard-progress {
+      margin: 0 0 12px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: #2b3040;
+    }
+
+    .onboard-step[hidden] {
+      display: none;
+    }
+
+    .onboard-step h2 {
+      margin: 0 0 6px;
+      font-size: 19px;
+      text-transform: uppercase;
+    }
+
+    .onboard-step .step-copy {
+      margin: 0 0 12px;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .form-actions button {
+      min-height: 28px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      font-size: 14px;
+      padding: 4px 14px;
+    }
+
+    .form-actions button.primary {
+      background: #7bab6e;
+      font-weight: 700;
+    }
+
+    .form-actions button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .form-actions button:disabled {
+      cursor: default;
+      opacity: .6;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 10px;
+    }
+
+    label {
+      display: grid;
+      gap: 3px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .field-help {
+      font-size: 11px;
+      font-weight: 400;
+      color: #2b3040;
+    }
+
+    input,
+    textarea {
+      height: 28px;
+      border: 2px solid var(--panel-dark);
+      border-top-color: #3d4556;
+      border-left-color: #3d4556;
+      border-right-color: #b4bbcc;
+      border-bottom-color: #b4bbcc;
+      background: #c6ccda;
+      color: #111;
+      padding: 2px 6px;
+    }
+
+    textarea {
+      height: auto;
+      min-height: 60px;
+      padding: 6px;
+      resize: vertical;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+
+    .status {
+      min-height: 18px;
+      color: #1f2736;
+      font-size: 13px;
+      line-height: 1.2;
+    }
+
+    .error {
+      color: #650000;
+      font-weight: 700;
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        width: 100%;
+        border: 0;
+        padding: 0 12px 24px;
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+        min-height: auto;
+        padding-bottom: 7px;
+      }
+
+      .brand {
+        width: min(260px, 100%);
+      }
+
+      .nav {
+        width: 100%;
+        padding-top: 0;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .form-actions button {
+        min-height: 44px;
+        font-size: 16px;
+      }
+
+      input,
+      textarea {
+        min-height: 44px;
+        font-size: 16px;
+        padding: 8px 10px;
+      }
+
+      label {
+        font-size: 15px;
+      }
+
+      .status {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar" aria-label="Site header">
+      <img class="brand" src="Logo.png" alt="Sketchbook Trilogies">
+      <div class="topbar-menu">
+        <nav class="nav" aria-label="Primary navigation">
+          <p><span>|</span></p>
+          <p><a href="index.html">home</a></p>
+          <p><span>-</span></p>
+          <p><a href="blog.html">blog</a></p>
+        </nav>
+
+      </div>
+    </header>
+
+    <section class="intro">
+      <h1>Set Up Your Profile</h1>
+      <p>Almost there — a couple quick things and you're set.</p>
+    </section>
+
+    <section class="auth-box" aria-label="Set up your profile">
+      <p class="onboard-progress" id="onboard-progress">Step 1 of 2</p>
+
+      <div class="onboard-step" data-step="welcome">
+        <h2>Welcome</h2>
+        <p class="step-copy">
+          Your account's ready — now let's set up your display name, username, and (optionally) a short bio.
+          You can change any of this later in settings.
+        </p>
+        <div class="form-actions">
+          <button type="button" class="primary" id="welcome-next-button">let's go</button>
+        </div>
+      </div>
+
+      <div class="onboard-step" data-step="profile" hidden>
+        <h2>Your profile</h2>
+        <p class="step-copy">This is how other people will see you.</p>
+        <form class="auth-form" id="profile-form">
+          <label>
+            display name
+            <input id="profile-display-name" type="text" autocomplete="nickname" maxlength="32" required>
+          </label>
+          <label>
+            username
+            <input id="profile-username" type="text" maxlength="20" placeholder="e.g. yourfavoritedemimale_brad" pattern="[a-z0-9_]{3,20}" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+            <span class="field-help">3-20 characters: lowercase letters, numbers, and underscores only.</span>
+          </label>
+          <label>
+            bio <span class="field-help">(optional)</span>
+            <textarea id="profile-bio" maxlength="280"></textarea>
+          </label>
+
+          <div class="form-actions">
+            <button type="button" id="profile-back-button">back</button>
+            <button type="submit" class="primary" id="profile-submit-button">finish</button>
+          </div>
+          <p class="status" id="profile-status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import {
+      doc,
+      getDoc,
+      getFirestore,
+      serverTimestamp,
+      setDoc,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js";
+
+    // If this page is restored from the browser's back/forward cache, force
+    // a fresh reload so it doesn't show stale in-progress form state.
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    });
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg6umXxHQ6INyc_U2AvmhF9blhQ5ZEtT8",
+      authDomain: "sketchbook-trilogies.firebaseapp.com",
+      projectId: "sketchbook-trilogies",
+      storageBucket: "sketchbook-trilogies.firebasestorage.app",
+      messagingSenderId: "564902002463",
+      appId: "1:564902002463:web:7dc95e5e857e19b959fa2a",
+      measurementId: "G-Q08PSQDHMH",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    if (await isSupported()) {
+      getAnalytics(app);
+    }
+
+    const USERNAME_PATTERN = /^[a-z0-9_]{3,20}$/;
+
+    // ---- step navigation ----
+    const steps = document.querySelectorAll(".onboard-step");
+    const progress = document.querySelector("#onboard-progress");
+    const stepOrder = ["welcome", "profile"];
+
+    function goToStep(name) {
+      steps.forEach((step) => {
+        step.hidden = step.dataset.step !== name;
+      });
+      const index = stepOrder.indexOf(name);
+      if (index >= 0) {
+        progress.textContent = `Step ${index + 1} of ${stepOrder.length}`;
+      }
+    }
+
+    function showError(statusEl, error) {
+      statusEl.className = "status error";
+      statusEl.textContent = error.message ? error.message.replace("Firebase: ", "") : String(error);
+    }
+
+    // ---- step 1: welcome ----
+    document.querySelector("#welcome-next-button").addEventListener("click", () => goToStep("profile"));
+
+    // ---- step 2: profile (display name + username + bio) ----
+    const profileForm = document.querySelector("#profile-form");
+    const profileDisplayName = document.querySelector("#profile-display-name");
+    const profileUsername = document.querySelector("#profile-username");
+    const profileBio = document.querySelector("#profile-bio");
+    const profileStatus = document.querySelector("#profile-status");
+    const profileBackButton = document.querySelector("#profile-back-button");
+    const profileSubmitButton = document.querySelector("#profile-submit-button");
+
+    profileBackButton.addEventListener("click", () => goToStep("welcome"));
+
+    let currentUser = null;
+
+    profileForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!currentUser) return;
+
+      profileStatus.className = "status";
+      profileStatus.textContent = "saving...";
+      profileSubmitButton.disabled = true;
+
+      const username = profileUsername.value.trim().toLowerCase();
+      if (!USERNAME_PATTERN.test(username)) {
+        profileStatus.className = "status error";
+        profileStatus.textContent = "Usernames must be 3-20 characters: lowercase letters, numbers, and underscores only.";
+        profileSubmitButton.disabled = false;
+        return;
+      }
+
+      const uid = currentUser.uid;
+      const name = profileDisplayName.value.trim();
+      let claimedUsername = null;
+
+      try {
+        await setDoc(doc(db, "usernames", username), { uid });
+        claimedUsername = username;
+      } catch (error) {
+        // Someone else already has it — not fatal, the profile still gets
+        // created below, just without a username; settable from settings.
+        console.error("Could not claim username:", error);
+      }
+
+      try {
+        await setDoc(doc(db, "users", uid), {
+          uid,
+          displayName: name,
+          username: claimedUsername,
+          email: currentUser.email,
+          photoURL: currentUser.photoURL || null,
+          bio: profileBio.value.trim().slice(0, 280),
+          followers: 0,
+          following: 0,
+          webcomics: 0,
+          posts: 0,
+          likes: 0,
+          createdAt: serverTimestamp(),
+        }, { merge: true });
+      } catch (error) {
+        console.error("Could not save your profile:", error);
+        showError(profileStatus, error);
+        profileSubmitButton.disabled = false;
+        return;
+      }
+
+      if (!claimedUsername) {
+        profileStatus.textContent = `Saved, but "${username}" was already taken — you can set a username from settings. Taking you to your profile...`;
+      } else {
+        profileStatus.textContent = "success. taking you to your profile...";
+      }
+      window.location.href = `profile.html?uid=${encodeURIComponent(uid)}`;
+    });
+
+    // This page assumes an account already exists (created via
+    // auth-sign-up.html or the Google fast-path). If nobody's signed in —
+    // e.g. someone bookmarked this page or opened it directly — send them
+    // to create an account first rather than showing a broken form.
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.replace("auth-sign-up.html");
+        return;
+      }
+      currentUser = user;
+
+      // If they somehow already have a complete profile (e.g. came back to
+      // this page after finishing onboarding), just send them onward
+      // instead of making them fill the form out again.
+      try {
+        const snapshot = await getDoc(doc(db, "users", user.uid));
+        if (snapshot.exists() && snapshot.data().username) {
+          window.location.replace(`profile.html?uid=${encodeURIComponent(user.uid)}`);
+          return;
+        }
+      } catch (error) {
+        console.error("Could not check for an existing profile:", error);
+      }
+
+      profileDisplayName.value = user.displayName || "";
+      goToStep("welcome");
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inbox - Sketchbook Trilogies</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    :root {
+      --ink: #05070b;
+      --paper: #bfc7dc;
+      --panel: #8a91a1;
+      --line: #090a0d;
+      --link: #002fff;
+      --visited: #4f1eb7;
+      --bevel-light: #c8cedd;
+      --bevel-dark: #4c5363;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 1px 1px, #2a2a33 1px, transparent 1.5px) 0 0 / 7px 7px,
+        #06060a;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 1px;
+    }
+
+    a:visited {
+      color: var(--visited);
+    }
+
+    .page {
+      width: min(100vw - 18px, 720px);
+      min-height: 100vh;
+      margin: 0 auto;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border-left: 4px solid #51596b;
+      border-right: 4px solid #51596b;
+      box-shadow: 0 0 0 1px #171a22;
+      padding: 0 22px 32px;
+    }
+
+    .topbar {
+      min-height: 42px;
+      display: flex;
+      align-items: start;
+      gap: 6px;
+      border-bottom: 3px double #6c758b;
+      overflow: hidden;
+    }
+
+    .brand {
+      width: 215px;
+      height: 34px;
+      object-fit: contain;
+      object-position: left center;
+      filter: contrast(1.18);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: start;
+      gap: 4px;
+      min-height: 34px;
+      padding-top: 3px;
+      font-size: 16px;
+      line-height: 1.15;
+      white-space: nowrap;
+      flex-wrap: wrap;
+    }
+
+    .nav p,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      margin: 14px 0 0;
+      font-size: 26px;
+      line-height: 1.05;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0 #e2e6f2;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      padding-bottom: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      border-bottom: 4px solid var(--line);
+    }
+
+    .state-box {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .panel {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 22px 14px;
+      text-align: center;
+      font-size: 14px;
+      color: #23283a;
+    }
+
+    .panel[hidden] {
+      display: none;
+    }
+
+    .panel b {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .app-popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 5, 9, .72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 300;
+    }
+    .app-popup-overlay[hidden] { display: none; }
+
+    .app-popup-panel {
+      width: min(100%, 380px);
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border: 4px solid #313644;
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark),
+        0 0 0 1px #090a0d,
+        6px 6px 0 rgba(0, 0, 0, .5);
+      padding: 18px;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .app-popup-message { margin: 0 0 16px; font-size: 14px; line-height: 1.4; white-space: pre-wrap; }
+    .app-popup-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+    .app-popup-actions button {
+      min-height: 30px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 4px 14px;
+    }
+
+    .app-popup-actions button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .app-popup-actions button.primary { background: #7bab6e; font-weight: 700; }
+    .app-popup-actions button.danger { background: #c97b7b; font-weight: 700; }
+
+    .inbox-toolbar {
+      margin-top: 14px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .inbox-toolbar button {
+      min-height: 30px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 4px 14px;
+    }
+
+    .inbox-toolbar button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .inbox-toolbar button:disabled {
+      cursor: default;
+      opacity: .55;
+    }
+
+    .notif-list {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .notif {
+      display: block;
+      border: 3px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 10px 12px;
+      text-decoration: none;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .notif:visited {
+      color: #1d2330;
+    }
+
+    .notif.unread {
+      background: #cfd6e8;
+      border-color: #3d4556;
+      font-weight: 700;
+    }
+
+    .notif .notif-from {
+      font-weight: 700;
+    }
+
+    .notif .notif-when {
+      display: block;
+      margin-top: 3px;
+      font-size: 11px;
+      font-weight: 400;
+      color: #4c5363;
+      font-family: "Trebuchet MS", Verdana, Arial, sans-serif;
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        width: 100%;
+        border: 0;
+        padding: 0 12px 24px;
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+        min-height: auto;
+        padding-bottom: 7px;
+      }
+
+      .brand {
+        width: min(260px, 100%);
+      }
+
+      .nav {
+        width: 100%;
+        padding-top: 0;
+      }
+
+      .notif {
+        font-size: 15px;
+        padding: 12px 14px;
+      }
+
+      .inbox-toolbar button,
+      .app-popup-actions button {
+        min-height: 44px;
+        padding: 4px 16px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-popup-overlay" id="app-popup-overlay" hidden>
+    <div class="app-popup-panel" role="alertdialog" aria-modal="true" aria-labelledby="app-popup-message">
+      <p class="app-popup-message" id="app-popup-message"></p>
+      <div class="app-popup-actions">
+        <button type="button" id="app-popup-cancel" hidden>cancel</button>
+        <button type="button" class="primary" id="app-popup-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="page">
+    <header class="topbar" aria-label="Site header">
+      <img class="brand" src="Logo.png" alt="Sketchbook Trilogies">
+      <div class="topbar-menu">
+        <nav class="nav" aria-label="Primary navigation">
+          <p><span>|</span></p>
+          <p><a href="index.html">home</a></p>
+          <p><span>-</span></p>
+          <p><a href="blog.html">blog</a></p>
+          <p><span>-</span></p>
+          <p><a href="settings.html">settings</a></p>
+        </nav>
+
+      </div>
+    </header>
+
+    <h1>Inbox</h1>
+    <p class="subtitle">Comments, replies, and activity on your webcomics.</p>
+
+    <section class="state-box" id="state-box" hidden></section>
+
+    <section class="panel" id="inbox-panel" hidden>
+      <b>Nothing here yet</b>
+      No new activity. When someone comments on or reacts to your work, it'll show up here.
+    </section>
+
+    <div class="inbox-toolbar" id="inbox-toolbar" hidden>
+      <button type="button" id="mark-all-read-button">mark all as read</button>
+      <button type="button" id="clear-inbox-button">clear inbox</button>
+    </div>
+
+    <div class="notif-list" id="notif-list" hidden></div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import {
+      getFirestore, collection, doc, getDocs, updateDoc, deleteDoc, query, orderBy, limit,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js";
+
+    // If this page is restored from the browser's back/forward cache (e.g.
+    // after signing in/out as a different account on another page, then
+    // hitting Back), force a fresh reload so auth-dependent UI (like
+    // "edit profile" or "account settings") re-evaluates against whoever is
+    // ACTUALLY signed in right now, instead of showing stale cached state.
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    });
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg6umXxHQ6INyc_U2AvmhF9blhQ5ZEtT8",
+      authDomain: "sketchbook-trilogies.firebaseapp.com",
+      projectId: "sketchbook-trilogies",
+      storageBucket: "sketchbook-trilogies.firebasestorage.app",
+      messagingSenderId: "564902002463",
+      appId: "1:564902002463:web:7dc95e5e857e19b959fa2a",
+      measurementId: "G-Q08PSQDHMH",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    if (await isSupported()) {
+      getAnalytics(app);
+    }
+
+    const stateBox = document.querySelector("#state-box");
+    const inboxPanel = document.querySelector("#inbox-panel");
+    const inboxToolbar = document.querySelector("#inbox-toolbar");
+    const markAllReadButton = document.querySelector("#mark-all-read-button");
+    const clearInboxButton = document.querySelector("#clear-inbox-button");
+    const notifList = document.querySelector("#notif-list");
+
+    // ---- custom alert/confirm popup (replaces browser alert()/confirm()) ----
+    const appPopupOverlay = document.querySelector("#app-popup-overlay");
+    const appPopupMessage = document.querySelector("#app-popup-message");
+    const appPopupCancelButton = document.querySelector("#app-popup-cancel");
+    const appPopupOkButton = document.querySelector("#app-popup-ok");
+    let appPopupResolve = null;
+
+    function closeAppPopup(result) {
+      appPopupOverlay.hidden = true;
+      if (appPopupResolve) {
+        const resolve = appPopupResolve;
+        appPopupResolve = null;
+        resolve(result);
+      }
+    }
+
+    appPopupOkButton.addEventListener("click", () => closeAppPopup(true));
+    appPopupCancelButton.addEventListener("click", () => closeAppPopup(false));
+    appPopupOverlay.addEventListener("click", (event) => {
+      if (event.target === appPopupOverlay) closeAppPopup(false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !appPopupOverlay.hidden) closeAppPopup(false);
+    });
+
+    function showAppAlert(message) {
+      return new Promise((resolve) => {
+        appPopupResolve = resolve;
+        appPopupMessage.textContent = message;
+        appPopupCancelButton.hidden = true;
+        appPopupOkButton.textContent = "OK";
+        appPopupOverlay.hidden = false;
+        appPopupOkButton.focus();
+      });
+    }
+
+    function showAppConfirm(message, confirmLabel = "OK") {
+      return new Promise((resolve) => {
+        appPopupResolve = resolve;
+        appPopupMessage.textContent = message;
+        appPopupCancelButton.hidden = false;
+        appPopupOkButton.textContent = confirmLabel;
+        appPopupOverlay.hidden = false;
+        appPopupOkButton.focus();
+      });
+    }
+
+    function timeAgo(timestamp) {
+      if (!timestamp || typeof timestamp.toMillis !== "function") return "";
+      const seconds = Math.max(0, Math.round((Date.now() - timestamp.toMillis()) / 1000));
+      if (seconds < 60) return "just now";
+      const minutes = Math.round(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      const hours = Math.round(minutes / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.round(hours / 24);
+      return `${days}d ago`;
+    }
+
+    let currentUid = null;
+    let currentNotifDocs = [];
+
+    function renderNotifications(uid, docs) {
+      currentUid = uid;
+      currentNotifDocs = docs;
+      notifList.innerHTML = "";
+
+      if (!docs.length) {
+        inboxPanel.hidden = false;
+        notifList.hidden = true;
+        inboxToolbar.hidden = true;
+        return;
+      }
+
+      inboxPanel.hidden = true;
+      notifList.hidden = false;
+      inboxToolbar.hidden = false;
+      markAllReadButton.disabled = !docs.some((d) => !d.data().read);
+
+      docs.forEach((docSnap) => {
+        const data = docSnap.data();
+        const link = document.createElement("a");
+        link.className = `notif${data.read ? "" : " unread"}`;
+
+        const from = document.createElement("span");
+        from.className = "notif-from";
+        from.textContent = data.fromName || "Someone";
+
+        let rest;
+        if (data.type === "post-comment") {
+          link.href = `blog.html?uid=${encodeURIComponent(uid)}`;
+          rest = document.createTextNode(` commented on your post: "${data.text || ""}"`);
+        } else {
+          link.href = `page-read.html?id=${encodeURIComponent(data.comicId || "")}`
+            + `&chapter=${encodeURIComponent(data.chapterId || "")}`
+            + `&page=${encodeURIComponent(data.pageId || "")}`;
+          rest = document.createTextNode(
+            ` commented on "${data.comicTitle || "your webcomic"}": "${data.text || ""}"`,
+          );
+        }
+
+        const when = document.createElement("span");
+        when.className = "notif-when";
+        when.textContent = timeAgo(data.createdAt);
+
+        link.append(from, rest, when);
+
+        link.addEventListener("click", () => {
+          if (data.read) return;
+          updateDoc(doc(db, "users", uid, "notifications", docSnap.id), { read: true }).catch((error) => {
+            console.error("Could not mark notification as read:", error);
+          });
+        }, { once: true });
+
+        notifList.append(link);
+      });
+    }
+
+    async function loadNotifications(uid) {
+      const notifQuery = query(
+        collection(db, "users", uid, "notifications"),
+        orderBy("createdAt", "desc"),
+        limit(50),
+      );
+      const snapshot = await getDocs(notifQuery);
+      renderNotifications(uid, snapshot.docs);
+    }
+
+    markAllReadButton.addEventListener("click", async () => {
+      if (!currentUid) return;
+      const unread = currentNotifDocs.filter((d) => !d.data().read);
+      if (!unread.length) return;
+
+      markAllReadButton.disabled = true;
+      try {
+        await Promise.all(unread.map((docSnap) => (
+          updateDoc(doc(db, "users", currentUid, "notifications", docSnap.id), { read: true })
+        )));
+        await loadNotifications(currentUid);
+      } catch (error) {
+        console.error("Could not mark all as read:", error);
+        await showAppAlert("Could not mark everything as read. Please try again.");
+        markAllReadButton.disabled = false;
+      }
+    });
+
+    clearInboxButton.addEventListener("click", async () => {
+      if (!currentUid || !currentNotifDocs.length) return;
+      const confirmed = await showAppConfirm(
+        "Clear your entire inbox? This deletes every notification and can't be undone.",
+        "clear inbox",
+      );
+      if (!confirmed) return;
+
+      clearInboxButton.disabled = true;
+      try {
+        await Promise.all(currentNotifDocs.map((docSnap) => (
+          deleteDoc(doc(db, "users", currentUid, "notifications", docSnap.id))
+        )));
+        await loadNotifications(currentUid);
+      } catch (error) {
+        console.error("Could not clear inbox:", error);
+        await showAppAlert("Could not clear your inbox. Please try again.");
+      } finally {
+        clearInboxButton.disabled = false;
+      }
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        stateBox.hidden = false;
+        stateBox.innerHTML = 'Sign in to view your inbox. <a href="auth-sign-in.html?mode=signin">Sign in</a>';
+        inboxPanel.hidden = true;
+        inboxToolbar.hidden = true;
+        notifList.hidden = true;
+        return;
+      }
+
+      stateBox.hidden = true;
+      loadNotifications(user.uid).catch((error) => {
+        console.error("Could not load inbox:", error);
+        inboxPanel.hidden = false;
+      });
+    });
+  </script>
+</body>
+</html>

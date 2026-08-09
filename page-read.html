@@ -1,0 +1,1278 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico">
+  <title>Page - Sketchbook Trilogies</title>
+  <style>
+    :root {
+      --ink: #05070b;
+      --paper: #bfc7dc;
+      --panel: #8a91a1;
+      --panel-dark: #4f5666;
+      --line: #090a0d;
+      --link: #002fff;
+      --visited: #4f1eb7;
+      --bevel-light: #c8cedd;
+      --bevel-dark: #4c5363;
+      --muted: #33394a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 1px 1px, #2a2a33 1px, transparent 1.5px) 0 0 / 7px 7px,
+        #06060a;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    a { color: var(--link); text-decoration: underline; text-underline-offset: 1px; }
+    a:visited { color: var(--visited); }
+    button { font: inherit; }
+    p { margin: 0; }
+
+    .page {
+      width: min(100vw - 18px, 760px);
+      min-height: 100vh;
+      margin: 0 auto;
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border-left: 4px solid #51596b;
+      border-right: 4px solid #51596b;
+      box-shadow: 0 0 0 1px #171a22;
+      padding: 0 22px 40px;
+    }
+
+    .topbar {
+      min-height: 42px;
+      display: flex;
+      align-items: start;
+      gap: 6px;
+      border-bottom: 3px double #6c758b;
+      overflow: hidden;
+    }
+
+    .brand {
+      width: 215px;
+      height: 34px;
+      object-fit: contain;
+      object-position: left center;
+      filter: contrast(1.18);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: start;
+      gap: 4px;
+      min-height: 34px;
+      padding-top: 3px;
+      font-size: 16px;
+      line-height: 1.15;
+      white-space: nowrap;
+      flex-wrap: wrap;
+    }
+
+    .nav p { margin: 0; }
+
+    .back-link { margin-top: 12px; font-size: 13px; }
+
+    h1 {
+      margin: 10px 0 0;
+      font-size: 24px;
+      line-height: 1.1;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0 #e2e6f2;
+      overflow-wrap: anywhere;
+    }
+
+    .page-heading {
+      margin-top: 4px;
+      padding-bottom: 12px;
+      border-bottom: 4px solid var(--line);
+      font-size: 15px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .page-heading[hidden] { display: none; }
+
+    .state-box {
+      margin-top: 14px;
+      border: 4px solid #5f687d;
+      background: #a2aabc;
+      color: #1d2330;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .state-box.error { color: #650000; font-weight: 700; }
+    .state-box[hidden] { display: none; }
+
+    .page-nav {
+      margin-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      flex-wrap: wrap;
+    }
+
+    .page-nav[hidden] { display: none; }
+    .page-nav .spacer { flex: 1 1 auto; }
+    .page-nav a, .page-nav span.disabled { flex: 0 1 auto; }
+    .page-nav span.disabled { color: var(--muted); text-decoration: none; }
+
+    .page-row {
+      margin-top: 16px;
+      border: 4px solid #5f687d;
+      background: var(--panel);
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark);
+      padding: 12px;
+    }
+
+    .page-row[hidden] { display: none; }
+
+    .page-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #303545;
+    }
+
+    .page-text-html {
+      padding: 16px 18px;
+      background: #f4f2ec;
+      border: 3px solid #090a0d;
+      font-size: 15px;
+      line-height: 1.6;
+      font-family: "Times New Roman", Georgia, serif;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
+    .page-text-html p { margin: 0 0 1em; }
+    .page-text-html p:last-child { margin-bottom: 0; }
+    .page-text-html a { color: var(--link); text-decoration: underline; }
+    .page-text-html a:visited { color: var(--visited); }
+    .page-text-html h1, .page-text-html h2, .page-text-html h3 { margin: 0.6em 0 0.4em; line-height: 1.2; }
+    .page-text-html ul, .page-text-html ol { text-align: left; display: inline-block; }
+    .page-text-html .dialog-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin: 0 0 0.35em;
+      text-align: left;
+    }
+    .page-text-html .dialog-line + .dialog-line {
+      margin-top: -0.1em;
+    }
+    .page-text-html .dialog-label {
+      font-weight: 700;
+      flex: 0 0 auto;
+      min-width: 96px;
+      padding-top: 0.05em;
+    }
+    .page-text-html .dialog-content {
+      flex: 1 1 auto;
+      min-width: 0;
+      white-space: pre-wrap;
+    }
+    .page-text-html .dialog-overlap {
+      border-left: 3px solid currentColor;
+      padding-left: 10px;
+      margin: 0 0 0.6em;
+      opacity: .95;
+      text-align: left;
+    }
+    .page-text-html .dialog-overlap::before {
+      content: "at the same time:";
+      display: block;
+      font-size: 10px;
+      font-style: italic;
+      opacity: .65;
+      margin-bottom: 2px;
+    }
+    .page-text-html .dialog-overlap .dialog-line {
+      margin-bottom: 0.15em;
+    }
+    .page-text-html .dialog-overlap .dialog-line:last-child {
+      margin-bottom: 0;
+    }
+    .page-text-html .chat-message {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      margin: 0 0 0.5em;
+      text-align: left;
+    }
+    .page-text-html .chat-message[data-side="right"] {
+      align-items: flex-end;
+      text-align: right;
+    }
+    .page-text-html .chat-sender {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 0 6px;
+    }
+    .page-text-html .chat-bubble {
+      display: inline-block;
+      max-width: 78%;
+      padding: 6px 11px;
+      border-radius: 14px;
+      border: 1px solid;
+      color: #1d2330;
+      white-space: pre-wrap;
+    }
+    .page-text-html img {
+      display: block;
+      width: 100%;
+      max-width: 480px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      margin: 0 auto 1em;
+      border: 3px solid #090a0d;
+      background: #303545;
+    }
+    .page-text-html .html-embed-block {
+      margin: 0 0 1em;
+    }
+    .page-text-html .html-embed {
+      display: block;
+      width: 100%;
+      max-width: 480px;
+      aspect-ratio: 4 / 3;
+      margin: 0 auto;
+      border: 3px solid #090a0d;
+      background: #303545;
+      overflow: hidden;
+    }
+    .page-text-html .html-embed iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* ---- custom audio player widget ---- */
+    .audio-embed-block {
+      max-width: 480px;
+      margin: 0 auto 1em;
+    }
+
+    .audio-player {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border: 3px solid #090a0d;
+      background: #a2aabc;
+    }
+
+    .audio-play-button {
+      flex: 0 0 auto;
+      width: 32px;
+      height: 32px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #c5ccdd;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .audio-play-button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .audio-progress-track {
+      flex: 1 1 auto;
+      height: 14px;
+      border: 2px solid var(--panel-dark);
+      background: #6f7789;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .audio-progress-fill {
+      position: absolute;
+      inset: 0;
+      width: 0%;
+      background: #7bab6e;
+    }
+
+    .audio-time {
+      flex: 0 0 auto;
+      font-size: 11px;
+      font-family: "Courier New", monospace;
+      color: #1d2330;
+      min-width: 78px;
+      text-align: right;
+    }
+
+    @media (max-width: 420px) {
+      .audio-time { min-width: 62px; font-size: 10px; }
+    }
+
+    .section-heading { margin-top: 24px; display: flex; align-items: baseline; gap: 8px; }
+    .section-heading[hidden] { display: none; }
+    .section-heading h2 { margin: 0; font-size: 18px; text-transform: uppercase; }
+    .section-heading .count { font-size: 12px; color: var(--muted); font-family: "Courier New", monospace; }
+
+    .comments-list { display: grid; gap: 10px; margin-top: 10px; }
+
+    .comment-row { display: flex; gap: 8px; align-items: flex-start; }
+
+    .comment-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #090a0d;
+      background: #303545;
+      flex: 0 0 auto;
+    }
+
+    .comment-body { font-size: 13px; line-height: 1.35; flex: 1 1 auto; min-width: 0; }
+    .comment-body .comment-author { font-weight: 700; margin-right: 4px; }
+    .comment-text { overflow-wrap: anywhere; white-space: pre-wrap; }
+    .comment-time { font-size: 10px; color: var(--muted); font-family: "Courier New", monospace; }
+
+    .comment-actions { margin-top: 2px; }
+
+    .comment-reply-button {
+      border: none;
+      background: none;
+      color: var(--link);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 0;
+      margin-right: 8px;
+      text-decoration: underline;
+    }
+
+    .comment-delete {
+      border: none;
+      background: none;
+      color: #650000;
+      cursor: pointer;
+      font-size: 11px;
+      padding: 0;
+      text-decoration: underline;
+    }
+
+    .comment-replies {
+      margin: 6px 0 0 20px;
+      padding-left: 10px;
+      border-left: 2px solid var(--panel-dark);
+      display: grid;
+      gap: 8px;
+    }
+
+    .comment-replying-to {
+      font-size: 10px;
+      font-style: italic;
+      color: var(--muted);
+      margin-bottom: 1px;
+    }
+
+    .comment-form, .comment-reply-form { display: flex; gap: 6px; margin-top: 10px; }
+
+    .comment-form input, .comment-reply-form input {
+      flex: 1 1 auto;
+      height: 28px;
+      border: 2px solid var(--panel-dark);
+      border-top-color: #3d4556;
+      border-left-color: #3d4556;
+      border-right-color: #b4bbcc;
+      border-bottom-color: #b4bbcc;
+      background: #c6ccda;
+      color: #111;
+      padding: 2px 6px;
+      font-size: 13px;
+    }
+
+    .comment-form button, .comment-reply-form button {
+      min-height: 28px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 2px 12px;
+    }
+
+    .comments-note { margin-top: 10px; font-size: 12px; color: var(--muted); }
+
+    /* Custom alert/confirm popup (replaces browser alert()/confirm()) */
+    .app-popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 5, 9, .72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 300;
+    }
+    .app-popup-overlay[hidden] { display: none; }
+
+    .app-popup-panel {
+      width: min(100%, 380px);
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, .06) 0 1px, transparent 1px 4px),
+        var(--paper);
+      border: 4px solid #313644;
+      box-shadow:
+        inset 2px 2px 0 var(--bevel-light),
+        inset -2px -2px 0 var(--bevel-dark),
+        0 0 0 1px #090a0d,
+        6px 6px 0 rgba(0, 0, 0, .5);
+      padding: 18px;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .app-popup-message { margin: 0 0 16px; font-size: 14px; line-height: 1.4; white-space: pre-wrap; }
+    .app-popup-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+    .app-popup-actions button {
+      min-height: 30px;
+      border: 2px solid #111;
+      border-top-color: var(--bevel-light);
+      border-left-color: var(--bevel-light);
+      border-right-color: var(--bevel-dark);
+      border-bottom-color: var(--bevel-dark);
+      background: #a4abbc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 4px 14px;
+    }
+
+    .app-popup-actions button:active {
+      border-top-color: var(--bevel-dark);
+      border-left-color: var(--bevel-dark);
+      border-right-color: var(--bevel-light);
+      border-bottom-color: var(--bevel-light);
+    }
+
+    .app-popup-actions button.primary { background: #7bab6e; font-weight: 700; }
+
+    @media (max-width: 560px) {
+      .page { width: 100%; border: 0; padding: 0 12px 32px; }
+      .topbar { flex-wrap: wrap; min-height: auto; padding-bottom: 7px; }
+      .brand { width: min(260px, 100%); }
+      .nav { width: 100%; padding-top: 0; }
+      .page-nav { font-size: 15px; }
+      .page-nav a, .page-nav span.disabled { padding: 8px 4px; display: inline-block; }
+      .audio-play-button { width: 40px; height: 40px; }
+      .audio-progress-track { height: 20px; }
+      .comment-form input, .comment-reply-form input { min-height: 40px; font-size: 15px; }
+      .comment-form button, .comment-reply-form button { min-height: 36px; padding: 0 12px; font-size: 13px; }
+      .app-popup-actions button { min-height: 40px; font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-popup-overlay" id="app-popup-overlay" hidden>
+    <div class="app-popup-panel" role="alertdialog" aria-modal="true" aria-labelledby="app-popup-message">
+      <p class="app-popup-message" id="app-popup-message"></p>
+      <div class="app-popup-actions">
+        <button type="button" id="app-popup-cancel" hidden>cancel</button>
+        <button type="button" class="primary" id="app-popup-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="page">
+    <header class="topbar" aria-label="Site header">
+      <img class="brand" src="Logo.png" alt="Sketchbook Trilogies">
+      <div class="topbar-menu">
+        <nav class="nav" aria-label="Primary navigation">
+          <p><span>|</span></p>
+          <p><a href="index.html">home</a></p>
+          <p><span>-</span></p>
+          <p><a href="blog.html">blog</a></p>
+          <p><span>-</span></p>
+          <p><a href="settings.html">settings</a></p>
+        </nav>
+
+      </div>
+    </header>
+
+    <p class="back-link"><a id="back-link" href="index.html">&larr; back to comic</a></p>
+
+    <h1 id="title">Webcomic</h1>
+    <p class="page-heading" id="page-heading" hidden></p>
+
+    <section class="state-box" id="state-box" hidden></section>
+
+    <nav class="page-nav" id="page-nav-top" hidden></nav>
+
+    <div class="page-row" id="page-row" hidden></div>
+
+    <nav class="page-nav" id="page-nav-bottom" hidden></nav>
+
+    <div class="section-heading" id="comments-heading" hidden>
+      <h2>Comments</h2>
+      <span class="count" id="comments-count"></span>
+    </div>
+    <div id="comment-form-slot"></div>
+    <div class="comments-list" id="comments-list"></div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import {
+      addDoc, deleteDoc, doc, getDoc, getDocs, collection, getFirestore, limit, orderBy, query, serverTimestamp, setDoc,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-lite.js";
+
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) window.location.reload();
+    });
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDg6umXxHQ6INyc_U2AvmhF9blhQ5ZEtT8",
+      authDomain: "sketchbook-trilogies.firebaseapp.com",
+      projectId: "sketchbook-trilogies",
+      storageBucket: "sketchbook-trilogies.firebasestorage.app",
+      messagingSenderId: "564902002463",
+      appId: "1:564902002463:web:7dc95e5e857e19b959fa2a",
+      measurementId: "G-Q08PSQDHMH",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    if (await isSupported()) getAnalytics(app);
+
+    const sampleAvatar = "default-avatar.png";
+
+    // ---- custom alert/confirm popup (replaces browser alert()/confirm()) ----
+    const appPopupOverlay = document.querySelector("#app-popup-overlay");
+    const appPopupMessage = document.querySelector("#app-popup-message");
+    const appPopupCancelButton = document.querySelector("#app-popup-cancel");
+    const appPopupOkButton = document.querySelector("#app-popup-ok");
+    let appPopupResolve = null;
+
+    function closeAppPopup(result) {
+      appPopupOverlay.hidden = true;
+      if (appPopupResolve) {
+        const resolve = appPopupResolve;
+        appPopupResolve = null;
+        resolve(result);
+      }
+    }
+
+    appPopupOkButton.addEventListener("click", () => closeAppPopup(true));
+    appPopupCancelButton.addEventListener("click", () => closeAppPopup(false));
+    appPopupOverlay.addEventListener("click", (event) => {
+      if (event.target === appPopupOverlay) closeAppPopup(false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !appPopupOverlay.hidden) closeAppPopup(false);
+    });
+
+    function showAppAlert(message) {
+      return new Promise((resolve) => {
+        appPopupResolve = resolve;
+        appPopupMessage.textContent = message;
+        appPopupCancelButton.hidden = true;
+        appPopupOkButton.textContent = "OK";
+        appPopupOverlay.hidden = false;
+        appPopupOkButton.focus();
+      });
+    }
+
+    function showAppConfirm(message, confirmLabel = "OK") {
+      return new Promise((resolve) => {
+        appPopupResolve = resolve;
+        appPopupMessage.textContent = message;
+        appPopupCancelButton.hidden = false;
+        appPopupOkButton.textContent = confirmLabel;
+        appPopupOverlay.hidden = false;
+        appPopupOkButton.focus();
+      });
+    }
+
+    // Comments store the author's display name and avatar at the time they
+    // were posted; we prefer showing their CURRENT username, display name,
+    // and avatar — fetched live (and cached per uid) since none of the
+    // three are kept in sync on the comment itself.
+    const authorInfoCache = new Map();
+
+    function applyLiveAuthorInfo(authorUid, { nameEl = null, avatarEl = null } = {}) {
+      if (!authorUid) return;
+
+      function apply(info) {
+        if (!info) return;
+        if (nameEl) {
+          nameEl.textContent = info.username ? `@${info.username}` : (info.displayName || nameEl.textContent);
+        }
+        if (avatarEl && info.photoURL) {
+          avatarEl.src = info.photoURL;
+        }
+      }
+
+      if (authorInfoCache.has(authorUid)) {
+        apply(authorInfoCache.get(authorUid));
+        return;
+      }
+
+      getDoc(doc(db, "users", authorUid)).then((snap) => {
+        const info = snap.exists()
+          ? {
+            username: snap.data().username || null,
+            displayName: snap.data().displayName || null,
+            photoURL: snap.data().photoURL || null,
+          }
+          : null;
+        authorInfoCache.set(authorUid, info);
+        apply(info);
+      }).catch(() => {
+        authorInfoCache.set(authorUid, null);
+      });
+    }
+
+    let currentUser = null;
+    let currentUserDoc = null;
+    let comicMeta = null;
+
+    const backLink = document.querySelector("#back-link");
+    const titleEl = document.querySelector("#title");
+    const pageHeading = document.querySelector("#page-heading");
+    const stateBox = document.querySelector("#state-box");
+    const pageNavTop = document.querySelector("#page-nav-top");
+    const pageNavBottom = document.querySelector("#page-nav-bottom");
+    const pageRow = document.querySelector("#page-row");
+    const commentsHeading = document.querySelector("#comments-heading");
+    const commentsCount = document.querySelector("#comments-count");
+    const commentFormSlot = document.querySelector("#comment-form-slot");
+    const commentsList = document.querySelector("#comments-list");
+
+    function showState(message, kind = "") {
+      stateBox.hidden = false;
+      stateBox.className = kind ? `state-box ${kind}` : "state-box";
+      stateBox.textContent = message;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const comicId = params.get("id");
+    const chapterId = params.get("chapter");
+    const pageId = params.get("page");
+
+    function chapterLabel(prefix, position, chapter) {
+      const subtitle = (chapter.subtitle || chapter.title || "").trim();
+      if (chapter.chapterType === "prologue") {
+        return subtitle ? `Prologue: ${subtitle}` : "Prologue";
+      }
+      if (chapter.chapterType === "epilogue") {
+        return subtitle ? `Epilogue: ${subtitle}` : "Epilogue";
+      }
+      return subtitle ? `${prefix} ${position}: ${subtitle}` : `${prefix} ${position}`;
+    }
+
+    // Prologues/epilogues sit outside normal chapter numbering — see the
+    // matching helper in webcomic-view.html / webcomic-edit.html.
+    function computeChapterPositions(chapters) {
+      let count = 0;
+      return chapters.map((chapter) => {
+        if (chapter.chapterType === "prologue" || chapter.chapterType === "epilogue") {
+          return null;
+        }
+        count += 1;
+        return count;
+      });
+    }
+
+    function formatTimestamp(timestamp) {
+      if (!timestamp) return "";
+      const date = typeof timestamp.toDate === "function" ? timestamp.toDate() : new Date(timestamp);
+      if (Number.isNaN(date.getTime())) return "";
+      return date.toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+    }
+
+    // Replaces a stored audio placeholder (just a URL, written by page-edit)
+    // with an actual <audio> element plus our own play/pause + scrub bar UI,
+    // rather than relying on the browser's native (and very
+    // inconsistently-styled) audio controls.
+    function formatAudioTime(seconds) {
+      if (!Number.isFinite(seconds)) return "0:00";
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60).toString().padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    function initAudioPlayer(block) {
+      const url = block.dataset.audioUrl;
+      if (!url) return;
+
+      block.innerHTML = "";
+      block.removeAttribute("contenteditable");
+
+      const audioEl = document.createElement("audio");
+      audioEl.preload = "metadata";
+      audioEl.src = url;
+
+      const player = document.createElement("div");
+      player.className = "audio-player";
+
+      const playButton = document.createElement("button");
+      playButton.type = "button";
+      playButton.className = "audio-play-button";
+      playButton.setAttribute("aria-label", "Play");
+      playButton.textContent = "\u25b6";
+
+      const track = document.createElement("div");
+      track.className = "audio-progress-track";
+      const fill = document.createElement("div");
+      fill.className = "audio-progress-fill";
+      track.append(fill);
+
+      const time = document.createElement("div");
+      time.className = "audio-time";
+      time.textContent = "0:00 / 0:00";
+
+      player.append(playButton, track, time);
+      block.append(audioEl, player);
+
+      function refresh() {
+        const duration = audioEl.duration;
+        time.textContent = `${formatAudioTime(audioEl.currentTime)} / ${formatAudioTime(duration)}`;
+        fill.style.width = Number.isFinite(duration) && duration > 0
+          ? `${(audioEl.currentTime / duration) * 100}%`
+          : "0%";
+      }
+
+      playButton.addEventListener("click", () => {
+        if (audioEl.paused) {
+          audioEl.play().catch(() => {});
+        } else {
+          audioEl.pause();
+        }
+      });
+
+      audioEl.addEventListener("play", () => {
+        playButton.textContent = "\u23f8";
+        playButton.setAttribute("aria-label", "Pause");
+      });
+      audioEl.addEventListener("pause", () => {
+        playButton.textContent = "\u25b6";
+        playButton.setAttribute("aria-label", "Play");
+      });
+      audioEl.addEventListener("ended", () => {
+        playButton.textContent = "\u25b6";
+        playButton.setAttribute("aria-label", "Play");
+      });
+      audioEl.addEventListener("timeupdate", refresh);
+      audioEl.addEventListener("loadedmetadata", refresh);
+
+      track.addEventListener("click", (event) => {
+        const rect = track.getBoundingClientRect();
+        const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+        if (Number.isFinite(audioEl.duration)) {
+          audioEl.currentTime = ratio * audioEl.duration;
+        }
+      });
+    }
+
+    async function loadOrderedPages(cId) {
+      const snap = await getDocs(collection(db, "webcomics", comicId, "chapters", cId, "pages"));
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      list.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      return list;
+    }
+
+    function pageLinkUrl(cId, pId) {
+      return `page-read.html?id=${encodeURIComponent(comicId)}&chapter=${encodeURIComponent(cId)}&page=${encodeURIComponent(pId)}`;
+    }
+
+    function buildPageNav(container, prevTarget, nextTarget) {
+      container.innerHTML = "";
+      container.hidden = false;
+
+      const prev = document.createElement(prevTarget ? "a" : "span");
+      if (prevTarget) {
+        prev.href = pageLinkUrl(prevTarget.chapterId, prevTarget.pageId);
+        prev.textContent = "\u2190 previous page";
+      } else {
+        prev.className = "disabled";
+        prev.textContent = "\u2190 previous page";
+      }
+
+      const spacer = document.createElement("span");
+      spacer.className = "spacer";
+
+      const next = document.createElement(nextTarget ? "a" : "span");
+      if (nextTarget) {
+        next.href = pageLinkUrl(nextTarget.chapterId, nextTarget.pageId);
+        next.textContent = "next page \u2192";
+      } else {
+        next.className = "disabled";
+        next.textContent = "next page \u2192";
+      }
+
+      container.append(prev, spacer, next);
+    }
+
+    async function load() {
+      if (!comicId || !chapterId || !pageId) {
+        showState("No page was specified.", "error");
+        return;
+      }
+
+      try {
+        const comicSnap = await getDoc(doc(db, "webcomics", comicId));
+        if (!comicSnap.exists()) {
+          showState("That webcomic doesn't exist, or has been deleted.", "error");
+          return;
+        }
+        const comic = { id: comicSnap.id, ...comicSnap.data() };
+
+        if (comic.status !== "published") {
+          showState("This webcomic isn't available to view.", "error");
+          return;
+        }
+
+        comicMeta = { authorUid: comic.authorUid, title: comic.title || "Untitled" };
+
+        // We have a real, viewable page now — clear any leftover error from
+        // an earlier attempt so it doesn't sit there next to content that
+        // actually loaded fine.
+        stateBox.hidden = true;
+
+        if (comic.customCssPages) {
+          const styleTag = document.createElement("style");
+          styleTag.id = "author-custom-css";
+          styleTag.textContent = comic.customCssPages;
+          document.head.append(styleTag);
+        }
+
+        titleEl.textContent = comic.title || "Untitled";
+        document.title = `${comic.title || "Untitled"} - Sketchbook Trilogies`;
+        backLink.href = `webcomic-view.html?id=${encodeURIComponent(comicId)}`;
+        backLink.textContent = `\u2190 back to ${comic.title || "comic"}`;
+
+        const chaptersSnap = await getDocs(collection(db, "webcomics", comicId, "chapters"));
+        const chapters = chaptersSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        chapters.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+        const chapterIndex = chapters.findIndex((c) => c.id === chapterId);
+        if (chapterIndex === -1) {
+          showState("That chapter doesn't exist, or has been removed.", "error");
+          return;
+        }
+        const chapter = chapters[chapterIndex];
+        const prefix = (comic.chapterPrefix || "Chapter").trim() || "Chapter";
+
+        const pages = await loadOrderedPages(chapterId);
+        const pageIndex = pages.findIndex((p) => p.id === pageId);
+        if (pageIndex === -1) {
+          showState("That page doesn't exist, or has been removed.", "error");
+          return;
+        }
+        const pageDoc = pages[pageIndex];
+
+        pageHeading.hidden = false;
+        const chapterPosition = computeChapterPositions(chapters)[chapterIndex];
+        const pageHeadingText = `${chapterLabel(prefix, chapterPosition, chapter)} \u2014 page ${pageIndex + 1} of ${pages.length}`;
+        pageHeading.textContent = pageHeadingText;
+        document.title = `${comic.title || "Untitled"} \u2014 ${pageHeadingText} - Sketchbook Trilogies`;
+
+        // Figure out prev/next targets, crossing chapter boundaries as needed.
+        let prevTarget = null;
+        let nextTarget = null;
+
+        if (pageIndex > 0) {
+          prevTarget = { chapterId, pageId: pages[pageIndex - 1].id };
+        } else if (chapterIndex > 0) {
+          const prevChapter = chapters[chapterIndex - 1];
+          const prevPages = await loadOrderedPages(prevChapter.id);
+          if (prevPages.length) {
+            prevTarget = { chapterId: prevChapter.id, pageId: prevPages[prevPages.length - 1].id };
+          }
+        }
+
+        if (pageIndex < pages.length - 1) {
+          nextTarget = { chapterId, pageId: pages[pageIndex + 1].id };
+        } else if (chapterIndex < chapters.length - 1) {
+          const nextChapter = chapters[chapterIndex + 1];
+          const nextPages = await loadOrderedPages(nextChapter.id);
+          if (nextPages.length) {
+            nextTarget = { chapterId: nextChapter.id, pageId: nextPages[0].id };
+          }
+        }
+
+        buildPageNav(pageNavTop, prevTarget, nextTarget);
+        buildPageNav(pageNavBottom, prevTarget, nextTarget);
+
+        pageRow.hidden = false;
+        pageRow.innerHTML = "";
+
+        if (comic.format === "text_image") {
+          const html = pageDoc.html || (pageDoc.text ? `<p>${escapeHtml(pageDoc.text).replace(/\n/g, "<br>")}</p>` : "");
+          const content = document.createElement("div");
+          content.className = "page-text-html";
+          content.innerHTML = html;
+          pageRow.append(content);
+          content.querySelectorAll(".audio-embed-block").forEach(initAudioPlayer);
+        } else {
+          const panels = Array.isArray(pageDoc.panels) ? pageDoc.panels : [];
+          panels.forEach((panelSrc) => {
+            const img = document.createElement("img");
+            img.className = "page-image";
+            img.alt = "";
+            img.src = panelSrc;
+            pageRow.append(img);
+          });
+        }
+
+        commentsHeading.hidden = false;
+        // Comments and reading-progress are secondary to the page content
+        // that's already rendered above — don't cover it with a page-level
+        // error if either of these fails.
+        try {
+          buildCommentForm();
+          await renderComments();
+        } catch (error) {
+          console.error("Could not load comments:", error);
+        }
+
+        pageLoadedSuccessfully = true;
+        try {
+          await saveReadingProgress();
+        } catch (error) {
+          console.error("Could not save reading progress:", error);
+        }
+      } catch (error) {
+        console.error("Could not load this page:", error);
+        showState("Could not load this page. Please try again.", "error");
+      }
+    }
+
+    // Records the last chapter/page this signed-in reader viewed for this
+    // webcomic, so webcomic-view can show a "you are here" marker. Purely
+    // best-effort — failing silently here shouldn't interrupt reading.
+    let pageLoadedSuccessfully = false;
+
+    async function saveReadingProgress() {
+      if (!currentUser || !pageLoadedSuccessfully || !comicId || !chapterId || !pageId) return;
+      try {
+        await setDoc(doc(db, "users", currentUser.uid, "readingProgress", comicId), {
+          chapterId,
+          pageId,
+          updatedAt: serverTimestamp(),
+        });
+      } catch (error) {
+        console.error("Could not save reading progress:", error);
+      }
+    }
+
+    // ---- comments (one level of replies) ----
+    function commentsCollectionRef() {
+      return collection(db, "webcomics", comicId, "chapters", chapterId, "pages", pageId, "comments");
+    }
+
+    async function addComment(text, parentId = null) {
+      await addDoc(commentsCollectionRef(), {
+        authorUid: currentUser.uid,
+        authorName: currentUserDoc?.displayName || currentUser.displayName || currentUser.email || "User",
+        authorPhotoURL: currentUserDoc?.photoURL || null,
+        text,
+        parentId,
+        createdAt: serverTimestamp(),
+      });
+      notifyOwnerOfComment(text);
+    }
+
+    // Best-effort: let the webcomic's author know about the comment in
+    // their inbox. Never notify someone about their own comment on their
+    // own comic, and never let a notification failure block the comment
+    // itself from posting.
+    async function notifyOwnerOfComment(text) {
+      if (!comicMeta?.authorUid || comicMeta.authorUid === currentUser.uid) return;
+      try {
+        await addDoc(collection(db, "users", comicMeta.authorUid, "notifications"), {
+          type: "comment",
+          fromUid: currentUser.uid,
+          fromName: currentUserDoc?.displayName || currentUser.displayName || currentUser.email || "User",
+          comicId,
+          comicTitle: comicMeta.title,
+          chapterId,
+          pageId,
+          text: text.slice(0, 140),
+          read: false,
+          createdAt: serverTimestamp(),
+        });
+      } catch (error) {
+        console.error("Could not send inbox notification:", error);
+      }
+    }
+
+    function buildCommentForm() {
+      commentFormSlot.innerHTML = "";
+      if (currentUser) {
+        const form = document.createElement("form");
+        form.className = "comment-form";
+        const input = document.createElement("input");
+        input.type = "text";
+        input.maxLength = 300;
+        input.placeholder = "Add a comment...";
+        const submit = document.createElement("button");
+        submit.type = "submit";
+        submit.textContent = "reply";
+        form.append(input, submit);
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const text = input.value.trim();
+          if (!text) return;
+          submit.disabled = true;
+          try {
+            await addComment(text);
+            input.value = "";
+            await renderComments();
+          } catch (error) {
+            console.error(error);
+            await showAppAlert("Could not post your comment. Please try again.");
+          } finally {
+            submit.disabled = false;
+          }
+        });
+        commentFormSlot.append(form);
+      } else {
+        const note = document.createElement("p");
+        note.className = "comments-note";
+        note.innerHTML = 'Sign in to comment. <a href="auth-sign-in.html?mode=signin">Sign in</a>';
+        commentFormSlot.append(note);
+      }
+    }
+
+    function buildCommentRow(comment, replyingToName = null) {
+      const row = document.createElement("div");
+      row.className = "comment-row";
+
+      const avatar = document.createElement("img");
+      avatar.className = "comment-avatar";
+      avatar.alt = "";
+      avatar.src = comment.authorPhotoURL || sampleAvatar;
+      avatar.onerror = () => { avatar.onerror = null; avatar.src = sampleAvatar; };
+
+      const body = document.createElement("div");
+      body.className = "comment-body";
+
+      if (replyingToName) {
+        const replyingTo = document.createElement("div");
+        replyingTo.className = "comment-replying-to";
+        replyingTo.textContent = `replying to ${replyingToName}`;
+        body.append(replyingTo);
+      }
+
+      const authorLink = document.createElement("a");
+      authorLink.className = "comment-author";
+      authorLink.href = `profile.html?uid=${encodeURIComponent(comment.authorUid || "")}`;
+      authorLink.textContent = comment.authorName || "Someone";
+      applyLiveAuthorInfo(comment.authorUid, { nameEl: authorLink, avatarEl: avatar });
+
+      const text = document.createElement("span");
+      text.className = "comment-text";
+      text.textContent = comment.text || "";
+
+      const time = document.createElement("div");
+      time.className = "comment-time";
+      time.textContent = formatTimestamp(comment.createdAt);
+
+      body.append(authorLink, text, time);
+
+      const actions = document.createElement("div");
+      actions.className = "comment-actions";
+
+      if (currentUser) {
+        const replyButton = document.createElement("button");
+        replyButton.type = "button";
+        replyButton.className = "comment-reply-button";
+        replyButton.textContent = "reply";
+
+        let replyForm = null;
+        replyButton.addEventListener("click", () => {
+          if (replyForm) {
+            replyForm.remove();
+            replyForm = null;
+            return;
+          }
+          replyForm = document.createElement("form");
+          replyForm.className = "comment-reply-form";
+          const input = document.createElement("input");
+          input.type = "text";
+          input.maxLength = 300;
+          input.placeholder = `reply to ${comment.authorName || "this comment"}...`;
+          const submit = document.createElement("button");
+          submit.type = "submit";
+          submit.textContent = "reply";
+          replyForm.append(input, submit);
+
+          replyForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const replyText = input.value.trim();
+            if (!replyText) return;
+            submit.disabled = true;
+            try {
+              await addComment(replyText, comment.id);
+              await renderComments();
+            } catch (error) {
+              console.error(error);
+              await showAppAlert("Could not post your reply. Please try again.");
+              submit.disabled = false;
+            }
+          });
+
+          actions.append(replyForm);
+          input.focus();
+        });
+
+        actions.append(replyButton);
+      }
+
+      if (currentUser && currentUser.uid === comment.authorUid) {
+        const del = document.createElement("button");
+        del.type = "button";
+        del.className = "comment-delete";
+        del.textContent = "delete";
+        del.addEventListener("click", async () => {
+          const confirmed = await showAppConfirm("Delete this comment?", "delete");
+          if (!confirmed) return;
+          try {
+            await deleteDoc(doc(commentsCollectionRef(), comment.id));
+            await renderComments();
+          } catch (error) {
+            console.error(error);
+            await showAppAlert("Could not delete that comment. Please try again.");
+          }
+        });
+        actions.append(del);
+      }
+
+      body.append(actions);
+      row.append(avatar, body);
+      return row;
+    }
+
+    async function renderComments() {
+      try {
+        const commentsQuery = query(commentsCollectionRef(), orderBy("createdAt", "asc"), limit(200));
+        const snapshot = await getDocs(commentsQuery);
+        const allComments = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+        commentsCount.textContent = `(${allComments.length})`;
+        commentsList.innerHTML = "";
+
+        if (!allComments.length) {
+          const empty = document.createElement("p");
+          empty.className = "comments-note";
+          empty.textContent = "No comments yet.";
+          commentsList.append(empty);
+          return;
+        }
+
+        const byId = new Map(allComments.map((c) => [c.id, c]));
+
+        function topLevelAncestorId(comment) {
+          let current = comment;
+          const seen = new Set();
+          while (current.parentId && byId.has(current.parentId) && !seen.has(current.id)) {
+            seen.add(current.id);
+            current = byId.get(current.parentId);
+          }
+          return current.id;
+        }
+
+        const topLevel = allComments.filter((comment) => !comment.parentId);
+        const repliesByTopLevel = new Map();
+        allComments.forEach((comment) => {
+          if (!comment.parentId) return;
+          const topId = topLevelAncestorId(comment);
+          if (topId === comment.id) return;
+          if (!repliesByTopLevel.has(topId)) repliesByTopLevel.set(topId, []);
+          repliesByTopLevel.get(topId).push(comment);
+        });
+
+        topLevel.forEach((comment) => {
+          commentsList.append(buildCommentRow(comment));
+
+          const replies = repliesByTopLevel.get(comment.id);
+          if (replies && replies.length) {
+            const repliesWrap = document.createElement("div");
+            repliesWrap.className = "comment-replies";
+            replies.forEach((reply) => {
+              const parent = byId.get(reply.parentId);
+              const replyingToName = parent && parent.id !== comment.id
+                ? (parent.authorName || "Someone")
+                : null;
+              repliesWrap.append(buildCommentRow(reply, replyingToName));
+            });
+            commentsList.append(repliesWrap);
+          }
+        });
+      } catch (error) {
+        console.error(error);
+        commentsList.innerHTML = "";
+        const errorNote = document.createElement("p");
+        errorNote.className = "comments-note";
+        errorNote.textContent = "Could not load comments.";
+        commentsList.append(errorNote);
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      currentUserDoc = null;
+
+      if (user) {
+        try {
+          const userSnap = await getDoc(doc(db, "users", user.uid));
+          if (userSnap.exists()) currentUserDoc = userSnap.data();
+        } catch (error) {
+          console.error("Could not load current user profile:", error);
+        }
+      }
+
+      if (!commentsHeading.hidden) {
+        buildCommentForm();
+        await renderComments();
+      }
+
+      await saveReadingProgress();
+    });
+
+    load();
+  </script>
+</body>
+</html>
