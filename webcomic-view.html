@@ -852,7 +852,7 @@
               // ones, same as an in-progress chapter with nothing posted yet.
               const pages = snap.docs
                 .map((d) => ({ id: d.id, ...d.data() }))
-                .filter((p) => p.status === "published");
+                .filter((p) => p.status !== "draft");
               pages.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
               metaEl.textContent = `${pages.length} page${pages.length === 1 ? "" : "s"}`;
