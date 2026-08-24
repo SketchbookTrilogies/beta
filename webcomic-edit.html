@@ -867,6 +867,16 @@
       </div>
     </section>
 
+    <section class="panel" id="advertise-panel" hidden>
+      <h2>Advertise</h2>
+      <p class="field-help">Ink-funded ads are shown above the browse listing on the homepage. 100 ink buys one, and it runs for 3 days.</p>
+      <p id="advertise-status"></p>
+      <div class="composer-row">
+        <button type="button" class="primary" id="buy-ad-button">buy an ad (100 ink)</button>
+        <p class="composer-status" id="advertise-action-status" aria-live="polite"></p>
+      </div>
+    </section>
+
     <form class="panel" id="details-panel" hidden>
       <h2>Edit details</h2>
       <label>
@@ -1086,6 +1096,11 @@
     const statusBadge = document.querySelector("#status-badge");
     const formatBadge = document.querySelector("#format-badge");
 
+    const advertisePanel = document.querySelector("#advertise-panel");
+    const advertiseStatus = document.querySelector("#advertise-status");
+    const advertiseActionStatus = document.querySelector("#advertise-action-status");
+    const buyAdButton = document.querySelector("#buy-ad-button");
+
     const stateBox = document.querySelector("#state-box");
     const lockBanner = document.querySelector("#lock-banner");
 
@@ -1163,6 +1178,10 @@
     let currentUser = null;
     let comic = null;
     let isOwner = false;
+    let currentUserInk = 0;
+
+    const AD_COST = 100;
+    const AD_DURATION_MS = 3 * 24 * 60 * 60 * 1000; // 3 days
     let chapters = [];
     let currentChapter = null;
     let pages = [];
@@ -1949,7 +1968,7 @@
         const row = document.createElement("article");
         row.className = "page-row";
 
-        const isPagePublished = pageDoc.status === "published";
+        const isPagePublished = pageDoc.status !== "draft";
 
         const numberEl = document.createElement("p");
         numberEl.className = "page-number";
@@ -2152,7 +2171,7 @@
     }
 
     async function deletePage(pageDoc) {
-      const isPublished = pageDoc.status === "published";
+      const isPublished = pageDoc.status !== "draft";
       if (isPublished && comic.status === "published" && (comic.pageCount || 0) <= 1) {
         await showAppAlert("This is the only published page keeping this webcomic published. Add/publish another page first, or unpublish it from your dashboard before deleting this one.");
         return;
@@ -2175,7 +2194,7 @@
     // pages, so this is the only thing (besides deleting a published page)
     // that changes it.
     async function togglePagePublish(pageDoc) {
-      const isPublished = pageDoc.status === "published";
+      const isPublished = pageDoc.status !== "draft";
       if (isPublished && comic.status === "published" && (comic.pageCount || 0) <= 1) {
         await showAppAlert("This is the only published page keeping this webcomic published. Publish another page first, or unpublish the whole webcomic from your dashboard before unpublishing this one.");
         return;
@@ -2218,6 +2237,21 @@
 
         hideState();
         renderHeader();
+
+        if (isOwner) {
+          advertisePanel.hidden = false;
+          try {
+            const userSnap = await getDoc(doc(db, "users", currentUser.uid));
+            currentUserInk = userSnap.exists() ? (userSnap.data().inkBalance ?? 0) : 0;
+          } catch (error) {
+            console.error("Could not load your ink balance:", error);
+            currentUserInk = 0;
+          }
+          renderAdvertise();
+        } else {
+          advertisePanel.hidden = true;
+        }
+
         showChaptersView();
         await loadChapters();
       } catch (error) {
@@ -2225,6 +2259,93 @@
         showState("Could not load that webcomic. Please try again.", "error");
       }
     }
+
+    // A webcomic's ad is "active" while adActiveUntil is still in the
+    // future — hasActiveAd is a denormalized flag kept in step with it so
+    // the homepage can query for active ads with a plain equality filter
+    // (no composite index needed), same pattern as status elsewhere in this
+    // app. If it's stale (the ad expired but nobody's cleared the flag
+    // yet), this is also where that gets noticed and cleaned up.
+    function adIsActive() {
+      return Boolean(comic.hasActiveAd && comic.adActiveUntil && comic.adActiveUntil > Date.now());
+    }
+
+    function renderAdvertise() {
+      advertiseActionStatus.textContent = "";
+
+      if (comic.hasActiveAd && comic.adActiveUntil && comic.adActiveUntil <= Date.now()) {
+        // Expired — clear the stale flag so it stops matching the
+        // homepage's active-ads query. Best-effort; doesn't block the UI.
+        updateDoc(doc(db, "webcomics", comicId), { hasActiveAd: false }).catch((error) => {
+          console.error("Could not clear expired ad flag:", error);
+        });
+        comic.hasActiveAd = false;
+      }
+
+      if (adIsActive()) {
+        const daysLeft = Math.max(1, Math.ceil((comic.adActiveUntil - Date.now()) / (24 * 60 * 60 * 1000)));
+        advertiseStatus.textContent = `Currently advertising \u2014 ${daysLeft} day${daysLeft === 1 ? "" : "s"} left. You have ${currentUserInk} ink.`;
+        buyAdButton.disabled = true;
+        buyAdButton.textContent = "already advertising";
+      } else if (currentUserInk < AD_COST) {
+        advertiseStatus.textContent = `Not currently advertising. You have ${currentUserInk} ink \u2014 you need ${AD_COST} to buy an ad.`;
+        buyAdButton.disabled = true;
+        buyAdButton.textContent = `buy an ad (${AD_COST} ink)`;
+      } else {
+        advertiseStatus.textContent = `Not currently advertising. You have ${currentUserInk} ink.`;
+        buyAdButton.disabled = false;
+        buyAdButton.textContent = `buy an ad (${AD_COST} ink)`;
+      }
+    }
+
+    buyAdButton.addEventListener("click", async () => {
+      if (!isOwner || adIsActive() || currentUserInk < AD_COST) return;
+
+      buyAdButton.disabled = true;
+      advertiseActionStatus.className = "composer-status";
+      advertiseActionStatus.textContent = "buying ad...";
+
+      // Firestore Lite doesn't support transactions, so this is two
+      // separate writes rather than one atomic one — same best-effort
+      // pattern this app already uses elsewhere (e.g. pageCount bumps
+      // after a page write). Spend the ink first; only activate the ad if
+      // that succeeds, and try to refund if activating it doesn't.
+      const newBalance = currentUserInk - AD_COST;
+      try {
+        await updateDoc(doc(db, "users", currentUser.uid), { inkBalance: newBalance });
+        currentUserInk = newBalance;
+      } catch (error) {
+        console.error("Could not charge ink for this ad:", error);
+        advertiseActionStatus.className = "composer-status error";
+        advertiseActionStatus.textContent = "Could not charge ink for this ad. Please try again.";
+        buyAdButton.disabled = false;
+        return;
+      }
+
+      const adActiveUntil = Date.now() + AD_DURATION_MS;
+      try {
+        await updateDoc(doc(db, "webcomics", comicId), {
+          hasActiveAd: true,
+          adActiveUntil,
+          updatedAt: serverTimestamp(),
+        });
+        comic.hasActiveAd = true;
+        comic.adActiveUntil = adActiveUntil;
+        advertiseActionStatus.textContent = "Ad is live!";
+        renderAdvertise();
+      } catch (error) {
+        console.error("Could not activate this ad:", error);
+        try {
+          await updateDoc(doc(db, "users", currentUser.uid), { inkBalance: currentUserInk + AD_COST });
+          currentUserInk += AD_COST;
+        } catch (refundError) {
+          console.error("Could not refund ink after a failed ad purchase:", refundError);
+        }
+        advertiseActionStatus.className = "composer-status error";
+        advertiseActionStatus.textContent = "Could not activate the ad. Your ink was not spent.";
+        renderAdvertise();
+      }
+    });
 
     onAuthStateChanged(auth, async (user) => {
       currentUser = user;
