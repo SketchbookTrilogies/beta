@@ -749,19 +749,55 @@
         return subtitle ? `Epilogue: ${subtitle}` : "Epilogue";
       }
       const prefix = (comic.chapterPrefix || "Chapter").trim() || "Chapter";
+      if (chapter.chapterType === "unlisted") {
+        const customNumber = (chapter.customNumber || "").trim();
+        if (!customNumber) return subtitle ? `Unlisted: ${subtitle}` : "Unlisted chapter";
+        return subtitle ? `${prefix} ${customNumber}: ${subtitle}` : `${prefix} ${customNumber}`;
+      }
       return subtitle ? `${prefix} ${position}: ${subtitle}` : `${prefix} ${position}`;
     }
 
-    // Prologues/epilogues sit outside normal chapter numbering — they never
-    // take up a number, so a regular "Chapter 1" is still Chapter 1 even
-    // with a prologue in front of it. Returns an array the same length as
-    // `chapters`, each entry being the regular chapter number (or null).
+    // Prologues/epilogues/unlisted chapters sit outside normal chapter
+    // numbering — they never take up a number, so a regular "Chapter 1" is
+    // still Chapter 1 even with a prologue (or an unlisted bonus chapter) in
+    // front of it. Returns an array the same length as `chapters`, each
+    // entry being the regular chapter number (or null).
     function computeChapterPositions(chapters) {
       let count = 0;
       return chapters.map((chapter) => {
-        if (chapter.chapterType === "prologue" || chapter.chapterType === "epilogue") {
+        if (chapter.chapterType === "prologue" || chapter.chapterType === "epilogue" || chapter.chapterType === "unlisted") {
           return null;
         }
+        count += 1;
+        return count;
+      });
+    }
+
+    // Same "unlisted" pattern one level down, for individual pages within a
+    // chapter — see the matching helper in webcomic-edit.html / page-read.html.
+    function pageLabel(position, page) {
+      if (page.pageType === "unlisted") {
+        const customNumber = (page.customNumber || "").trim();
+        return customNumber ? `page ${customNumber}` : "unlisted page";
+      }
+      return `page ${position}`;
+    }
+
+    // Prologues always sit at the very top of the chapter list, epilogues
+    // always at the very bottom — see the matching helper in
+    // webcomic-edit.html for why (at most one of each can exist).
+    function sortChapters(chapters) {
+      const byOrder = (a, b) => (a.order ?? 0) - (b.order ?? 0);
+      const prologues = chapters.filter((c) => c.chapterType === "prologue").sort(byOrder);
+      const epilogues = chapters.filter((c) => c.chapterType === "epilogue").sort(byOrder);
+      const rest = chapters.filter((c) => c.chapterType !== "prologue" && c.chapterType !== "epilogue").sort(byOrder);
+      return [...prologues, ...rest, ...epilogues];
+    }
+
+    function computePagePositions(pages) {
+      let count = 0;
+      return pages.map((page) => {
+        if (page.pageType === "unlisted") return null;
         count += 1;
         return count;
       });
@@ -781,8 +817,7 @@
         }
 
         const snapshot = await getDocs(collection(db, "webcomics", comicId, "chapters"));
-        const chapters = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-        chapters.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        const chapters = sortChapters(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
 
         chaptersCount.textContent = `(${chapters.length})`;
         chaptersEmpty.hidden = chapters.length > 0;
@@ -811,7 +846,13 @@
 
           getDocs(collection(db, "webcomics", comicId, "chapters", chapter.id, "pages"))
             .then((snap) => {
-              const pages = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+              // Pages start as drafts and stay invisible to everyone but
+              // their author until explicitly published (see page-edit.html
+              // / webcomic-edit.html) — readers here only ever see published
+              // ones, same as an in-progress chapter with nothing posted yet.
+              const pages = snap.docs
+                .map((d) => ({ id: d.id, ...d.data() }))
+                .filter((p) => p.status === "published");
               pages.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
               metaEl.textContent = `${pages.length} page${pages.length === 1 ? "" : "s"}`;
@@ -824,10 +865,12 @@
                 return;
               }
 
+              const pagePositions = computePagePositions(pages);
+
               pages.forEach((pageDoc, pageIndex) => {
                 const link = document.createElement("a");
                 link.href = `page-read.html?id=${encodeURIComponent(comicId)}&chapter=${encodeURIComponent(chapter.id)}&page=${encodeURIComponent(pageDoc.id)}`;
-                link.textContent = `page ${pageIndex + 1}`;
+                link.textContent = pageLabel(pagePositions[pageIndex], pageDoc);
 
                 const isHere = readingProgress
                   && readingProgress.chapterId === chapter.id
