@@ -135,6 +135,27 @@
       text-transform: none;
     }
 
+    .status-badge {
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 2px 6px;
+      border: 2px solid #090a0d;
+      font-family: "Courier New", monospace;
+    }
+
+    .status-badge.published {
+      background: #7bab6e;
+    }
+
+    .status-badge.draft {
+      background: #c9c07a;
+    }
+
+    #publish-page-button.unpublish {
+      background: #c9c07a;
+    }
+
     .state-box {
       margin-top: 14px;
       border: 4px solid #5f687d;
@@ -1045,6 +1066,7 @@
     <p class="subtitle" id="page-subtitle" hidden>
       <span id="chapter-line"></span>
       <span class="format-tag" id="format-badge"></span>
+      <span class="status-badge" id="page-status-badge" hidden></span>
     </p>
 
     <section class="state-box" id="state-box" hidden></section>
@@ -1158,9 +1180,11 @@
 
       <div class="composer-row">
         <button type="button" class="delete-button" id="delete-page-button" hidden>delete this page</button>
+        <button type="button" id="publish-page-button" hidden>publish</button>
         <button type="button" class="primary" id="save-page-button">save page</button>
         <p class="composer-status" id="save-status" aria-live="polite"></p>
       </div>
+      <p class="field-help" id="draft-note" hidden>New pages start as drafts — only you can see them until you hit "publish".</p>
     </div>
   </main>
 
@@ -1464,6 +1488,9 @@
     const panelAddStatus = document.querySelector("#panel-add-status");
     const deletePageButton = document.querySelector("#delete-page-button");
     const savePageButton = document.querySelector("#save-page-button");
+    const publishPageButton = document.querySelector("#publish-page-button");
+    const pageStatusBadge = document.querySelector("#page-status-badge");
+    const draftNote = document.querySelector("#draft-note");
     const saveStatus = document.querySelector("#save-status");
 
     function showState(message, kind = "") {
@@ -2430,6 +2457,7 @@
     let currentUser = null;
     let comic = null;
     let chapter = null;
+    let currentPage = null; // the page doc being edited, incl. its status ("draft"/"published"); null when adding a new page
     let panels = [];
 
     backToEditorLink.href = comicId ? `webcomic-edit.html?id=${encodeURIComponent(comicId)}` : "webcomic-edit.html";
@@ -2439,6 +2467,56 @@
       await updateDoc(doc(db, "webcomics", comicId), { pageCount: newCount, updatedAt: serverTimestamp() });
       comic.pageCount = newCount;
     }
+
+    // pageCount (which gates whether the whole webcomic can be published —
+    // see canBePublished() in firestore.rules) only ever counts PUBLISHED
+    // pages, never drafts. New pages are created as drafts, so creation no
+    // longer bumps pageCount — only publishing/unpublishing does.
+    function updateStatusUi() {
+      if (!pageId || !currentPage) {
+        // Adding a brand-new page: nothing to toggle yet, just a heads-up
+        // that it'll land as a draft once saved.
+        pageStatusBadge.hidden = true;
+        publishPageButton.hidden = true;
+        draftNote.hidden = false;
+        return;
+      }
+      draftNote.hidden = true;
+      const isPublished = currentPage.status === "published";
+      pageStatusBadge.hidden = false;
+      pageStatusBadge.className = `status-badge ${isPublished ? "published" : "draft"}`;
+      pageStatusBadge.textContent = isPublished ? "published" : "draft";
+      publishPageButton.hidden = false;
+      publishPageButton.className = isPublished ? "unpublish" : "";
+      publishPageButton.textContent = isPublished ? "unpublish" : "publish";
+    }
+
+    publishPageButton.addEventListener("click", async () => {
+      if (!pageId || !currentPage) return;
+      const isPublished = currentPage.status === "published";
+
+      if (isPublished && comic.status === "published" && (comic.pageCount || 0) <= 1) {
+        await showAppAlert("This is the only published page keeping this webcomic published. Publish another page first, or unpublish the whole webcomic from your dashboard before unpublishing this one.");
+        return;
+      }
+
+      publishPageButton.disabled = true;
+      const newStatus = isPublished ? "draft" : "published";
+      try {
+        await updateDoc(doc(db, "webcomics", comicId, "chapters", chapterId, "pages", pageId), {
+          status: newStatus,
+          updatedAt: serverTimestamp(),
+        });
+        await bumpPageCount(isPublished ? -1 : 1);
+        currentPage.status = newStatus;
+        updateStatusUi();
+      } catch (error) {
+        console.error("Could not change this page's publish status:", error);
+        await showAppAlert("Could not change this page's publish status. Please try again.");
+      } finally {
+        publishPageButton.disabled = false;
+      }
+    });
 
     function renderPanelList() {
       panelList.innerHTML = "";
@@ -2546,14 +2624,17 @@
             updatedAt: serverTimestamp(),
           });
         } else {
+          // New pages start as drafts — they don't count toward pageCount
+          // (and so can't be what makes a webcomic publishable) until the
+          // author explicitly publishes them.
           await addDoc(collection(db, "webcomics", comicId, "chapters", chapterId, "pages"), {
             ...fields,
+            status: "draft",
             order: Date.now(),
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
           });
           await updateDoc(doc(db, "webcomics", comicId, "chapters", chapterId), { updatedAt: serverTimestamp() });
-          await bumpPageCount(1);
         }
 
         hasUnsavedChanges = false;
@@ -2567,8 +2648,9 @@
     });
 
     deletePageButton.addEventListener("click", async () => {
-      if (comic.status === "published" && (comic.pageCount || 0) <= 1) {
-        await showAppAlert("This is the only page keeping this webcomic published. Add another page first, or unpublish it from your dashboard before deleting this one.");
+      const isPublished = currentPage?.status === "published";
+      if (isPublished && comic.status === "published" && (comic.pageCount || 0) <= 1) {
+        await showAppAlert("This is the only published page keeping this webcomic published. Add/publish another page first, or unpublish it from your dashboard before deleting this one.");
         return;
       }
       const confirmed = await showAppConfirm("Delete this page? This can't be undone.", "delete");
@@ -2577,7 +2659,7 @@
       deletePageButton.disabled = true;
       try {
         await deleteDoc(doc(db, "webcomics", comicId, "chapters", chapterId, "pages", pageId));
-        await bumpPageCount(-1);
+        if (isPublished) await bumpPageCount(-1);
         hasUnsavedChanges = false;
         window.location.href = `webcomic-edit.html?id=${encodeURIComponent(comicId)}`;
       } catch (error) {
@@ -2625,6 +2707,8 @@
           }
           pageDoc = { id: pageSnap.id, ...pageSnap.data() };
         }
+        currentPage = pageDoc;
+        updateStatusUi();
 
         pageTitle.textContent = pageId ? "Edit Page" : "Add A New Page";
         document.title = `${pageId ? "Edit Page" : "Add A New Page"} \u2014 ${comic.title || "Untitled"} - Sketchbook Trilogies`;
