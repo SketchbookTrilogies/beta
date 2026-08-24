@@ -852,7 +852,7 @@
       // an unpublished page.
       const list = snap.docs
         .map((d) => ({ id: d.id, ...d.data() }))
-        .filter((p) => p.status === "published");
+        .filter((p) => p.status !== "draft");
       list.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
       return list;
     }
