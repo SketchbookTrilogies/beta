@@ -936,7 +936,13 @@
             <option value="">regular chapter</option>
             <option value="prologue">prologue</option>
             <option value="epilogue">epilogue</option>
+            <option value="unlisted">unlisted (custom number)</option>
           </select>
+        </label>
+        <label id="new-chapter-number-row" hidden>
+          custom number
+          <input type="text" id="new-chapter-number" maxlength="12" placeholder="e.g. 3.5">
+          <span class="field-help">Shown as &ldquo;<span id="new-chapter-prefix-preview">Chapter</span> 3.5&rdquo; and skips the normal 1, 2, 3&hellip; sequence — later chapters keep their numbers.</span>
         </label>
         <label>
           subtitle (optional)
@@ -1129,6 +1135,9 @@
     const prefixStatus = document.querySelector("#prefix-status");
     const addChapterPanel = document.querySelector("#add-chapter-panel");
     const newChapterType = document.querySelector("#new-chapter-type");
+    const newChapterNumberRow = document.querySelector("#new-chapter-number-row");
+    const newChapterNumber = document.querySelector("#new-chapter-number");
+    const newChapterPrefixPreview = document.querySelector("#new-chapter-prefix-preview");
     const newChapterSubtitle = document.querySelector("#new-chapter-subtitle");
     const addChapterPreview = document.querySelector("#add-chapter-preview");
     const addChapterButton = document.querySelector("#add-chapter-button");
@@ -1426,18 +1435,29 @@
         return subtitle ? `Epilogue: ${subtitle}` : "Epilogue";
       }
       const prefix = getChapterPrefix();
+      // Unlisted chapters skip the automatic 1, 2, 3... sequence entirely —
+      // the author types in whatever number/label they want (e.g. "3.5" for
+      // a bonus chapter slotted between 3 and 4) instead of it being computed
+      // from position, so a bonus chapter never bumps every later chapter's
+      // number.
+      if (chapter.chapterType === "unlisted") {
+        const customNumber = (chapter.customNumber ?? "").trim();
+        if (!customNumber) return subtitle ? `Unlisted: ${subtitle}` : "Unlisted chapter";
+        return subtitle ? `${prefix} ${customNumber}: ${subtitle}` : `${prefix} ${customNumber}`;
+      }
       return subtitle ? `${prefix} ${position}: ${subtitle}` : `${prefix} ${position}`;
     }
 
-    // Prologues/epilogues sit outside normal chapter numbering — they never
-    // take up a number, and regular chapters count only each other, so
-    // "Chapter 1" is still Chapter 1 even with a prologue in front of it.
-    // Returns an array the same length/order as `chapters`, where each
-    // entry is the regular chapter number (or null for a prologue/epilogue).
+    // Prologues/epilogues/unlisted chapters sit outside normal chapter
+    // numbering — they never take up a number, and regular chapters count
+    // only each other, so "Chapter 1" is still Chapter 1 even with a
+    // prologue (or an unlisted bonus chapter) in front of it. Returns an
+    // array the same length/order as `chapters`, where each entry is the
+    // regular chapter number (or null for a prologue/epilogue/unlisted one).
     function computeChapterPositions(chapters) {
       let count = 0;
       return chapters.map((chapter) => {
-        if (chapter.chapterType === "prologue" || chapter.chapterType === "epilogue") {
+        if (chapter.chapterType === "prologue" || chapter.chapterType === "epilogue" || chapter.chapterType === "unlisted") {
           return null;
         }
         count += 1;
@@ -1489,19 +1509,38 @@
       }
     });
 
+    // A webcomic can only have one prologue and one epilogue at a time —
+    // there's only ever one "beginning" and one "end". Regular chapters and
+    // unlisted chapters have no such limit.
+    function chapterTypeTaken(type, excludeId = null) {
+      return chapters.some((c) => c.chapterType === type && c.id !== excludeId);
+    }
+
+    function syncChapterTypeOptions(selectEl, excludeId = null) {
+      const prologueOption = selectEl.querySelector('option[value="prologue"]');
+      const epilogueOption = selectEl.querySelector('option[value="epilogue"]');
+      if (prologueOption) prologueOption.disabled = chapterTypeTaken("prologue", excludeId);
+      if (epilogueOption) epilogueOption.disabled = chapterTypeTaken("epilogue", excludeId);
+    }
+
     function updateAddChapterPreview() {
       const chapterType = newChapterType.value;
       const subtitle = newChapterSubtitle.value.trim();
+      newChapterNumberRow.hidden = chapterType !== "unlisted";
+      newChapterPrefixPreview.textContent = getChapterPrefix();
+      syncChapterTypeOptions(newChapterType);
       if (chapterType) {
-        addChapterPreview.textContent = `will be added as: ${chapterLabel(null, { subtitle, chapterType })}`;
+        const customNumber = newChapterNumber.value.trim();
+        addChapterPreview.textContent = `will be added as: ${chapterLabel(null, { subtitle, chapterType, customNumber })}`;
         return;
       }
-      const regularCount = chapters.filter((c) => c.chapterType !== "prologue" && c.chapterType !== "epilogue").length;
+      const regularCount = chapters.filter((c) => c.chapterType !== "prologue" && c.chapterType !== "epilogue" && c.chapterType !== "unlisted").length;
       addChapterPreview.textContent = `will be added as: ${chapterLabel(regularCount + 1, { subtitle })}`;
     }
 
     newChapterType.addEventListener("change", updateAddChapterPreview);
     newChapterSubtitle.addEventListener("input", updateAddChapterPreview);
+    newChapterNumber.addEventListener("input", updateAddChapterPreview);
 
     function showChaptersView() {
       currentChapter = null;
@@ -1514,11 +1553,23 @@
       pagesView.hidden = false;
     }
 
+    // Prologues always sit at the very top of the chapter list, epilogues
+    // always at the very bottom — regardless of their `order` value or when
+    // they were created — since a webcomic only ever has at most one of
+    // each (see the one-prologue/one-epilogue limit above). Everything else
+    // sorts by `order` in between, same as always.
+    function sortChapters(chapters) {
+      const byOrder = (a, b) => (a.order ?? 0) - (b.order ?? 0);
+      const prologues = chapters.filter((c) => c.chapterType === "prologue").sort(byOrder);
+      const epilogues = chapters.filter((c) => c.chapterType === "epilogue").sort(byOrder);
+      const rest = chapters.filter((c) => c.chapterType !== "prologue" && c.chapterType !== "epilogue").sort(byOrder);
+      return [...prologues, ...rest, ...epilogues];
+    }
+
     async function loadChapters() {
       try {
         const snapshot = await getDocs(collection(db, "webcomics", comicId, "chapters"));
-        chapters = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-        chapters.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        chapters = sortChapters(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
         renderChapterPrefixUI();
         renderChapters();
       } catch (error) {
@@ -1536,6 +1587,13 @@
       updateAddChapterPreview();
 
       const positions = computeChapterPositions(chapters);
+      // Prologue (if any) is pinned at index 0, epilogue (if any) is pinned
+      // at the last index — up/down reordering must stay within the band
+      // between them, and never let a middle chapter swap into a pinned slot.
+      const hasPrologue = chapters.some((c) => c.chapterType === "prologue");
+      const hasEpilogue = chapters.some((c) => c.chapterType === "epilogue");
+      const bandStart = hasPrologue ? 1 : 0;
+      const bandEnd = chapters.length - 1 - (hasEpilogue ? 1 : 0);
 
       chapters.forEach((chapter, index) => {
         const wrap = document.createElement("div");
@@ -1570,16 +1628,20 @@
           const actions = document.createElement("div");
           actions.className = "chapter-actions";
 
+          const isPinned = chapter.chapterType === "prologue" || chapter.chapterType === "epilogue";
+
           const upButton = document.createElement("button");
           upButton.type = "button";
           upButton.textContent = "\u2191";
-          upButton.disabled = index === 0;
+          upButton.disabled = isPinned || index === bandStart;
+          upButton.title = isPinned ? "Prologues/epilogues always stay at the top/bottom" : "";
           upButton.addEventListener("click", () => moveChapter(index, -1));
 
           const downButton = document.createElement("button");
           downButton.type = "button";
           downButton.textContent = "\u2193";
-          downButton.disabled = index === chapters.length - 1;
+          downButton.disabled = isPinned || index === bandEnd;
+          downButton.title = isPinned ? "Prologues/epilogues always stay at the top/bottom" : "";
           downButton.addEventListener("click", () => moveChapter(index, 1));
 
           const renameButton = document.createElement("button");
@@ -1609,9 +1671,24 @@
             <option value="">regular chapter</option>
             <option value="prologue">prologue</option>
             <option value="epilogue">epilogue</option>
+            <option value="unlisted">unlisted (custom number)</option>
           `;
           renameTypeSelect.value = chapter.chapterType || "";
+          syncChapterTypeOptions(renameTypeSelect, chapter.id);
           renameTypeLabel.append(renameTypeSelect);
+
+          const renameNumberLabel = document.createElement("label");
+          renameNumberLabel.textContent = "custom number";
+          renameNumberLabel.hidden = chapter.chapterType !== "unlisted";
+          const renameNumberInput = document.createElement("input");
+          renameNumberInput.type = "text";
+          renameNumberInput.maxLength = 12;
+          renameNumberInput.placeholder = "e.g. 3.5";
+          renameNumberInput.value = chapter.customNumber ?? "";
+          const renameNumberHelp = document.createElement("span");
+          renameNumberHelp.className = "field-help";
+          renameNumberHelp.textContent = "Skips the normal 1, 2, 3\u2026 sequence — later chapters keep their numbers.";
+          renameNumberLabel.append(renameNumberInput, renameNumberHelp);
 
           const renameLabel = document.createElement("label");
           renameLabel.textContent = "subtitle (optional)";
@@ -1624,13 +1701,19 @@
           renamePreview.className = "add-chapter-preview";
           const updateRenamePreview = () => {
             const typeValue = renameTypeSelect.value;
-            const previewChapter = { subtitle: renameInput.value.trim(), chapterType: typeValue || null };
+            renameNumberLabel.hidden = typeValue !== "unlisted";
+            const previewChapter = {
+              subtitle: renameInput.value.trim(),
+              chapterType: typeValue || null,
+              customNumber: renameNumberInput.value.trim(),
+            };
             const previewPosition = typeValue ? null : positions[index];
             renamePreview.textContent = `will show as: ${chapterLabel(previewPosition, previewChapter)}`;
           };
           updateRenamePreview();
           renameInput.addEventListener("input", updateRenamePreview);
           renameTypeSelect.addEventListener("change", updateRenamePreview);
+          renameNumberInput.addEventListener("input", updateRenamePreview);
           const renameRow = document.createElement("div");
           renameRow.className = "composer-row";
           const renameSaveButton = document.createElement("button");
@@ -1646,11 +1729,28 @@
 
           renameSaveButton.addEventListener("click", async () => {
             const value = renameInput.value.trim();
+            const typeValue = renameTypeSelect.value || null;
+            const customNumberValue = renameNumberInput.value.trim();
+
+            if (typeValue === "unlisted" && !customNumberValue) {
+              renameStatus.className = "composer-status error";
+              renameStatus.textContent = "Give the unlisted chapter a custom number first.";
+              renameNumberInput.focus();
+              return;
+            }
+
+            if ((typeValue === "prologue" || typeValue === "epilogue") && chapterTypeTaken(typeValue, chapter.id)) {
+              renameStatus.className = "composer-status error";
+              renameStatus.textContent = `This webcomic already has a ${typeValue}. Edit the existing one instead.`;
+              return;
+            }
+
             renameSaveButton.disabled = true;
             try {
               await updateDoc(doc(db, "webcomics", comicId, "chapters", chapter.id), {
                 subtitle: value,
-                chapterType: renameTypeSelect.value || null,
+                chapterType: typeValue,
+                customNumber: typeValue === "unlisted" ? customNumberValue : null,
                 updatedAt: serverTimestamp(),
               });
               await loadChapters();
@@ -1666,7 +1766,7 @@
             renamePanel.hidden = true;
           });
 
-          renamePanel.append(renameTypeLabel, renameLabel, renamePreview, renameRow);
+          renamePanel.append(renameTypeLabel, renameNumberLabel, renameLabel, renamePreview, renameRow);
         }
 
         wrap.append(row);
@@ -1676,9 +1776,20 @@
     }
 
     async function moveChapter(index, direction) {
-      const neighborIndex = index + direction;
-      if (neighborIndex < 0 || neighborIndex >= chapters.length) return;
       const a = chapters[index];
+      // Prologue/epilogue rows are pinned (see sortChapters) and their
+      // up/down buttons are disabled, but guard here too in case this ever
+      // gets called some other way.
+      if (a.chapterType === "prologue" || a.chapterType === "epilogue") return;
+
+      const hasPrologue = chapters.some((c) => c.chapterType === "prologue");
+      const hasEpilogue = chapters.some((c) => c.chapterType === "epilogue");
+      const bandStart = hasPrologue ? 1 : 0;
+      const bandEnd = chapters.length - 1 - (hasEpilogue ? 1 : 0);
+
+      const neighborIndex = index + direction;
+      if (neighborIndex < bandStart || neighborIndex > bandEnd) return;
+
       const b = chapters[neighborIndex];
       const aOrder = a.order ?? 0;
       const bOrder = b.order ?? 0;
@@ -1724,6 +1835,21 @@
       if (!isOwner) return;
       const subtitle = newChapterSubtitle.value.trim();
       const chapterType = newChapterType.value || null;
+      const customNumber = chapterType === "unlisted" ? newChapterNumber.value.trim() : "";
+
+      if (chapterType === "unlisted" && !customNumber) {
+        addChapterStatus.className = "composer-status error";
+        addChapterStatus.textContent = "Give the unlisted chapter a custom number first.";
+        newChapterNumber.focus();
+        return;
+      }
+
+      if ((chapterType === "prologue" || chapterType === "epilogue") && chapterTypeTaken(chapterType)) {
+        addChapterStatus.className = "composer-status error";
+        addChapterStatus.textContent = `This webcomic already has a ${chapterType}. Edit the existing one instead of adding another.`;
+        return;
+      }
+
       addChapterButton.disabled = true;
       addChapterStatus.className = "composer-status";
       addChapterStatus.textContent = "adding...";
@@ -1731,12 +1857,15 @@
         await addDoc(collection(db, "webcomics", comicId, "chapters"), {
           subtitle,
           chapterType,
+          customNumber: chapterType === "unlisted" ? customNumber : null,
           order: Date.now(),
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         });
         newChapterSubtitle.value = "";
         newChapterType.value = "";
+        newChapterNumber.value = "";
+        newChapterNumberRow.hidden = true;
         addChapterStatus.className = "composer-status success";
         addChapterStatus.textContent = "chapter added.";
         await loadChapters();
@@ -1784,19 +1913,51 @@
       }
     }
 
+    function pageLabel(position, page) {
+      if (page.pageType === "unlisted") {
+        const customNumber = (page.customNumber ?? "").trim();
+        return customNumber ? `page ${customNumber}` : "unlisted page";
+      }
+      return `page ${position}`;
+    }
+
+    // Unlisted pages sit outside the normal 1, 2, 3... numbering — the
+    // author types in whatever number/label they want (e.g. a bonus page
+    // slotted between page 4 and page 5 as "4.5") instead of it being
+    // computed from position, so a bonus page never bumps every later
+    // page's number. Same pattern as chapters — see chapterLabel above.
+    function computePagePositions(pages) {
+      let count = 0;
+      return pages.map((page) => {
+        if (page.pageType === "unlisted") return null;
+        count += 1;
+        return count;
+      });
+    }
+
     function renderPages() {
       pagesList.innerHTML = "";
       pagesCount.textContent = `(${pages.length})`;
       pagesEmpty.hidden = pages.length > 0;
       const isTextImage = comic.format === "text_image";
+      const positions = computePagePositions(pages);
 
       pages.forEach((pageDoc, index) => {
+        const wrap = document.createElement("div");
+        wrap.className = "chapter-row-wrap";
+
         const row = document.createElement("article");
         row.className = "page-row";
 
+        const isPagePublished = pageDoc.status === "published";
+
         const numberEl = document.createElement("p");
         numberEl.className = "page-number";
-        numberEl.textContent = `page ${index + 1}`;
+        numberEl.textContent = pageLabel(positions[index], pageDoc) + " ";
+        const pageStatusBadge = document.createElement("span");
+        pageStatusBadge.className = `status-badge ${isPagePublished ? "published" : "draft"}`;
+        pageStatusBadge.textContent = isPagePublished ? "published" : "draft";
+        numberEl.append(pageStatusBadge);
         row.append(numberEl);
 
         if (isTextImage) {
@@ -1829,6 +1990,8 @@
           }
         }
 
+        let numberingPanel = null;
+
         if (isOwner) {
           const actions = document.createElement("div");
           actions.className = "page-actions";
@@ -1845,6 +2008,13 @@
           downButton.disabled = index === pages.length - 1;
           downButton.addEventListener("click", () => movePage(index, 1));
 
+          const numberingButton = document.createElement("button");
+          numberingButton.type = "button";
+          numberingButton.textContent = "numbering";
+          numberingButton.addEventListener("click", () => {
+            numberingPanel.hidden = !numberingPanel.hidden;
+          });
+
           const editButton = document.createElement("button");
           editButton.type = "button";
           editButton.textContent = "edit";
@@ -1852,17 +2022,110 @@
             window.location.href = `page-edit.html?id=${encodeURIComponent(comicId)}&chapter=${encodeURIComponent(currentChapter.id)}&page=${encodeURIComponent(pageDoc.id)}`;
           });
 
+          const publishButton = document.createElement("button");
+          publishButton.type = "button";
+          publishButton.textContent = isPagePublished ? "unpublish" : "publish";
+          publishButton.addEventListener("click", () => togglePagePublish(pageDoc));
+
           const deleteButton = document.createElement("button");
           deleteButton.type = "button";
           deleteButton.className = "delete-button";
           deleteButton.textContent = "delete";
           deleteButton.addEventListener("click", () => deletePage(pageDoc));
 
-          actions.append(upButton, downButton, editButton, deleteButton);
+          actions.append(upButton, downButton, numberingButton, editButton, publishButton, deleteButton);
           row.append(actions);
+
+          numberingPanel = document.createElement("div");
+          numberingPanel.className = "chapter-rename-panel";
+          numberingPanel.hidden = true;
+
+          const numberingTypeLabel = document.createElement("label");
+          numberingTypeLabel.textContent = "type";
+          const numberingTypeSelect = document.createElement("select");
+          numberingTypeSelect.innerHTML = `
+            <option value="">regular page</option>
+            <option value="unlisted">unlisted (custom number)</option>
+          `;
+          numberingTypeSelect.value = pageDoc.pageType || "";
+          numberingTypeLabel.append(numberingTypeSelect);
+
+          const numberingNumberLabel = document.createElement("label");
+          numberingNumberLabel.textContent = "custom number";
+          numberingNumberLabel.hidden = pageDoc.pageType !== "unlisted";
+          const numberingNumberInput = document.createElement("input");
+          numberingNumberInput.type = "text";
+          numberingNumberInput.maxLength = 12;
+          numberingNumberInput.placeholder = "e.g. 4.5";
+          numberingNumberInput.value = pageDoc.customNumber ?? "";
+          const numberingNumberHelp = document.createElement("span");
+          numberingNumberHelp.className = "field-help";
+          numberingNumberHelp.textContent = "Skips the normal 1, 2, 3\u2026 sequence — later pages keep their numbers.";
+          numberingNumberLabel.append(numberingNumberInput, numberingNumberHelp);
+
+          const numberingPreview = document.createElement("p");
+          numberingPreview.className = "add-chapter-preview";
+          const updateNumberingPreview = () => {
+            const typeValue = numberingTypeSelect.value;
+            numberingNumberLabel.hidden = typeValue !== "unlisted";
+            const previewPage = { pageType: typeValue || null, customNumber: numberingNumberInput.value.trim() };
+            const previewPosition = typeValue ? null : positions[index];
+            numberingPreview.textContent = `will show as: ${pageLabel(previewPosition, previewPage)}`;
+          };
+          updateNumberingPreview();
+          numberingTypeSelect.addEventListener("change", updateNumberingPreview);
+          numberingNumberInput.addEventListener("input", updateNumberingPreview);
+
+          const numberingRow = document.createElement("div");
+          numberingRow.className = "composer-row";
+          const numberingSaveButton = document.createElement("button");
+          numberingSaveButton.type = "button";
+          numberingSaveButton.className = "primary";
+          numberingSaveButton.textContent = "save";
+          const numberingCancelButton = document.createElement("button");
+          numberingCancelButton.type = "button";
+          numberingCancelButton.textContent = "cancel";
+          const numberingStatus = document.createElement("p");
+          numberingStatus.className = "composer-status";
+          numberingRow.append(numberingSaveButton, numberingCancelButton, numberingStatus);
+
+          numberingSaveButton.addEventListener("click", async () => {
+            const typeValue = numberingTypeSelect.value || null;
+            const customNumberValue = numberingNumberInput.value.trim();
+
+            if (typeValue === "unlisted" && !customNumberValue) {
+              numberingStatus.className = "composer-status error";
+              numberingStatus.textContent = "Give the unlisted page a custom number first.";
+              numberingNumberInput.focus();
+              return;
+            }
+
+            numberingSaveButton.disabled = true;
+            try {
+              await updateDoc(doc(db, "webcomics", comicId, "chapters", currentChapter.id, "pages", pageDoc.id), {
+                pageType: typeValue,
+                customNumber: typeValue === "unlisted" ? customNumberValue : null,
+                updatedAt: serverTimestamp(),
+              });
+              await loadPages();
+            } catch (error) {
+              console.error(error);
+              numberingStatus.className = "composer-status error";
+              numberingStatus.textContent = "Could not save that.";
+              numberingSaveButton.disabled = false;
+            }
+          });
+
+          numberingCancelButton.addEventListener("click", () => {
+            numberingPanel.hidden = true;
+          });
+
+          numberingPanel.append(numberingTypeLabel, numberingNumberLabel, numberingPreview, numberingRow);
         }
 
-        pagesList.append(row);
+        wrap.append(row);
+        if (numberingPanel) wrap.append(numberingPanel);
+        pagesList.append(wrap);
       });
     }
 
@@ -1889,19 +2152,45 @@
     }
 
     async function deletePage(pageDoc) {
-      if (comic.status === "published" && (comic.pageCount || 0) <= 1) {
-        await showAppAlert("This is the only page keeping this webcomic published. Add another page first, or unpublish it from your dashboard before deleting this one.");
+      const isPublished = pageDoc.status === "published";
+      if (isPublished && comic.status === "published" && (comic.pageCount || 0) <= 1) {
+        await showAppAlert("This is the only published page keeping this webcomic published. Add/publish another page first, or unpublish it from your dashboard before deleting this one.");
         return;
       }
       const confirmed = await showAppConfirm("Delete this page? This can't be undone.", "delete");
       if (!confirmed) return;
       try {
         await deleteDoc(doc(db, "webcomics", comicId, "chapters", currentChapter.id, "pages", pageDoc.id));
-        await bumpPageCount(-1);
+        if (isPublished) await bumpPageCount(-1);
         await loadPages();
       } catch (error) {
         console.error(error);
         await showAppAlert("Could not delete that page. Please try again.");
+      }
+    }
+
+    // Toggles a page between draft and published. pageCount (which gates
+    // whether the whole webcomic itself can be published — see
+    // canBePublished() in firestore.rules) only ever counts PUBLISHED
+    // pages, so this is the only thing (besides deleting a published page)
+    // that changes it.
+    async function togglePagePublish(pageDoc) {
+      const isPublished = pageDoc.status === "published";
+      if (isPublished && comic.status === "published" && (comic.pageCount || 0) <= 1) {
+        await showAppAlert("This is the only published page keeping this webcomic published. Publish another page first, or unpublish the whole webcomic from your dashboard before unpublishing this one.");
+        return;
+      }
+      const newStatus = isPublished ? "draft" : "published";
+      try {
+        await updateDoc(doc(db, "webcomics", comicId, "chapters", currentChapter.id, "pages", pageDoc.id), {
+          status: newStatus,
+          updatedAt: serverTimestamp(),
+        });
+        await bumpPageCount(isPublished ? -1 : 1);
+        await loadPages();
+      } catch (error) {
+        console.error(error);
+        await showAppAlert("Could not change that page's publish status. Please try again.");
       }
     }
 
