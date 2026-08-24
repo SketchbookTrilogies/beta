@@ -2482,7 +2482,7 @@
         return;
       }
       draftNote.hidden = true;
-      const isPublished = currentPage.status === "published";
+      const isPublished = currentPage.status !== "draft";
       pageStatusBadge.hidden = false;
       pageStatusBadge.className = `status-badge ${isPublished ? "published" : "draft"}`;
       pageStatusBadge.textContent = isPublished ? "published" : "draft";
@@ -2493,7 +2493,7 @@
 
     publishPageButton.addEventListener("click", async () => {
       if (!pageId || !currentPage) return;
-      const isPublished = currentPage.status === "published";
+      const isPublished = currentPage.status !== "draft";
 
       if (isPublished && comic.status === "published" && (comic.pageCount || 0) <= 1) {
         await showAppAlert("This is the only published page keeping this webcomic published. Publish another page first, or unpublish the whole webcomic from your dashboard before unpublishing this one.");
@@ -2648,7 +2648,7 @@
     });
 
     deletePageButton.addEventListener("click", async () => {
-      const isPublished = currentPage?.status === "published";
+      const isPublished = currentPage?.status !== "draft";
       if (isPublished && comic.status === "published" && (comic.pageCount || 0) <= 1) {
         await showAppAlert("This is the only published page keeping this webcomic published. Add/publish another page first, or unpublish it from your dashboard before deleting this one.");
         return;
